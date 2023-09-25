@@ -3,6 +3,8 @@
 
 class Player {
 public:
+	Player();
+
 	list<Territory> toDefend();
 
 	list<Territory> toAttack();

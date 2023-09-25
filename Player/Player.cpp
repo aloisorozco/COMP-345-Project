@@ -1,34 +1,31 @@
 #include "Player.h"
 
+#include "../Map/Map.h"
+#include "../Orders/Orders.h"
+#include "../Cards/Cards.h"
+
 using namespace std;
-
-class Territory {
-
-};
-
-class Card {
-
-};
-
-class Order {
-
-};
 
 class Player {
 private:
 
-	list<Territory> territoryList;
-	list<Card> cardList;
-	list<Order> orderList;
+	list<Territory> territoryCollection;
+	OrderList orderList;
+	Hand hand;
+	
 
 public:
 
-	list<Territory> toDefend() {
+	Player() {
 
 	}
 
-	list<Territory> toAttack() {
+	list<Territory> toDefend() {
+		return null;
+	}
 
+	list<Territory> toAttack() {
+		return null;
 	}
 
 	void issueOrder(Order order) {
