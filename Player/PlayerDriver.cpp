@@ -7,5 +7,5 @@ void testPlayers() {
 }
 
 int main() {
-
+	//All data members of user-defined class type must be of pointer type. 
 }

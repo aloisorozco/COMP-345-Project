@@ -4,18 +4,17 @@
 class OrderList {
 
 public:
-	OrderList() {
+	OrderList();
 
-	}
+	//can change this to reference or pointer parameter if you want
+	addOrder(Order order);
 
 };
 
 class Order {
 
 public:
-	Order() {
-
-	}
+	Order();
 
 };
 
