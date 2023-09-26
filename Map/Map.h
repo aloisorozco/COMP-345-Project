@@ -4,9 +4,7 @@
 class Territory {
 
 public:
-	Territory() {
-
-	}
+	Territory();
 
 };
 

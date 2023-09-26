@@ -4,18 +4,14 @@
 class Deck {
 
 public:
-	Deck() {
-
-	}
+	Deck();
 
 };
 
 class Hand {
 
 public:
-	Hand() {
-
-	}
+	Hand();
 
 };
 
