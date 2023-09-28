@@ -4,99 +4,177 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 
+#include <iostream>
+#include <string>
+
 using namespace std;
 
 // All classes must implement a correct copy constructor, assignment operator, and stream insertion operator
 // Memory leaks must be avoided 
 // Code must be documented using comments (user-defined classes, methods, free functions, operators)
 
+Player::Player() {
+	territoryArray = NULL;
+	sizeOfTerritoryArray = new int(0);
+	orderList = new OrderList();
+	hand = NULL;
+}
 
-//TODO: check if NULL works
-class Player {
+Player::Player(Territory* territoryArray, int* sizeOfTerritoryArray) {
+	this->territoryArray = territoryArray;
+	this->sizeOfTerritoryArray = new int(*sizeOfTerritoryArray);
+}
 
-private:
-	//TODO: territoryCollection impl tbd based on Map dependency
-	list<Territory> territoryCollection;
-	OrderList* orderList;
-	Hand* hand;
-	
+//TODO: is this how it should be copied?
+Player::Player(const Player& copyPlayer) {
+	this->territoryArray = copyPlayer.territoryArray;
+	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
+	this->orderList = copyPlayer.orderList;
+	this->hand = copyPlayer.hand;
+}
 
-public:
+Player::~Player() {
+	delete this->territoryArray;
+	territoryArray = NULL;
 
-	Player() {
-		//TODO: territoryCollection impl tbd based on Map dependency
-		orderList = new OrderList();
-		hand = new Hand();
-	}
+	delete this->sizeOfTerritoryArray;
+	sizeOfTerritoryArray = NULL;
 
-	Player(const Player& playerToCopy) {
-		this.territoryCollection = playerToCopy.getTerritoryCollection();
-		this.orderList = playerToCopy.getOrderList();
-		this.hand = playerToCopy.getHand();
-	}
+	delete this->orderList;
+	orderList = NULL;
 
-	//TODO: check if this works
-	~Player() {
-		//TODO: territoryCollection impl tbd based on Map dependency
-		delete orderList;
-		orderList = NULL;
-		delete hand;
-		hand = NULL;
-	}
+	delete this->hand;
+	hand = NULL;
+}
 
-	list<Territory> toDefend() {
-		return NULL;
-	}
-
-	list<Territory> toAttack() {
+Territory* Player::toDefend() {
+	//TODO: test to see if we can remove this
+	if (sizeOfTerritoryArray == 0) {
 		return NULL;
 	}
 	
-	//TODO: wait for Order dependency
-	void issueOrder() {
+	if (sizeOfTerritoryArray == 1) {
+		return territoryArray;
+	}
+
+	//for now just returning the first half of the player's territory array
+	int sizeOfToDefendArray = sizeOfTerritoryArray / 2;
+	Territory toDefendArray[sizeOfToDefendArray];
+	for (int i = 0; i < sizeOfToDefendArray; i++) {
+		toDefendArray[i] = territoryArray[i];
+	}
+
+	//TODO: test that this works
+	return toDefendArray;
+}
+
+Territory* Player::toAttack() {
+	//TODO: need to wait on MAP dependency
+	return NULL;
+}
+
+void Player::issueOrder() {
+	int playerInput;
+
+	//The different kinds of orders are: deploy, advance,
+	//bomb, blockade, airlift, and negotiate
+	cout << "Choose an order:\n";
+	cout << "1.Deploy\n2. Advance\n3. Bomb\n4. Blockade\n5. Airlift\n6. Negotiate\n";
+
+	cin >> playerInput;
+
+	//TODO: test
+	Order* order;
+
+	switch (playerInput) {
+
+	//TODO: wait on ORDER dependency
+	case 1:
+		order = new Deploy();
+		break;
+
+	case 2:
+		order = new Advance();
+		break;
+
+	case 3:
+		order = new Bomb();
+		break;
+
+	case 4:
+		order = new Blockade();
+		break;
+
+	case 5:
+		order = new Airlift();
+		break;
+
+	case 6:
+		order = new Negotiate();
+		break;
+	
+	default:
+		cout << "Incorrect input\n";
+		return;
+		//break;
+
+	this->orderList->addOrder(order);
 
 	}
 
-	//Getters and Setters
-	list<Territory> getTerritoryCollection() {
-		return territoryCollection;
-	}
+}
 
-	OrderList* getOrderList() {
-		return orderList;
-	}
+//stream insertion operators TODO: wait for dependencies
+ostream& operator << (ostream& out, const Player& player)
+{
 
-	Hand* getHand() {
-		return hand;
-	}
+	/*out << c.real;
+	out << "+i" << c.imag << endl;*/
+	return out;
+}
 
-	void setTerritoryCollection() {
-		//TODO: territoryCollection impl tbd based on Map dependency
-	}
+//TODO: check if necessary
+istream& operator >> (istream& in, Player& player)
+{
+	/*cout << "Enter Real Part ";
+	in >> c.real;
+	cout << "Enter Imaginary Part ";
+	in >> c.imag;*/
+	return in;
+}
 
-	void setOrderList(OrderList* orderList) {
+//assignment operator
+Player& Player::operator=(const Player& player) {
+	this->setTerritoryArray(*player.territoryArray);
+	this->setOrderList(*player.orderList);
+	this->setHand(*player.hand);
 
-	}
+	return *this;
+}
 
-	void setHand(Hand* hand) {
+//Getters and Setters
+Territory Player::getTerritoryArray() {
+	return *this->territoryArray;
+}
 
-	}
+OrderList Player::getOrderList() {
+	return *this->orderList;
+}
 
-	//stream insertion operators TODO: wait for dependencies
-	ostream& operator << (ostream& out, const Player& c)
-	{
-		/*out << c.real;
-		out << "+i" << c.imag << endl;*/
-		return out;
-	}
+Hand Player::getHand() {
+	return *this->hand;
+}
 
-	istream& operator >> (istream& in, Player& c)
-	{
-		/*cout << "Enter Real Part ";
-		in >> c.real;
-		cout << "Enter Imaginary Part ";
-		in >> c.imag;*/
-		return in;
-	}
+//TODO: test
+void Player::setTerritoryArray(Territory territoryArray) {
+	*this->territoryArray = territoryArray;
+}
 
-};
+void Player::setOrderList(OrderList orderList) {
+	*this->orderList = orderList;
+}
+
+void Player::setHand(Hand hand) {
+	*this->hand = hand;
+}
+
