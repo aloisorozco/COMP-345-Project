@@ -6,8 +6,7 @@ class OrderList {
 public:
 	OrderList();
 
-	//can change this to reference or pointer parameter if you want
-	addOrder(Order order);
+	addOrder(Order* order);
 
 };
 
@@ -15,6 +14,48 @@ class Order {
 
 public:
 	Order();
+
+};
+
+class Deploy : public Order {
+
+public:
+	Deploy();
+
+};
+
+class Advance : public Order {
+
+public:
+	Advance();
+
+};
+
+class Bomb : public Order {
+
+public:
+	Bomb();
+
+};
+
+class Blockade : public Order {
+
+public:
+	Blockade();
+
+};
+
+class Airlift : public Order {
+
+public:
+	Airlift();
+
+};
+
+class Negotiate : public Order {
+
+public:
+	Negotiate();
 
 };
 

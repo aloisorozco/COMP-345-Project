@@ -4,12 +4,18 @@
 class Player {
 
 private:
-	list<Territory> territoryCollection;
+	//to get element in territoryArray: *(territoryArray + index)
+	//this is equivalent to Territory territoryArray[] but it had
+	//to be done this way because of requirements (all variables must be in pointers)
+	Territory* territoryArray;
+	int* sizeOfTerritoryArray;
 	OrderList* orderList;
 	Hand* hand;
 
 public:
 	Player();
+
+	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
 	Player(const Player& playerToCopy);
 
@@ -21,21 +27,24 @@ public:
 
 	void issueOrder();
 
-	list<Territory> getTerritoryCollection();
+	Territory getTerritoryArray();
 
-	OrderList* getOrderList();
+	OrderList getOrderList();
 
-	Hand* getHand();
+	Hand getHand();
 
-	void setTerritoryCollection();
+	void setTerritoryArray(Territory territoryArray);
 
-	void setOrderList(OrderList* orderList);
+	void setOrderList(OrderList orderList);
 
-	void setHand(Hand* hand);
+	void setHand(Hand hand);
 
-	ostream& operator << (ostream& out, const Player& c);
+	ostream& operator << (ostream& out, const Player& player);
 
-	istream& operator >> (istream& in, Player& c);
+	//TODO: Ask professor about whether on not to do cin stream insertion
+	istream& operator >> (istream& in, Player& player);
+
+	Player& operator=(const Player& player);
 
 };
 
