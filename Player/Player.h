@@ -4,6 +4,10 @@
 class Player {
 
 private:
+
+	//for stream insertion operator
+	int playerID;
+
 	//to get element in territoryArray: *(territoryArray + index)
 	//this is equivalent to Territory territoryArray[] but it had
 	//to be done this way because of requirements (all variables must be in pointers)
@@ -13,6 +17,7 @@ private:
 	Hand* hand;
 
 public:
+
 	Player();
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -27,11 +32,15 @@ public:
 
 	void issueOrder();
 
+	int getPlayerID();
+
 	Territory getTerritoryArray();
 
 	OrderList getOrderList();
 
 	Hand getHand();
+
+	void setPlayerID(int playerID);
 
 	void setTerritoryArray(Territory territoryArray);
 

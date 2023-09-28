@@ -13,7 +13,14 @@ using namespace std;
 // Memory leaks must be avoided 
 // Code must be documented using comments (user-defined classes, methods, free functions, operators)
 
+
+//TODO test that playerCount & playerID is working
+int* playerCount = new int(1);
+
 Player::Player() {
+	playerID = new int(*playerCount);
+	*playerCount++;
+
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
 	orderList = new OrderList();
@@ -21,12 +28,16 @@ Player::Player() {
 }
 
 Player::Player(Territory* territoryArray, int* sizeOfTerritoryArray) {
+	playerID = new int(*playerCount);
+	*playerCount++;
+
 	this->territoryArray = territoryArray;
 	this->sizeOfTerritoryArray = new int(*sizeOfTerritoryArray);
 }
 
 //TODO: is this how it should be copied?
 Player::Player(const Player& copyPlayer) {
+	this->playerID = copyPlayer.playerID;
 	this->territoryArray = copyPlayer.territoryArray;
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
 	this->orderList = copyPlayer.orderList;
@@ -124,17 +135,15 @@ void Player::issueOrder() {
 
 }
 
-//stream insertion operators TODO: wait for dependencies
-ostream& operator << (ostream& out, const Player& player)
+//stream insertion operators TODO: check if this is ok
+ostream& Player::operator << (ostream& out, const Player& player)
 {
-
-	/*out << c.real;
-	out << "+i" << c.imag << endl;*/
+	out << "Player " << playerID << endl;
 	return out;
 }
 
 //TODO: check if necessary
-istream& operator >> (istream& in, Player& player)
+istream& Player::operator >> (istream& in, Player& player)
 {
 	/*cout << "Enter Real Part ";
 	in >> c.real;
@@ -153,6 +162,10 @@ Player& Player::operator=(const Player& player) {
 }
 
 //Getters and Setters
+int Player::getPlayerID() {
+	return *this->playerID;
+}
+
 Territory Player::getTerritoryArray() {
 	return *this->territoryArray;
 }
@@ -165,7 +178,12 @@ Hand Player::getHand() {
 	return *this->hand;
 }
 
-//TODO: test
+//TODO: testSetters
+void Player::setPlayerID(int playerID) {
+	*this->playerID = playerID;
+}
+
+
 void Player::setTerritoryArray(Territory territoryArray) {
 	*this->territoryArray = territoryArray;
 }
