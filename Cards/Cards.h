@@ -36,7 +36,7 @@ private:
  */
 class Hand {
 public:
-    Hand();
+    explicit Hand(int handSize);
     int handSize;
 	void addCard(Card card);
     const vector<Card>& getCards() const;

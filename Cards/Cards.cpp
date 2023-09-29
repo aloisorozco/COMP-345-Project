@@ -74,8 +74,9 @@ void Deck::initializeDeck() {
         cards.emplace_back(CardType::Diplomacy);
     }
 }
-Hand::Hand(){
-    handSize = 0;
+Hand::Hand(int handSize){
+    //
+    handSize = handSize;
 };
 void Hand::addCard(Card card) {
     cards.push_back(card);

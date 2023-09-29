@@ -2,10 +2,10 @@
 #include <iostream>
 void testCards(){
     Deck deck;
-    Hand hand;
+    int handSize = 7;
+    Hand hand(handSize);
     //Hand Size for the game not specified yet.
     //Draw cards
-    hand.handSize =7;
     for(int i =0; i<hand.handSize; i++){
         Card drawnCard = deck.draw();
         hand.addCard(drawnCard);
