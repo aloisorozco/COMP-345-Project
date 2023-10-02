@@ -10,15 +10,17 @@ class Player {
 private:
 
 	//for stream insertion operator
-	int playerID;
+	int* playerID;
 
 	//to get element in territoryArray: *(territoryArray + index)
 	//this is equivalent to Territory territoryArray[] but it had
 	//to be done this way because of requirements (all variables must be in pointers)
 	Territory* territoryArray;
 	int* sizeOfTerritoryArray;
-	OrderList* orderList;
+	OrdersList* ordersList;
 	Hand* hand;
+
+	friend ostream& operator << (ostream& out, const Player& player);
 
 public:
 
@@ -30,9 +32,9 @@ public:
 
 	~Player();
 
-	list<Territory> toDefend();
+	Territory* toDefend();
 
-	list<Territory> toAttack();
+	Territory* toAttack();
 
 	void issueOrder();
 
@@ -40,7 +42,7 @@ public:
 
 	Territory getTerritoryArray();
 
-	OrderList getOrderList();
+	OrdersList getOrdersList();
 
 	Hand getHand();
 
@@ -48,14 +50,9 @@ public:
 
 	void setTerritoryArray(Territory territoryArray);
 
-	void setOrderList(OrderList orderList);
+	void setOrdersList(OrdersList ordersList);
 
 	void setHand(Hand hand);
-
-	ostream& operator << (ostream& out, const Player& player);
-
-	//TODO: Ask professor about whether on not to do cin stream insertion
-	istream& operator >> (istream& in, Player& player);
 
 	Player& operator=(const Player& player);
 

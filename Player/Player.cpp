@@ -23,7 +23,7 @@ Player::Player() {
 
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
-	orderList = new OrderList();
+	ordersList = new OrdersList();
 	hand = NULL;
 }
 
@@ -40,7 +40,7 @@ Player::Player(const Player& copyPlayer) {
 	this->playerID = copyPlayer.playerID;
 	this->territoryArray = copyPlayer.territoryArray;
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
-	this->orderList = copyPlayer.orderList;
+	this->ordersList = copyPlayer.ordersList;
 	this->hand = copyPlayer.hand;
 }
 
@@ -51,8 +51,8 @@ Player::~Player() {
 	delete this->sizeOfTerritoryArray;
 	sizeOfTerritoryArray = NULL;
 
-	delete this->orderList;
-	orderList = NULL;
+	delete this->ordersList;
+	ordersList = NULL;
 
 	delete this->hand;
 	hand = NULL;
@@ -60,16 +60,17 @@ Player::~Player() {
 
 Territory* Player::toDefend() {
 	//TODO: test to see if we can remove this
-	if (sizeOfTerritoryArray == 0) {
+	if (*sizeOfTerritoryArray == 0) {
 		return NULL;
 	}
 	
-	if (sizeOfTerritoryArray == 1) {
+	if (*sizeOfTerritoryArray == 1) {
 		return territoryArray;
 	}
 
 	//for now just returning the first half of the player's territory array
-	int sizeOfToDefendArray = sizeOfTerritoryArray / 2;
+	//TODO: fix
+	int sizeOfToDefendArray = *sizeOfTerritoryArray / 2;
 	Territory toDefendArray[sizeOfToDefendArray];
 	for (int i = 0; i < sizeOfToDefendArray; i++) {
 		toDefendArray[i] = territoryArray[i];
@@ -129,33 +130,23 @@ void Player::issueOrder() {
 		return;
 		//break;
 
-	this->orderList->addOrder(order);
+	this->ordersList->add(*order);
 
 	}
 
 }
 
 //stream insertion operators TODO: check if this is ok
-ostream& Player::operator << (ostream& out, const Player& player)
+ostream& operator << (ostream& out, const Player& player)
 {
-	out << "Player " << playerID << endl;
+	out << "Player " << *player.playerID << endl;
 	return out;
-}
-
-//TODO: check if necessary
-istream& Player::operator >> (istream& in, Player& player)
-{
-	/*cout << "Enter Real Part ";
-	in >> c.real;
-	cout << "Enter Imaginary Part ";
-	in >> c.imag;*/
-	return in;
 }
 
 //assignment operator
 Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(*player.territoryArray);
-	this->setOrderList(*player.orderList);
+	this->setOrdersList(*player.ordersList);
 	this->setHand(*player.hand);
 
 	return *this;
@@ -170,8 +161,8 @@ Territory Player::getTerritoryArray() {
 	return *this->territoryArray;
 }
 
-OrderList Player::getOrderList() {
-	return *this->orderList;
+OrdersList Player::getOrdersList() {
+	return *this->ordersList;
 }
 
 Hand Player::getHand() {
@@ -188,8 +179,8 @@ void Player::setTerritoryArray(Territory territoryArray) {
 	*this->territoryArray = territoryArray;
 }
 
-void Player::setOrderList(OrderList orderList) {
-	*this->orderList = orderList;
+void Player::setOrdersList(OrdersList ordersList) {
+	*this->ordersList = ordersList;
 }
 
 void Player::setHand(Hand hand) {
