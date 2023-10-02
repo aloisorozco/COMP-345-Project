@@ -24,8 +24,6 @@ void testPlayers() {
 	//Testing attack and defend functions
 	Territory* toAttackTerritories = player1->toAttack();
 
-	
-
 	Territory* toDefendTerritories = player1->toDefend();
 
 	//Avoiding memory leaks
