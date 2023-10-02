@@ -1,6 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../Map/Map.h"
+#include "../Orders/Orders.h"
+#include "../Cards/Cards.h"
+
 class Player {
 
 private:

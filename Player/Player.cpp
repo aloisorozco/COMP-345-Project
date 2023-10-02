@@ -27,12 +27,12 @@ Player::Player() {
 	hand = NULL;
 }
 
-Player::Player(Territory* territoryArray, int* sizeOfTerritoryArray) {
+Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	playerID = new int(*playerCount);
 	*playerCount++;
 
 	this->territoryArray = territoryArray;
-	this->sizeOfTerritoryArray = new int(*sizeOfTerritoryArray);
+	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
 }
 
 //TODO: is this how it should be copied?
