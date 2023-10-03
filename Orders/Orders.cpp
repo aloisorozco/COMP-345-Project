@@ -110,7 +110,7 @@ int Negotiate::execute(){
     return -1;
 }
 
-int OrdersList::add(Order* order){
+int OrdersList::add(Order order){
 
     orders.push_back(order);
     return 0;
@@ -140,7 +140,7 @@ int OrdersList::move(int index1, int index2){
 
     if (index1 >= 0 && index1 < orders.size() && index2 >= 0 && index2 < orders.size() && index1 != index2) {
 
-        Order* ordermove = orders[index1];
+        Order ordermove = orders[index1];
         orders.erase(orders.begin() + index1);
 
         orders.insert(orders.begin() + index2, ordermove);
@@ -155,9 +155,9 @@ int OrdersList::move(int index1, int index2){
 
 int OrdersList::executeAll(){
 
-    for(Order* order : orders){
+    for(Order order : orders){
 
-        if(order->execute() != 0){
+        if(order.execute() != 0){
             return -1;
         }
     }
@@ -167,8 +167,8 @@ int OrdersList::executeAll(){
 
 void OrdersList::copyOrders(const OrdersList& other) {
     orders.reserve(other.orders.size());
-    for (Order* order : other.orders) {
-        orders.push_back(new Order(*order));
+    for (Order order : other.orders) {
+        orders.push_back(Order(order));
     }
 }
 
@@ -180,20 +180,19 @@ OrdersList::OrdersList(const OrdersList& other) {
 OrdersList& OrdersList::operator=(const OrdersList& other) {
 
     if (this != &other) {
-
-        for (Order* order : orders) {
-            delete order;
-        }
-
         orders.clear();
-        copyOrders(other);
+
+        if (!other.orders.empty()) {
+            copyOrders(other);
+        }
     }
     return *this;
 }
 
 std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
-    for (const Order* order : ordersList.orders) {
-        os << *order << "\n";
+    
+    for (const Order order : ordersList.orders) {
+        os << order << "\n";
     }
     return os;
 }

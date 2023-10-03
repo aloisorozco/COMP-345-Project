@@ -109,7 +109,7 @@ class Negotiate : public Order{
 class OrdersList {
 
     private:
-        std::vector<Order*> orders;
+        std::vector<Order> orders;
 
         void copyOrders(const OrdersList& other);
 
@@ -120,7 +120,7 @@ class OrdersList {
 
         OrdersList& operator=(const OrdersList& other);
 
-        int add(Order* order);
+        int add(Order order);
         int move(int index1, int index2);
         int remove();
         int remove(int index);

@@ -15,17 +15,17 @@ int main(){
 int testOrdersLists(){
 
     OrdersList orders = OrdersList();
-    orders.add(new Order());
-    orders.add(new Deploy());
-    orders.add(new Advance());
-    orders.add(new Bomb());
-    orders.add(new Blockade());
-    orders.add(new Airlift());
-    orders.add(new Negotiate());
+    orders.add(Order());
+    orders.add(Deploy());
+    orders.add(Advance());
+    orders.add(Bomb());
+    orders.add(Blockade());
+    orders.add(Airlift());
+    orders.add(Negotiate());
 
-    orders.add(new Advance());
-    orders.add(new Bomb());
-    orders.add(new Airlift());
+    orders.add(Advance());
+    orders.add(Bomb());
+    orders.add(Airlift());
 
     orders.remove(4);
     orders.remove();
