@@ -17,6 +17,7 @@ void testPlayers() {
 
 	//Testing stream insertion
 	cout << *player1 << endl;
+	cout << *player2 << endl;
 
 	//Issue order
 	player1->issueOrder();
@@ -30,6 +31,10 @@ void testPlayers() {
 	player1->~Player();
 	delete player1;
 	player1 = NULL;
+
+	player2->~Player();
+	delete player2;
+	player2 = NULL;
 
 
 }

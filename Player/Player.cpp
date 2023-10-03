@@ -18,8 +18,9 @@ using namespace std;
 int* playerCount = new int(1);
 
 Player::Player() {
+	//assign playerCount to playerID and increment playerCount
 	playerID = new int(*playerCount);
-	*playerCount++;
+	(*playerCount)++;
 
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
@@ -27,15 +28,16 @@ Player::Player() {
 	hand = NULL;
 }
 
+//initializing a player with a collection of territories
 Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	playerID = new int(*playerCount);
-	*playerCount++;
+	(*playerCount)++;
 
 	this->territoryArray = territoryArray;
 	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
 }
 
-//TODO: is this how it should be copied?
+//copy constructor
 Player::Player(const Player& copyPlayer) {
 	this->playerID = copyPlayer.playerID;
 	this->territoryArray = copyPlayer.territoryArray;
@@ -44,6 +46,7 @@ Player::Player(const Player& copyPlayer) {
 	this->hand = copyPlayer.hand;
 }
 
+//destructor to avoid any memory leaks
 Player::~Player() {
 	delete this->territoryArray;
 	territoryArray = NULL;
@@ -59,25 +62,8 @@ Player::~Player() {
 }
 
 Territory* Player::toDefend() {
-	//TODO: test to see if we can remove this
-	if (*sizeOfTerritoryArray == 0) {
-		return NULL;
-	}
-	
-	if (*sizeOfTerritoryArray == 1) {
-		return territoryArray;
-	}
-
-	//for now just returning the first half of the player's territory array
-	//TODO: fix
-	int sizeOfToDefendArray = *sizeOfTerritoryArray / 2;
-	Territory toDefendArray[sizeOfToDefendArray];
-	for (int i = 0; i < sizeOfToDefendArray; i++) {
-		toDefendArray[i] = territoryArray[i];
-	}
-
-	//TODO: test that this works
-	return toDefendArray;
+	//TODO: need to wait on MAP dependency
+	return NULL;
 }
 
 Territory* Player::toAttack() {
@@ -85,6 +71,7 @@ Territory* Player::toAttack() {
 	return NULL;
 }
 
+//issuing order
 void Player::issueOrder() {
 	int playerInput;
 
@@ -93,36 +80,47 @@ void Player::issueOrder() {
 	cout << "Choose an order:\n";
 	cout << "1.Deploy\n2. Advance\n3. Bomb\n4. Blockade\n5. Airlift\n6. Negotiate\n";
 
+	//getting player input
 	cin >> playerInput;
 
-	//TODO: test
 	Order* order;
 
+	//creating and adding order object to player's order list
 	switch (playerInput) {
-
-	//TODO: wait on ORDER dependency
 	case 1:
 		order = new Deploy();
+		this->ordersList->add(*order);
+		cout << "Deploy order added\n";
 		break;
 
 	case 2:
 		order = new Advance();
+		this->ordersList->add(*order);
+		cout << "Advance order added\n";
 		break;
 
 	case 3:
 		order = new Bomb();
+		this->ordersList->add(*order);
+		cout << "Bomb order added\n";
 		break;
 
 	case 4:
 		order = new Blockade();
+		this->ordersList->add(*order);
+		cout << "Blockade order added\n";
 		break;
 
 	case 5:
 		order = new Airlift();
+		this->ordersList->add(*order);
+		cout << "Airlift order added\n";
 		break;
 
 	case 6:
 		order = new Negotiate();
+		this->ordersList->add(*order);
+		cout << "Negotiate order added\n";
 		break;
 	
 	default:
@@ -130,13 +128,11 @@ void Player::issueOrder() {
 		return;
 		//break;
 
-	this->ordersList->add(*order);
-
 	}
 
 }
 
-//stream insertion operators TODO: check if this is ok
+//stream insertion operator
 ostream& operator << (ostream& out, const Player& player)
 {
 	out << "Player " << *player.playerID << endl;
