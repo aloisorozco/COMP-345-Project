@@ -11,8 +11,15 @@ class Order {
         std::string description;
 
     public:
-        Order() : description("This is a generic order."){
+        Order() : description("This is a generic order description."){}
+        Order(const Order& other) : description(other.description) {}
 
+        Order& operator=(const Order& other) {
+
+            if (this != &other) {
+                this->description = other.description;
+            }
+            return *this;
         }
 
         virtual bool validate();
@@ -24,7 +31,7 @@ class Order {
         }
 
         virtual std::string getDescription() const {
-            return "This is a generic order description.";
+            return this->description;
         }
 };
 
@@ -102,14 +109,24 @@ class Negotiate : public Order{
 class OrdersList {
 
     private:
-        std::vector<Order> orders;
+        std::vector<Order*> orders;
+
+        void copyOrders(const OrdersList& other);
 
     public:
-        int add(Order order);
+
+        OrdersList() = default;
+        OrdersList(const OrdersList& other);
+
+        OrdersList& operator=(const OrdersList& other);
+
+        int add(Order* order);
         int move(int index1, int index2);
         int remove();
         int remove(int index);
         int executeAll();
+
+        friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
 };
 
 #endif
