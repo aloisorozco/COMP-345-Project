@@ -14,13 +14,13 @@ Territory* getTerritoryArray() {
 	Territory* territoryArray = new Territory[7];
 
     // Create Territories
-	territoryArray[0] = Territory("t1", 1, 2, "c1");
-	territoryArray[1] = Territory("t2", 1, 2, "c1");
+	territoryArray[0] = Territory("t1", 2, 2, "c1");
+	territoryArray[1] = Territory("t2", 2, 2, "c1");
 	territoryArray[2] = Territory("t3", 2, 2, "c1");
-	territoryArray[3] = Territory("t4", 1, 2, "c2");
-	territoryArray[4] = Territory("t5", 2, 2, "c2");
-	territoryArray[5] = Territory("t6", 1, 2, "c2");
-	territoryArray[6] = Territory("t7", 2, 2, "c3");
+	territoryArray[3] = Territory("t4", 2, 2, "c1");
+	territoryArray[4] = Territory("t5", 2, 2, "c1");
+	territoryArray[5] = Territory("t6", 2, 2, "c1");
+	territoryArray[6] = Territory("t7", 2, 2, "c1");
 
 	return territoryArray;
 }
@@ -46,8 +46,15 @@ void testPlayers() {
 
 	Territory* toDefendTerritories = player2->toDefend();
 
-    //cout << "Territories to attack: " << toAttackTerritories << endl;
-    //cout << "Territories to defend: " << toDefendTerritories << endl;
+	cout << "Territories to attack: " << endl;
+	for (int i = 0; i < 7; i++) {
+		cout << toAttackTerritories[i] << endl;
+	}
+	
+	cout << "Territories to defend: " << endl;
+	for (int i = 0; i < 7; i++) {
+		cout << toDefendTerritories[i] << endl;
+	}
 }
 
 int main() {
