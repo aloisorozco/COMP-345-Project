@@ -6,14 +6,33 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
+Territory* getTerritoryArray() {
+	Territory* territoryArray = new Territory[7];
+
+    // Create Territories
+	territoryArray[0] = Territory("t1", 1, 2, "c1");
+	territoryArray[1] = Territory("t2", 1, 2, "c1");
+	territoryArray[2] = Territory("t3", 2, 2, "c1");
+	territoryArray[3] = Territory("t4", 1, 2, "c2");
+	territoryArray[4] = Territory("t5", 2, 2, "c2");
+	territoryArray[5] = Territory("t6", 1, 2, "c2");
+	territoryArray[6] = Territory("t7", 2, 2, "c3");
+
+	return territoryArray;
+}
+
 //function to test players
 void testPlayers() {
-	//All data members of user-defined class type must be of pointer type. 
+
 	Player* player1 = new Player();
-	Player* player2 = new Player();//TODO: make this use 2nd constructor (the one with territories)
+
+	Territory* territoryArray = getTerritoryArray();
+
+    Player* player2 = new Player(territoryArray, 7);
 
 	//Testing stream insertion
 	cout << *player1 << endl;
@@ -23,20 +42,12 @@ void testPlayers() {
 	player1->issueOrder();
 
 	//Testing attack and defend functions
-	Territory* toAttackTerritories = player1->toAttack();
+	Territory* toAttackTerritories = player2->toAttack();
 
-	Territory* toDefendTerritories = player1->toDefend();
+	Territory* toDefendTerritories = player2->toDefend();
 
-	//Avoiding memory leaks
-	player1->~Player();
-	delete player1;
-	player1 = NULL;
-
-	player2->~Player();
-	delete player2;
-	player2 = NULL;
-
-
+    //cout << "Territories to attack: " << toAttackTerritories << endl;
+    //cout << "Territories to defend: " << toDefendTerritories << endl;
 }
 
 int main() {
