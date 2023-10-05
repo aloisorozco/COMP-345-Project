@@ -21,6 +21,8 @@ public:
 
 	Territory(const Territory& copyTerritory); //initialize copy constructor
 
+	Territory& operator=(const Territory& territory);
+
 	//Getter and Setter	
 	string getName() const ;
 	int getPlayer() const ;
@@ -52,6 +54,8 @@ public:
 	void setSource(Territory* u); //set start territory
 	void setDestination(Territory* v); //set end territory
 
+	Edge& operator=(const Edge& edge);
+
 	~Edge(); //initialize destructor
 };
 
@@ -82,7 +86,6 @@ public:
 
 class Map {
 private:
-	vector<Territory*> territories;
 	vector<Continent*> continents;
 	vector<Edge*> edges;
 
@@ -91,11 +94,10 @@ public:
 	Map(const vector<Continent*>& inputContinents, const vector<Edge*>& inputEdges); //initialize constructor
 	Map(const Map& copyMap); //initialize copy constructor
 
-	const vector<Territory*>& getTerritories() const; //get territories
 	const vector<Continent*>& getContinents() const; //get continents
 	const vector<Edge*>& getEdges() const; //get edges
 
-	void addContinent(Continent& continent); //add continent to map
+	void addContinent(Continent* continent); //add continent to map
 	void addEdge(Territory* start, Territory* end); //add edge to map
 
 	bool validateMap(); //TODO: validate map
