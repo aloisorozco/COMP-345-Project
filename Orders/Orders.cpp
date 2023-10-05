@@ -164,3 +164,35 @@ int OrdersList::executeAll(){
 
     return 0;
 }
+
+void OrdersList::copyOrders(const OrdersList& other) {
+    orders.reserve(other.orders.size());
+    for (Order order : other.orders) {
+        orders.push_back(Order(order));
+    }
+}
+
+OrdersList::OrdersList(const OrdersList& other) {
+
+    copyOrders(other);
+}
+
+OrdersList& OrdersList::operator=(const OrdersList& other) {
+
+    if (this != &other) {
+        orders.clear();
+
+        if (!other.orders.empty()) {
+            copyOrders(other);
+        }
+    }
+    return *this;
+}
+
+std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
+    
+    for (const Order order : ordersList.orders) {
+        os << order << "\n";
+    }
+    return os;
+}

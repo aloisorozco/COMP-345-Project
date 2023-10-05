@@ -13,26 +13,40 @@ using namespace std;
 // Memory leaks must be avoided 
 // Code must be documented using comments (user-defined classes, methods, free functions, operators)
 
+
+//TODO test that playerCount & playerID is working
+int* playerCount = new int(1);
+
 Player::Player() {
+	//assign playerCount to playerID and increment playerCount
+	playerID = new int(*playerCount);
+	(*playerCount)++;
+
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
-	orderList = new OrderList();
+	ordersList = new OrdersList();
 	hand = NULL;
 }
 
-Player::Player(Territory* territoryArray, int* sizeOfTerritoryArray) {
+//initializing a player with a collection of territories
+Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
+	playerID = new int(*playerCount);
+	(*playerCount)++;
+
 	this->territoryArray = territoryArray;
-	this->sizeOfTerritoryArray = new int(*sizeOfTerritoryArray);
+	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
 }
 
-//TODO: is this how it should be copied?
+//copy constructor
 Player::Player(const Player& copyPlayer) {
+	this->playerID = copyPlayer.playerID;
 	this->territoryArray = copyPlayer.territoryArray;
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
-	this->orderList = copyPlayer.orderList;
+	this->ordersList = copyPlayer.ordersList;
 	this->hand = copyPlayer.hand;
 }
 
+//destructor to avoid any memory leaks
 Player::~Player() {
 	delete this->territoryArray;
 	territoryArray = NULL;
@@ -40,32 +54,16 @@ Player::~Player() {
 	delete this->sizeOfTerritoryArray;
 	sizeOfTerritoryArray = NULL;
 
-	delete this->orderList;
-	orderList = NULL;
+	delete this->ordersList;
+	ordersList = NULL;
 
 	delete this->hand;
 	hand = NULL;
 }
 
 Territory* Player::toDefend() {
-	//TODO: test to see if we can remove this
-	if (sizeOfTerritoryArray == 0) {
-		return NULL;
-	}
-	
-	if (sizeOfTerritoryArray == 1) {
-		return territoryArray;
-	}
-
-	//for now just returning the first half of the player's territory array
-	int sizeOfToDefendArray = sizeOfTerritoryArray / 2;
-	Territory toDefendArray[sizeOfToDefendArray];
-	for (int i = 0; i < sizeOfToDefendArray; i++) {
-		toDefendArray[i] = territoryArray[i];
-	}
-
-	//TODO: test that this works
-	return toDefendArray;
+	//TODO: need to wait on MAP dependency
+	return NULL;
 }
 
 Territory* Player::toAttack() {
@@ -73,6 +71,7 @@ Territory* Player::toAttack() {
 	return NULL;
 }
 
+//issuing order
 void Player::issueOrder() {
 	int playerInput;
 
@@ -81,36 +80,47 @@ void Player::issueOrder() {
 	cout << "Choose an order:\n";
 	cout << "1.Deploy\n2. Advance\n3. Bomb\n4. Blockade\n5. Airlift\n6. Negotiate\n";
 
+	//getting player input
 	cin >> playerInput;
 
-	//TODO: test
 	Order* order;
 
+	//creating and adding order object to player's order list
 	switch (playerInput) {
-
-	//TODO: wait on ORDER dependency
 	case 1:
 		order = new Deploy();
+		this->ordersList->add(*order);
+		cout << "Deploy order added\n";
 		break;
 
 	case 2:
 		order = new Advance();
+		this->ordersList->add(*order);
+		cout << "Advance order added\n";
 		break;
 
 	case 3:
 		order = new Bomb();
+		this->ordersList->add(*order);
+		cout << "Bomb order added\n";
 		break;
 
 	case 4:
 		order = new Blockade();
+		this->ordersList->add(*order);
+		cout << "Blockade order added\n";
 		break;
 
 	case 5:
 		order = new Airlift();
+		this->ordersList->add(*order);
+		cout << "Airlift order added\n";
 		break;
 
 	case 6:
 		order = new Negotiate();
+		this->ordersList->add(*order);
+		cout << "Negotiate order added\n";
 		break;
 	
 	default:
@@ -118,60 +128,55 @@ void Player::issueOrder() {
 		return;
 		//break;
 
-	this->orderList->addOrder(order);
-
 	}
 
 }
 
-//stream insertion operators TODO: wait for dependencies
+//stream insertion operator
 ostream& operator << (ostream& out, const Player& player)
 {
-
-	/*out << c.real;
-	out << "+i" << c.imag << endl;*/
+	out << "Player " << *player.playerID << endl;
 	return out;
-}
-
-//TODO: check if necessary
-istream& operator >> (istream& in, Player& player)
-{
-	/*cout << "Enter Real Part ";
-	in >> c.real;
-	cout << "Enter Imaginary Part ";
-	in >> c.imag;*/
-	return in;
 }
 
 //assignment operator
 Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(*player.territoryArray);
-	this->setOrderList(*player.orderList);
+	this->setOrdersList(*player.ordersList);
 	this->setHand(*player.hand);
 
 	return *this;
 }
 
 //Getters and Setters
+int Player::getPlayerID() {
+	return *this->playerID;
+}
+
 Territory Player::getTerritoryArray() {
 	return *this->territoryArray;
 }
 
-OrderList Player::getOrderList() {
-	return *this->orderList;
+OrdersList Player::getOrdersList() {
+	return *this->ordersList;
 }
 
 Hand Player::getHand() {
 	return *this->hand;
 }
 
-//TODO: test
+//TODO: testSetters
+void Player::setPlayerID(int playerID) {
+	*this->playerID = playerID;
+}
+
+
 void Player::setTerritoryArray(Territory territoryArray) {
 	*this->territoryArray = territoryArray;
 }
 
-void Player::setOrderList(OrderList orderList) {
-	*this->orderList = orderList;
+void Player::setOrdersList(OrdersList ordersList) {
+	*this->ordersList = ordersList;
 }
 
 void Player::setHand(Hand hand) {

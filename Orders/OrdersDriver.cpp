@@ -34,5 +34,11 @@ int testOrdersLists(){
 
     orders.move(2, 5);
 
-    return orders.executeAll();
+    OrdersList orders2 = orders;
+
+    orders2.executeAll();
+
+    cout << "\n" << orders;
+
+    return 0;
 }
