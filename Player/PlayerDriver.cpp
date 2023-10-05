@@ -40,24 +40,43 @@ void testPlayers() {
 
 	//Issue order
 	player1->issueOrder();
+	cout << "---" << endl;
 
 	//Testing attack and defend functions
 	Territory* toAttackTerritories = player2->toAttack();
 
 	Territory* toDefendTerritories = player2->toDefend();
 
-	cout << "Territories to attack: " << endl;
+	cout << "Territories to attack for " << *player2 << endl;
 	for (int i = 0; i < 7; i++) {
 		cout << toAttackTerritories[i] << endl;
 	}
+	cout << "---" << endl;
 	
-	cout << "Territories to defend: " << endl;
+	cout << "Territories to defend for " << *player2 << endl;
 	for (int i = 0; i < 7; i++) {
 		cout << toDefendTerritories[i] << endl;
 	}
-}
+	cout << "---" << endl;
 
-int main() {
-	testPlayers();
-	return 0;
+	Territory* territoryArray1 = getTerritoryArray();
+	player1->setTerritoryArray(territoryArray1);
+
+	//Testing attack and defend functions
+	Territory* toAttackTerritories1 = player1->toAttack();
+
+	Territory* toDefendTerritories1 = player1->toDefend();
+
+	cout << "Territories to attack for " << *player1 << endl;
+	for (int i = 0; i < 7; i++) {
+		cout << toAttackTerritories1[i] << endl;
+	}
+	cout << "---" << endl;
+
+	cout << "Territories to defend for " << *player1 << endl;
+	for (int i = 0; i < 7; i++) {
+		cout << toDefendTerritories1[i] << endl;
+	}
+	cout << "---" << endl;
+
 }
