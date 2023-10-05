@@ -5,9 +5,9 @@
 
 using namespace std;
 
-int main()
-{
-    ifstream  inputFile ("Test.map)");
+int read_file(){
+    
+    ifstream  inputFile ("Africa.map)");
     if (!inputFile) {
         std::cerr << "Failed to open the file." << std::endl;
         return 1;
@@ -30,4 +30,13 @@ int main()
     inputFile.close();
 
     return 0;
-}
+
+};
+
+
+int main()
+{
+    read_file();
+
+    return 0;
+};
