@@ -9,12 +9,7 @@
 
 using namespace std;
 
-// All classes must implement a correct copy constructor, assignment operator, and stream insertion operator
-// Memory leaks must be avoided 
-// Code must be documented using comments (user-defined classes, methods, free functions, operators)
-
-
-//TODO test that playerCount & playerID is working
+//used for playerID and incremented so each player has a unique id
 int* playerCount = new int(1);
 
 Player::Player() {
@@ -35,6 +30,8 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 
 	this->territoryArray = territoryArray;
 	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
+	ordersList = new OrdersList();
+	hand = NULL;
 }
 
 //copy constructor
@@ -61,6 +58,7 @@ Player::~Player() {
 	hand = NULL;
 }
 
+//territories to defend - for now just returns the territoryArray
 Territory* Player::toDefend() {
 	if (this->sizeOfTerritoryArray == 0) {
 		return NULL;
@@ -68,6 +66,7 @@ Territory* Player::toDefend() {
 	return territoryArray;
 }
 
+//territories to attack - for now just returns the territoryArray
 Territory* Player::toAttack() {
 	if (this->sizeOfTerritoryArray == 0) {
 		return NULL;
@@ -94,37 +93,37 @@ void Player::issueOrder() {
 	case 1:
 		order = new Deploy();
 		this->ordersList->add(*order);
-		cout << "Deploy order added\n";
+		cout << "Deploy order added";
 		break;
 
 	case 2:
 		order = new Advance();
 		this->ordersList->add(*order);
-		cout << "Advance order added\n";
+		cout << "Advance order added";
 		break;
 
 	case 3:
 		order = new Bomb();
 		this->ordersList->add(*order);
-		cout << "Bomb order added\n";
+		cout << "Bomb order added";
 		break;
 
 	case 4:
 		order = new Blockade();
 		this->ordersList->add(*order);
-		cout << "Blockade order added\n";
+		cout << "Blockade order added";
 		break;
 
 	case 5:
 		order = new Airlift();
 		this->ordersList->add(*order);
-		cout << "Airlift order added\n";
+		cout << "Airlift order added";
 		break;
 
 	case 6:
 		order = new Negotiate();
 		this->ordersList->add(*order);
-		cout << "Negotiate order added\n";
+		cout << "Negotiate order added";
 		break;
 	
 	default:
@@ -133,6 +132,7 @@ void Player::issueOrder() {
 		//break;
 
 	}
+	cout << " for " << *this << endl;
 
 }
 
@@ -145,7 +145,7 @@ ostream& operator << (ostream& out, const Player& player)
 
 //assignment operator
 Player& Player::operator=(const Player& player) {
-	this->setTerritoryArray(*player.territoryArray);
+	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
 	this->setHand(*player.hand);
 
@@ -169,14 +169,13 @@ Hand Player::getHand() {
 	return *this->hand;
 }
 
-//TODO: testSetters
 void Player::setPlayerID(int playerID) {
 	*this->playerID = playerID;
 }
 
 
-void Player::setTerritoryArray(Territory territoryArray) {
-	*this->territoryArray = territoryArray;
+void Player::setTerritoryArray(Territory* territoryArray) {
+	this->territoryArray = territoryArray;
 }
 
 void Player::setOrdersList(OrdersList ordersList) {
