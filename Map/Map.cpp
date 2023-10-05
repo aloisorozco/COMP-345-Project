@@ -273,7 +273,7 @@ bool Map::validate(const Map& map) {
 
 int main(){
 
-    Map map;
+    Map* map = new Map();
    
     // Create Territories
     Territory* t1= new Territory ("t1", 1, 2, "c1");
@@ -306,19 +306,19 @@ int main(){
 
 
     //Add Continents to Map
-    map.addContinent(c1);
-    map.addContinent(c2);
-    map.addContinent(c3);
+    map->addContinent(c1);
+    map->addContinent(c2);
+    map->addContinent(c3);
 
     //add Edges to Map
-    map.addEdge(t1, t2);
-    map.addEdge(t1, t3);
-    map.addEdge(t2, t3);
-    map.addEdge(t1, t4);
-    map.addEdge(t4, t5);
-    map.addEdge(t4, t6);
-    map.addEdge(t5, t6);
-    map.addEdge(t7, t6);
+    map->addEdge(t1, t2);
+    map->addEdge(t1, t3);
+    map->addEdge(t2, t3);
+    map->addEdge(t1, t4);
+    map->addEdge(t4, t5);
+    map->addEdge(t4, t6);
+    map->addEdge(t5, t6);
+    map->addEdge(t7, t6);
 
     Edge* e1= new Edge(t1, t2);
 
@@ -326,16 +326,16 @@ int main(){
 
     
     //Print Map
-    map.printMap();  
+    map->printMap();  
 
     cout<<*t1<<endl;
 
     
-for (int i=0; i<4; i++){
-        cout<< c1->getTerritories()[i]->getName()<<endl;
+    for (int i=0; i<3; i++){
+            cout<< c1->getTerritories()[i]->getName()<<endl;
 
-    };
+        };
 
 
-return 0;
+    return 0;
 };
