@@ -14,6 +14,9 @@ private:
 	int* army;
 	string* continent;
 
+	friend ostream& operator << (ostream& out, const Territory& territory);
+
+
 public:	
 	Territory();//Inititalize default constructor
 

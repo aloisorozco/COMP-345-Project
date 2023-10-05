@@ -62,13 +62,17 @@ Player::~Player() {
 }
 
 Territory* Player::toDefend() {
-	//TODO: need to wait on MAP dependency
-	return NULL;
+	if (this->sizeOfTerritoryArray == 0) {
+		return NULL;
+	}
+	return territoryArray;
 }
 
 Territory* Player::toAttack() {
-	//TODO: need to wait on MAP dependency
-	return NULL;
+	if (this->sizeOfTerritoryArray == 0) {
+		return NULL;
+	}
+	return territoryArray;
 }
 
 //issuing order
