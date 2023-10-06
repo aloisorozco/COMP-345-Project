@@ -84,6 +84,8 @@ public:
     void addTerritory(Territory* t);
     void addContinent(Continent* c);
 
+	
+
     bool isConnected() const;
     bool areContinentsConnected() const;
     bool areTerritoriesInOneContinent() const;
