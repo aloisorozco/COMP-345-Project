@@ -1,6 +1,6 @@
 #ifndef CARDS_H
 #define CARDS_H
-//#include "../Orders/Orders.h"
+#include "../Orders/Orders.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -41,11 +41,11 @@ public:
     //Setter getter handsize might be useful later
     void setHandSize(int s);
     int getHandSize() const;
+    OrdersList getOrdersList()const;
     ~Hand(); // deconstructor
 
 private:
-    //Temporary for adding orders on play()
-    //OrdersList* ordersList;
+    OrdersList* ordersList;
     //the current hand size
     int handSize = 0;
     //maybe a max hand size later on??
@@ -74,7 +74,6 @@ public:
 private:
     CardType type;
 };
-
 // free function declaration
 void testCards();
 

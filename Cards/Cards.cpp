@@ -1,5 +1,5 @@
 #include "Cards.h"
-//#include "../Orders/Orders.h"
+#include "../Orders/Orders.h"
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -48,31 +48,32 @@ void Card::play(Deck **deck, Hand **hand){
         return;
     }
     cout <<"Playing a " << this->cardTypeToString() << " card." << endl;
-    //Order* order; // play() creates an order
+    Order* order; // play() creates an order outside not to get deleted
     if(type == CardType::Bomb){
-        //order = new Bomb(); //havent fetched/merged Order
+        order = new Order(); //havent fetched/merged Order
         cout<<"Creating new Bomb Order to Order List\n";
-        //ordersList->add(*order);
+        (**hand).getOrdersList().add(*order);
     }
     else if(type == CardType::Reinforcement){
-        //order = new Reinforcement();
+        //This adds +5 units to your pool of deployable units.
+        order = new Order();
         cout<<"Creating new Reinforcement Order to Order List\n";
-        //ordersList->add(*order);
+        (**hand).getOrdersList().add(*order);
     }
     else if(type == CardType::Blockade){
-        //order = new Blockade();
+        order = new Order();
         cout<<"Creating new Blockade Order to Order List\n";
-        //ordersList->add(*order);
+        (**hand).getOrdersList().add(*order);
     }
     else if(type == CardType::Airlift){
-        //order = new Airlift();
+        order = new Order();
         cout<<"Creating new Airlift Order to Order List\n";
-        //ordersList->add(*order);
+        (**hand).getOrdersList().add(*order);
     }
     else if(type == CardType::Diplomacy){
-        //order = new Diplomacy();
+        order = new Order();
         cout<<"Creating new Diplomacy Order to Order List\n";
-        //ordersList->add(*order);
+        (**hand).getOrdersList().add(*order);
     }
     //print the card played
     (*deck)->returnCard(this);
@@ -154,7 +155,10 @@ void Deck::setDeckSize(int s) {
 }
 ///////////////HAND//////////////////
 
-Hand::Hand(Deck* deck){}
+Hand::Hand(Deck* deck){
+    //need to add play() cards to OrderList
+    ordersList = new OrdersList();
+}
 Hand::Hand(const Hand &) {}
 
 const vector<Card *> & Hand::getCards() const {
@@ -187,6 +191,9 @@ Hand::~Hand() {
         delete card;
     }
     cards.clear();
+
+    delete this->ordersList;
+    ordersList = NULL;
 }
 
 int Hand::getHandSize() const {
@@ -205,6 +212,10 @@ void Hand::removeCard(Card* card) {
         handSize--;
     }
 
+}
+
+OrdersList Hand::getOrdersList()const {
+    return *this->ordersList;
 }
 
 
