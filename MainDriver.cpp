@@ -40,7 +40,7 @@ int main() {
         switch (choice) {
             case 1:
                 // call function to test map
-                // testMap();
+                // testLoadMaps();
                 break;
 
             case 2:
