@@ -30,6 +30,16 @@ GameState* GameState::getNextState(const std::string& command) const {
     return nullptr;
 }
 
+GameState::GameState(const GameState &) {} //Required but not used
+GameState &GameState::operator=(const GameState &) {
+    return *this;
+}
+
+ostream &operator<<(ostream& out, const GameState &) {
+    out <<"Not called "<<endl;
+    return out;
+}
+
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
 GameEngine::GameEngine() : currentState(nullptr) {}
 
@@ -84,4 +94,12 @@ void GameEngine::processCommand(const std::string& command)
         currentState = nextState;
         std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
     }
+}
+//NOT CALLED
+GameEngine::GameEngine(const GameEngine &) {}
+GameEngine &GameEngine::operator=(const GameEngine &) {
+    return *this;
+}
+ostream &operator<<(ostream& out, const GameEngine &) {
+    return out;
 }
