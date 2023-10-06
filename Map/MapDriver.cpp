@@ -5,12 +5,10 @@
 #include <vector>
 #include <filesystem>
 
-
 #include "Map.h"
 
 using namespace std;
-namespace fs = std::filesystem;  // Namespace alias for filesystem
-
+namespace fs = std::filesystem; // Namespace alias for filesystem
 
 int testLoadMaps(){
     // Get the current working directory
@@ -18,22 +16,45 @@ int testLoadMaps(){
 
     // Search for a ".map" file in the current directory
     std::string mapFileName;
-    
+
     while (true){
+           // Get the current working directory
+    fs::path currentDir = fs::current_path();
+
+    // Search for a ".map" file in the current directory
+    std::string mapFileName;
     for (const auto& entry : fs::directory_iterator(currentDir)) {
         if (entry.is_regular_file() && entry.path().extension() == ".map" || entry.is_regular_file() && entry.path().extension() == ".txt") {
             mapFileName = entry.path().string();
-            break; // Found the first ".map" file, exit the loop
+
+            // Open the ".map" file
+            std::ifstream inputFile(mapFileName);
+            cout<<"Opened: "<< mapFileName<<endl;
+
+            // Check if the file is open
+            if (!inputFile.is_open()) {
+                std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+                continue; // Skip to the next file
+            }
+
+            std::string firstLine;
+            if (std::getline(inputFile, firstLine) && firstLine.find("[Map]") == 0) {
+                // The first line starts with "[Map]", so this is the correct file
+                inputFile.close();
+                break; // Exit the loop
+            }
+
+            inputFile.close(); // Close the file, as it doesn't start with "[Map]"
         }
     }
 
-    // Check if a ".map" file was found
+    // Check if a ".map" file with "[Map]" as the first line was found
     if (mapFileName.empty()) {
-        std::cerr << "No '.map' file found in the current directory." << std::endl;
+        std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
         return 1; // Return an error code
     }
 
-    // Open the ".map" file
+    // Open the selected ".map" file
     std::ifstream inputFile(mapFileName);
 
     // Check if the file is open
@@ -71,24 +92,19 @@ int testLoadMaps(){
 
             // Process the words (you can replace this with your logic)
             for (const std::string& w : words) {
-                if (w != "[Map]"){
-                    return false;
-                }
-
                 std::cout << "Word: " << w << std::endl;
             }
         }
     }
-    
 
     // Close the input file
     inputFile.close();
-    }
+
     return 0; // Return 0 to indicate success
+    }
 };
 
 int main(){
     testLoadMaps();
     return 0;
-}   
-   
+};

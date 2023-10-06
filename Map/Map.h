@@ -17,17 +17,18 @@ private:
 	friend ostream& operator << (ostream& out, const Territory& territory);
 
 public:	
-	Territory();//Inititalize default constructor
+	Territory();
 
-	Territory(const string& territoryName, const string& territoryContinent); //initialize constructor
+	Territory(const string& territoryName, const string& territoryContinent);
 
-	Territory(const Territory& copyTerritory); //initialize copy constructor
+	Territory(const Territory& copyTerritory); 
 	
 	Territory& operator=(const Territory& territory);
+
 	void addNeighbor(Territory* neighbor);
 	bool isNeighbor(Territory* territory);
 
-	//Getter and Setter	
+		
 	string getName() const ;
 	int getPlayer() const ;
 	int getArmy() const ;
@@ -39,7 +40,7 @@ public:
 	void setArmy(int army);
 	void setContinent(const string& continent);	
 
-	~Territory(); //initialize destructor
+	~Territory(); 
 };
 
 
@@ -48,29 +49,29 @@ private:
 	string* name;
 	vector<Territory*> territories;
 
+	
+
 public:
-	Continent(); //initialize default constructor
-	Continent(const string& continentName); //initialize constructor
-	Continent(const Continent& copyContinent); //initialize copy constructor
+	Continent(); 
+	Continent(const string& continentName); 
+	Continent(const Continent& copyContinent); 
+	~Continent();
 
-	string getContinentName() const; //get continent name
-	const vector<Territory*>& getTerritories() const; //get territories
+	Continent& operator=(const Continent& continent);
+	friend ostream& operator<<(std::ostream& os, const Continent& c);	
 
-	void setName(const string& continentName); //set continent name
+	void addTerritory(Territory* territory); 
 
-	void addTerritory(Territory* territory); //add territory to continent
-	void printContinent(); //print continent
+	string getContinentName() const; 
+	const vector<Territory*>& getTerritories() const; 
 
-	friend std::ostream& operator<<(std::ostream& os, const Continent& c); // Stream insertion operator
-
-
-	~Continent(); //initialize destructor
+	void setName(const string& continentName);
+	void setTerritories(const vector<Territory*>& continentTerritories);	
 };
 
 
 class Map {
 	private:
-    vector<Territory*> territories;
     vector<Continent*> continents;
 public:
     Map();
@@ -78,15 +79,23 @@ public:
     Map& operator=(const Map& m); // Assignment operator
     friend std::ostream& operator<<(std::ostream& os, const Map& m); // Stream insertion operator
 
-    vector<Territory*> getTerritories() const;
-    vector<Continent*> getContinents() const;
+    
+    
 
-    void addTerritory(Territory* t);
     void addContinent(Continent* c);
 
-    bool isConnected() const;
-    bool areContinentsConnected() const;
-    bool areTerritoriesInOneContinent() const;
+    bool areTerritoriesInOneContinent();
+
+	bool validate() ;
+	bool isMapConnected();
+	bool isContinentConnected();
+	bool checkTerritoriesInContinents();
+
+	vector<Continent*> getContinents() const;
+
+	void setContinents(const vector<Continent*>& continents);
+	
+	
 
 
 };

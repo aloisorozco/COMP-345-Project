@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <stack>
+#include <set>
 #include "Map.h"
 using namespace std;
 
@@ -11,10 +13,8 @@ Territory::Territory(const string& territoryName, const string& territoryContine
     name(new string(territoryName)),     
     continent(new string(territoryContinent)),
     player(new int(0)),
-    army(new int(2)),
-    adjacentTerritories(vector<Territory*>()) 
+    army(new int(2))
     {}
-
 
 //Copy constructor (Territory)
 Territory::Territory(const Territory& copyTerritory){
@@ -98,7 +98,7 @@ Continent::Continent(const string& continentName): name(new string(continentName
 //Copy constructor (Continent)
 Continent::Continent(const Continent& copyContinent) {
     for (Territory* territory : copyContinent.territories) {
-        territories.push_back(new Territory(*territory));
+        territories.push_back(territory);
     }
 }
 
@@ -114,8 +114,23 @@ Continent::~Continent(){
 
 //Add Territory to Continent 
 void Continent::addTerritory(Territory* territory){
-    territories.push_back(new Territory(*territory));
+    territories.push_back(territory);
 }
+
+//stream insertion operator
+ostream& operator << (std::ostream& os, const Continent& c)
+{
+	os << "Continent " << c.getContinentName() << endl;     
+	return os;
+}
+
+//assignment operator
+Continent& Continent::operator=(const Continent& continent) {
+	this->setName(*continent.name);
+	this->setTerritories(continent.territories);
+	return *this;
+}
+
 
 //Getter (Continent)
 string Continent::getContinentName() const { return *name; }
@@ -129,7 +144,15 @@ void Continent::setName(const string& continentName) {
         } else {
             *name = continentName;
         }
+}
+
+void Continent::setTerritories(const vector<Territory*>& continentTerritories) {
+    for (Territory* territory : continentTerritories) {
+        territories.push_back(territory);
     }
+}
+
+
 
 
 //=============================================================================================================================================================================================================//
@@ -141,19 +164,144 @@ void Map::addContinent(Continent* continent) {
     continents.push_back(continent);
 }
 
-void Map::addTerritory(Territory* territory) {
-    territories.push_back(territory);
-}
-
 vector<Continent*> Map::getContinents() const {
     return continents;
 }
 
-vector<Territory*> Map::getTerritories() const {
-    return territories;
+void Map::setContinents(const vector<Continent*>& continents) {
+    this->continents = continents;
 }
 
-/*
+ostream& operator<<(std::ostream& os, const Map& m){
+
+    os << "Map Information:\n" << std::endl;
+    
+    // Iterate through continents and territories and print their details.
+    for (const Continent* continent : m.continents) {
+        
+        os << "Continent: " << continent->getContinentName() <<"\n"<< std::endl;
+        for (const Territory* territory : continent->getTerritories()) {
+            os <<*territory<<endl;
+        }
+        os<<"===============================================\n\n";
+    }
+    
+    return os;
+}
+
+Map& Map::operator=(const Map& m){
+    this->setContinents(m.getContinents());
+    return *this;
+}
+
+bool Map::isMapConnected() {
+    //initalize visited list and stack of territories from map
+    set<const Territory*> visited;    
+    const Territory* startingTerritory = this->getContinents()[0]->getTerritories()[0]; // Start from the first territory.
+    std::stack<const Territory*> stack;
+    stack.push(startingTerritory);
+    
+
+    while (!stack.empty()) {
+        const Territory* currentTerritory = stack.top();
+        stack.pop();
+        
+        // Mark the current territory as visited.
+        visited.insert(currentTerritory);
+        
+        // Get the neighbors of the current territory.
+        for (Territory* neighbor : currentTerritory->getNeighbors()) {
+            if (visited.find(neighbor) == visited.end()) {
+                stack.push(neighbor);
+            }        
+        }
+    }
+
+    // Check if all territories were visited.
+    for (const Continent* continent : continents) {
+        for (const Territory* territory : continent->getTerritories()) {
+            if (visited.find(territory) == visited.end()) {
+                
+                // If any territory was not visited, the map is not valid.
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Map::isContinentConnected() {
+    //initalize visited list and stack of territories from continent
+    set<const Territory*> visited;    
+    const Territory* startingTerritory = continents[0]->getTerritories()[0]; // Start from the first territory.
+    std::stack<const Territory*> stack;
+    stack.push(startingTerritory);
+    
+    while (!stack.empty()) {        
+        const Territory* currentTerritory = stack.top();       
+        stack.pop();
+        // Mark the current territory as visited.
+        visited.insert(currentTerritory);
+        
+        // Get the neighbors of the current territory.
+        for (Territory* neighbor : currentTerritory->getNeighbors()) {
+            if (visited.find(neighbor) == visited.end()) {
+                stack.push(neighbor);
+            }        
+        }
+    }
+
+    // Check if all territories were visited.
+    for (const Continent* continent : continents) {
+        for (const Territory* territory : continent->getTerritories()) {
+            if (visited.find(territory) == visited.end()) {
+                
+                // If any territory was not visited, the map is not valid.
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Map::checkTerritoriesInContinents() {
+    std::set<const Territory*> territoriesSet; // To keep track of visited territories.
+
+    for (const Continent* continent : continents) {
+        for (const Territory* territory : continent->getTerritories()) {
+            if (territoriesSet.find(territory) != territoriesSet.end()) {
+                // If the territory is already in the set, it is assigned to multiple continents.
+                return false;
+            }
+            territoriesSet.insert(territory);
+        }
+    }
+
+    // If all territories are assigned to continents only once, return true.
+    return true;
+}
+
+bool Map::validate() {
+    if (this->getContinents().empty()) {
+        // If there are no continents, the map is not valid.
+        return false;
+    }
+
+    if (!isMapConnected() || !isContinentConnected()) {
+        // If the map is not connected, it is not valid.
+        return false;
+    }
+    if (!checkTerritoriesInContinents()) {
+        // If a territory is assigned to multiple continents, the map is not valid.
+        return false;
+    }
+
+    return true;
+}
+
+
+
+/* To test map Functionality
 
 int main(){
 
@@ -182,19 +330,17 @@ int main(){
     t7->addNeighbor(t6);
     t6->addNeighbor(t7);
 
+   
 
-    cout<<*t1<<endl;
+    
 
-    for (int i = 0; i < t1->getNeighbors().size(); i++){
-        cout<<t1->getNeighbors()[i]->getName()<<endl;
-    }
+    
 
     Continent* c1 = new Continent("North America");
     Continent* c2 = new Continent("South America");
     Continent* c3 = new Continent("Europe");
 
-    cout<<c1->getContinentName()<<endl;
-
+    
     c1->addTerritory(t1);
     c1->addTerritory(t2);
     c1->addTerritory(t3);
@@ -202,6 +348,8 @@ int main(){
     c2->addTerritory(t5);
     c2->addTerritory(t6);
     c3->addTerritory(t7);
+
+   
     
 
     Map* m1 = new Map();
@@ -210,19 +358,18 @@ int main(){
     m1->addContinent(c2);
     m1->addContinent(c3);
 
-    cout<<m1->getContinents()[0]->getTerritories().size()<<endl;
+   
+    // cout<<m1->getContinents().size()<<endl;
 
-    for(int i=0; i<m1->getContinents().size(); i++){
-        for(int j=0; j<m1->getContinents()[i]->getTerritories().size(); j++){
-            cout<<m1->getContinents()[i]->getTerritories()[j]->getName()<<endl;
-        }
-        cout<<m1->getContinents()[i]->getContinentName()<<endl;
-            
-    }
+    cout<<"Map is "<<m1->validate()<<endl;
+    
+    cout<<*m1<<endl;
+    
+    
 
 
 
     return 0;
-}
-*/
+};
 
+*/
