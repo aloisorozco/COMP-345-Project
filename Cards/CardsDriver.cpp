@@ -61,7 +61,3 @@ void testCards(){
 
 
 }
-int main(){
-    testCards();
-    return 0;
-}

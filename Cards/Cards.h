@@ -74,4 +74,8 @@ public:
 private:
     CardType type;
 };
+
+// free function declaration
+void testCards();
+
 #endif

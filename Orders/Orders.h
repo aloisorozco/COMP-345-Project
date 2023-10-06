@@ -129,4 +129,7 @@ class OrdersList {
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
 };
 
+// free function declaration
+int testOrdersLists();
+
 #endif

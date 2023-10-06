@@ -58,4 +58,7 @@ public:
 
 };
 
+// free function declaration
+void testPlayers();
+
 #endif

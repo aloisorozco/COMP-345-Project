@@ -5,14 +5,8 @@
 
 using namespace std;
 
-int testOrdersLists();
-
-int main(){
-
-    return testOrdersLists();
-}
-
 int testOrdersLists(){
+    int any;
 
     OrdersList orders = OrdersList();
     orders.add(Order());
@@ -40,5 +34,7 @@ int testOrdersLists(){
 
     cout << "\n" << orders;
 
+    cout << "Enter any character to end : ";
+    cin >> any;
     return 0;
 }

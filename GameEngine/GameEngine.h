@@ -1,7 +1,14 @@
 // GameEngine.h
+#ifndef GAME_ENGINE_H
+#define GAME_ENGINE_H
+
+
 #include <string>
 #include <map>
 #include <vector>
+
+
+
 
 // The GameState class represents a single state in a game.
 // Each state has a name and a set of transitions that lead to other states.
@@ -68,3 +75,7 @@ private:
     // The current state of the game.
     GameState* currentState;
 };
+
+//free functions declaration
+void testGameStates();
+#endif // GAME_ENGINE_H
