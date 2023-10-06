@@ -153,6 +153,8 @@ vector<Territory*> Map::getTerritories() const {
     return territories;
 }
 
+/*
+
 int main(){
 
     Territory* t1 = new Territory("Canada", "North America");
@@ -213,5 +215,5 @@ int main(){
 
     return 0;
 }
-
+*/
 
