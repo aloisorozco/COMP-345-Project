@@ -7,11 +7,13 @@ using namespace std;
 Territory::Territory() : name(new string("")), player(new int(0)), army(new int(0)), continent(new string("")) {}
 
 //Constructor
-Territory::Territory(const string& territoryName, int territoryPlayer, int territoryArmy, const string& territoryContinent): 
-    name(new string(territoryName)), 
-    player(new int(territoryPlayer)), 
-    army(new int(territoryArmy)), 
-    continent(new string(territoryContinent)) {}
+Territory::Territory(const string& territoryName, const string& territoryContinent): 
+    name(new string(territoryName)),     
+    continent(new string(territoryContinent)),
+    player(new int(0)),
+    army(new int(2)),
+    adjacentTerritories(vector<Territory*>()) 
+    {}
 
 
 //Copy constructor (Territory)
@@ -57,12 +59,26 @@ Territory& Territory::operator=(const Territory& territory) {
 	return *this;
 }
 
+void Territory::addNeighbor(Territory* neighbor) {
+    adjacentTerritories.push_back(neighbor);
+}
+
+bool Territory::isNeighbor(Territory* territory) {
+    for (Territory* neighbor : adjacentTerritories) {
+        if (neighbor == territory) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 //Getters (Territory)
 string Territory::getName() const { return *name; }
 int Territory::getPlayer() const { return *player; }
 int Territory::getArmy() const { return *army; }
 string Territory::getContinent() const { return *continent; }
+vector<Territory*> Territory::getNeighbors() const { return adjacentTerritories; }
 
 //Setters (Territory)
 void Territory::setName(const string& territoryName) {*name = territoryName;}
@@ -73,58 +89,8 @@ void Territory::setContinent(const string& territoryContinent) {*continent = ter
 //=============================================================================================================================================================================================================//
 
 
-//Default constructor (Edge)
-Edge::Edge() {
-    source= nullptr;
-    destination= nullptr;
-}
-
-//Constructor (Edge)
-Edge::Edge(Territory* u, Territory* v) : source(u), destination(v) {}
-
-//Copy constructor (Edge)
-Edge::Edge(const Edge& copyEdge){
-    this->source = copyEdge.source;
-    this->destination = copyEdge.destination;
-} 
-
-//Destructor (Edge)
-Edge::~Edge(){
-    delete this-> source;
-    source = NULL;
-
-    delete this->destination;
-    destination= NULL;
-}
-
-//stream insertion operator
-ostream& operator << (ostream& out, const Edge& edge){
-    out << "Edge  " << edge.getSource()->getName() << " -> " << edge.getDestination()->getName() << endl;
-    return out;
-}
-
-
-//assignment operator
-Edge& Edge::operator=(const Edge& edge) {
-	this->setSource(edge.source);
-    this->setDestination(edge.destination);
-	return *this;
-}
-
-
-//Getters (Edge)
-Territory* Edge::getSource() const { return source; }
-Territory* Edge::getDestination() const { return destination; }
-
-//Setters (Edge)
-void Edge::setSource(Territory* u){*source = *u;}
-void Edge::setDestination(Territory* v){*destination = *v;}
-
-//=============================================================================================================================================================================================================//
-
-
 // Default Constructor (Continent) 
-Continent::Continent(): name(nullptr) {} 
+Continent::Continent(): name(new string ("")) {} 
 
 //Constructor (Continent)
 Continent::Continent(const string& continentName): name(new string(continentName)){}
@@ -146,8 +112,13 @@ Continent::~Continent(){
     }
 }
 
+//Add Territory to Continent 
+void Continent::addTerritory(Territory* territory){
+    territories.push_back(new Territory(*territory));
+}
+
 //Getter (Continent)
-string Continent::getContinentName() const { return (name != nullptr) ? *name : ""; }
+string Continent::getContinentName() const { return *name; }
 const vector<Territory*>& Continent::getTerritories() const {return territories;}
 
 
@@ -159,183 +130,88 @@ void Continent::setName(const string& continentName) {
             *name = continentName;
         }
     }
-//Add Territory to Continent 
-void Continent::addTerritory(Territory* territory){
-    territories.push_back(new Territory(*territory));
-}
+
 
 //=============================================================================================================================================================================================================//
 
 
-//Default constructor (Map)
 Map::Map() {}
 
-//Constructor (Map)
-Map::Map(const vector<Continent*>& inputContinents, const vector<Edge*>& inputEdges)
-    : continents(inputContinents), edges(inputEdges) {}
-
-//Copy constructor (Map)
-Map::Map(const Map& copyMap) {
-        for (Continent* continent : copyMap.continents) {
-            continents.push_back(new Continent(*continent));
-        }
-        for (Edge* edge : copyMap.edges) {
-            edges.push_back(new Edge(edge->getSource(), edge->getDestination()));
-        }
-    }
-//Destructor (Map)
-Map::~Map(){
-    for (Continent* continent : continents){
-        delete continent;
-        continent = NULL;
-    }
-    for (Edge* edge : edges){
-        delete edge;
-        edge = NULL;
-    }
+void Map::addContinent(Continent* continent) {
+    continents.push_back(continent);
 }
 
-//Getters (Map)
-const vector<Continent*>& Map::getContinents() const { return continents; }
-const vector<Edge*>& Map::getEdges() const { return edges; }
-
-//Add Continent to Map
-void Map::addContinent(Continent* continent){
-    continents.push_back(new Continent(*continent));
+void Map::addTerritory(Territory* territory) {
+    territories.push_back(territory);
 }
 
-// Add Edge to Map
-void Map::addEdge(Territory* source, Territory* destination){
-    Edge* edge = new Edge(source, destination);
-    edges.push_back(edge);
+vector<Continent*> Map::getContinents() const {
+    return continents;
 }
 
-//Print Map
-void Map::printMap(){
-    for (Continent* continent : continents){
-        cout << "\nContinent: " << endl; //doesnt work??
-        for (Territory* territory : continent->getTerritories()){
-            cout << "Territory Name: "<< territory->getName() 
-                << " - Player " << territory->getPlayer() 
-                <<" - Army: "<<territory->getArmy()<< endl;
-        }
-    }
-    for (Edge* edge : edges){
-        cout << "\nEdge: " << endl;
-        cout << edge->getSource()->getName() << " -> " << edge->getDestination()->getName() << endl;
-    }
+vector<Territory*> Map::getTerritories() const {
+    return territories;
 }
-
-void Map::DFS(const Map& map, Territory* start, unordered_set<Territory*>& visited) {
-    visited.insert(start);
-
-    // Iterate through neighboring territories
-    for (Edge* edge : map.getEdges()) {
-        if (edge->getSource() == start && visited.find(edge->getDestination()) == visited.end()) {
-            DFS(map, edge->getDestination(), visited);
-            cout<<"condition 1"<<endl; //this is not printing "condition 1
-            cout<<edge->getDestination()->getName()<<endl;
-        }
-        else if (edge->getSource() == start && visited.find(edge->getDestination()) == visited.end()) {
-            DFS(map, edge->getSource(), visited);
-            cout<<"condition 2"<<endl;
-            cout<<edge->getSource()->getName()<<endl;
-        }
-    }
-}
-
-// Function to check if the map is a connected graph
-bool Map::validate(const Map& map) {
-    // Get a starting territory (you can choose any)
-    if (map.getContinents().empty() || map.getContinents()[0]->getTerritories().empty()) {
-        // If there are no territories, it's still considered connected
-        cout<<"condition 3"<<endl;
-        return true;
-    }
-    
-    Territory* startTerritory = map.getContinents()[0]->getTerritories()[0];
-
-    // Create a set to keep track of visited territories
-    unordered_set<Territory*> visited;
-
-    // Perform DFS starting from the chosen territory
-    DFS(map, startTerritory, visited);
-
-    // Check if all territories have been visited
-    
-    cout<<"\n visited " <<visited.size()<<endl;
-    cout<<"\n map " <<map.getContinents()[0]->getTerritories().size()<<endl;
-
-    return visited.size() == map.getContinents()[0]->getTerritories().size();
-}
-
-
 
 int main(){
 
-    Map map;
-   
-    // Create Territories
-    Territory* t1= new Territory ("t1", 1, 2, "c1");
-    Territory* t2= new Territory ("t2", 1, 2, "c1");
-    Territory* t3= new Territory ("t3", 2, 2, "c1");
-    Territory* t4= new Territory ("t4", 1, 2, "c2");
-    Territory* t5= new Territory ("t5", 2, 2, "c2");
-    Territory* t6= new Territory ("t6", 1, 2, "c2");
-    Territory* t7= new Territory ("t7", 2, 2, "c3");
-    Territory* t8= new Territory ("t8", 7, 7, "c3");
+    Territory* t1 = new Territory("Canada", "North America");
+    Territory* t2 = new Territory("USA", "North America");
+    Territory* t3 = new Territory("Mexico", "North America");
+    Territory* t4 = new Territory("Brazil", "South America");
+    Territory* t5 = new Territory("Argentina", "South America");
+    Territory* t6 = new Territory("Peru", "South America");
+    Territory* t7 = new Territory("England", "Europe");
 
-    //Create Continents
-    Continent* c1= new Continent("C1");
-    
-    Continent* c2= new Continent("C2");
-    
-    Continent* c3= new Continent("C3");
+    t1->addNeighbor(t2);
+    t1->addNeighbor(t3);
+    t2->addNeighbor(t1);
+    t2->addNeighbor(t3);
+    t2->addNeighbor(t4);
+    t3->addNeighbor(t1);
+    t3->addNeighbor(t2);
+    t3->addNeighbor(t4);
+    t4->addNeighbor(t2);
+    t4->addNeighbor(t3);
+    t4->addNeighbor(t5);
+    t4->addNeighbor(t6);
+    t5->addNeighbor(t4);
+    t6->addNeighbor(t4);
+    t7->addNeighbor(t6);
+    t6->addNeighbor(t7);
 
-    *t1=*t8;
-    cout<<t1->getName()<< t1->getArmy()<<t1->getPlayer() <<endl;  
-    
-
-    c1->addTerritory(t1);
-    c1->addTerritory(t2);
-    c1->addTerritory(t3);
-    c2->addTerritory(t4);
-    c2->addTerritory(t5);
-    c2->addTerritory(t6);
-    c3->addTerritory(t7);
-
-
-    //Add Continents to Map
-    map.addContinent(c1);
-    map.addContinent(c2);
-    map.addContinent(c3);
-
-    //add Edges to Map
-    map.addEdge(t1, t2);
-    map.addEdge(t1, t3);
-    map.addEdge(t2, t3);
-    map.addEdge(t1, t4);
-    map.addEdge(t4, t5);
-    map.addEdge(t4, t6);
-    map.addEdge(t5, t6);
-    map.addEdge(t7, t6);
-
-    Edge* e1= new Edge(t1, t2);
-
-    cout<<*e1<<endl;   
-
-    
-    //Print Map
-    map.printMap();  
 
     cout<<*t1<<endl;
 
-    
-for (int i=0; i<4; i++){
-        cout<< c1->getTerritories()[i]->getName()<<endl;
+    for (int i = 0; i < t1->getNeighbors().size(); i++){
+        cout<<t1->getNeighbors()[i]->getName()<<endl;
+    }
 
-    };
+    Continent* c1 = new Continent("North America");
+    Continent* c2 = new Continent("South America");
+    Continent* c3 = new Continent("Europe");
+
+    cout<<c1->getContinentName()<<endl;
+
+    Map* m1 = new Map();
+
+    m1->addContinent(c1);
+    m1->addContinent(c2);
+    m1->addContinent(c3);
+
+    cout<<m1->getContinents()[0]->getTerritories().size()<<endl;
+
+    for(int i=0; i<m1->getContinents().size(); i++){
+        for(int j=0; j<m1->getContinents()[i]->getTerritories().size(); j++){
+            cout<<m1->getContinents()[i]->getTerritories()[j]->getName()<<endl;
+        }
+        cout<<m1->getContinents()[i]->getContinentName()<<endl;
+            
+    }
 
 
-return 0;
-};
+
+    return 0;
+}
+
+
