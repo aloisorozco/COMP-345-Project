@@ -94,10 +94,6 @@ public:
 	vector<Continent*> getContinents() const;
 
 	void setContinents(const vector<Continent*>& continents);
-	
-	
-
-
 };
 
 int testLoadMaps();
