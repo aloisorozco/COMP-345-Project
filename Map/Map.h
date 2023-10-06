@@ -43,28 +43,6 @@ public:
 };
 
 
-// class Edge {
-// private:
-// 	Territory* source;
-// 	Territory* destination;
-
-// public:
-// 	Edge(); //initialize default constructor
-// 	Edge(Territory* u, Territory* v); //initialize constructor
-// 	Edge(const Edge& copyEdge); //initialize copy constructor
-
-// 	Territory* getSource() const; //get start territory
-// 	Territory* getDestination() const ; //get end territory
-
-// 	void setSource(Territory* u); //set start territory
-// 	void setDestination(Territory* v); //set end territory
-
-// 	Edge& operator=(const Edge& edge);
-
-// 	~Edge(); //initialize destructor
-// };
-
-
 class Continent {
 private:
 	string* name;
@@ -113,7 +91,7 @@ public:
 
 };
 
-
+int testLoadMaps();
 
 
 
