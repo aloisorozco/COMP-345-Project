@@ -14,13 +14,13 @@ Territory* getTerritoryArray() {
 	Territory* territoryArray = new Territory[7];
 
     // Create Territories
-	territoryArray[0] = Territory("Yukon", 2, 2, "c1");
-	territoryArray[1] = Territory("Quebec", 2, 2, "c1");
-	territoryArray[2] = Territory("Ontario", 2, 2, "c1");
-	territoryArray[3] = Territory("Manitoba", 2, 2, "c1");
-	territoryArray[4] = Territory("BC", 2, 2, "c1");
-	territoryArray[5] = Territory("Mexico", 2, 2, "c1");
-	territoryArray[6] = Territory("USA", 2, 2, "c1");
+	territoryArray[0] = Territory("Yukon", "c1");
+	territoryArray[1] = Territory("Quebec", "c1");
+	territoryArray[2] = Territory("Ontario", "c1");
+	territoryArray[3] = Territory("Manitoba", "c1");
+	territoryArray[4] = Territory("BC", "c1");
+	territoryArray[5] = Territory("Mexico", "c1");
+	territoryArray[6] = Territory("USA", "c1");
 
 	return territoryArray;
 }

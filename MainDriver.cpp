@@ -6,7 +6,7 @@
 #include "GameEngine/GameEngine.h"
 #include "Cards/Cards.h"
 #include "Orders/Orders.h"
-//#include "Player/Player.h"
+#include "Player/Player.h"
 //#include "Map/Map.h"
 
 
@@ -45,7 +45,7 @@ int main() {
 
             case 2:
                 // call function to test player
-                //testPlayers();
+                testPlayers();
                 break;
 
             case 3:
