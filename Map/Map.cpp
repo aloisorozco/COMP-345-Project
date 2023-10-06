@@ -193,6 +193,15 @@ int main(){
 
     cout<<c1->getContinentName()<<endl;
 
+    c1->addTerritory(t1);
+    c1->addTerritory(t2);
+    c1->addTerritory(t3);
+    c2->addTerritory(t4);
+    c2->addTerritory(t5);
+    c2->addTerritory(t6);
+    c3->addTerritory(t7);
+    
+
     Map* m1 = new Map();
 
     m1->addContinent(c1);

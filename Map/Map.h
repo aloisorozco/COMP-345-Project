@@ -16,7 +16,6 @@ private:
 	vector<Territory*> adjacentTerritories;
 	friend ostream& operator << (ostream& out, const Territory& territory);
 
-
 public:	
 	Territory();//Inititalize default constructor
 
