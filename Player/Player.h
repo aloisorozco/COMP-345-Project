@@ -48,7 +48,7 @@ public:
 
 	void setPlayerID(int playerID);
 
-	void setTerritoryArray(Territory territoryArray);
+	void setTerritoryArray(Territory* territoryArray);
 
 	void setOrdersList(OrdersList ordersList);
 
