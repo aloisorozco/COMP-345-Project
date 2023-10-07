@@ -96,7 +96,7 @@ public:
 	void setContinents(const vector<Continent*>& continents);
 };
 
-int testLoadMaps();
+void testLoadMaps();
 
 
 

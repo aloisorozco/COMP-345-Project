@@ -1,110 +1,242 @@
-#include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <vector>
+#include <map>
 #include <filesystem>
-
 #include "Map.h"
 
 using namespace std;
 namespace fs = std::filesystem; // Namespace alias for filesystem
 
-int testLoadMaps(){
+void testLoadMaps()
+{
     // Get the current working directory
     fs::path currentDir = fs::current_path();
 
     // Search for a ".map" file in the current directory
     std::string mapFileName;
 
-    while (true){
-           // Get the current working directory
-    fs::path currentDir = fs::current_path();
+    while (true)
+    {
+        // Get the current working directory
+        fs::path currentDir = fs::current_path();
 
-    // Search for a ".map" file in the current directory
-    std::string mapFileName;
-    for (const auto& entry : fs::directory_iterator(currentDir)) {
-        if (entry.is_regular_file() && entry.path().extension() == ".map" || entry.is_regular_file() && entry.path().extension() == ".txt") {
-            mapFileName = entry.path().string();
+        // Search for a ".map" file in the current directory
+        vector<string> mapFiles;
+        std::string mapFileName;
 
-            // Open the ".map" file
-            std::ifstream inputFile(mapFileName);
-            cout<<"Opened: "<< mapFileName<<endl;
+        for (const auto &entry : fs::directory_iterator(currentDir))
+        {
+            if (entry.is_regular_file() && (entry.path().extension() == ".map" || entry.path().extension() == ".txt"))
+            {
+                mapFileName = entry.path().filename().string();
 
-            // Check if the file is open
-            if (!inputFile.is_open()) {
-                std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
-                continue; // Skip to the next file
+                // Open the ".map" file
+                std::ifstream file(mapFileName);
+
+                // Check if the file is open
+                if (!file.is_open())
+                {
+                    std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+                    continue; // Skip to the next file
+                }
+
+                std::string firstLine;
+                if (std::getline(file, firstLine) && firstLine.find("[Map]") == 0)
+                {
+                    // The first line starts with "[Map]", so this is the correct file
+                    mapFiles.push_back(mapFileName);
+                    file.close();
+                }
+
+                if (std::getline(file, firstLine) && firstLine.find("[Map]") != 0)
+                {
+                    file.close(); // Close the file, as it doesn't start with "[Map]"
+                }
             }
-
-            std::string firstLine;
-            if (std::getline(inputFile, firstLine) && firstLine.find("[Map]") == 0) {
-                // The first line starts with "[Map]", so this is the correct file
-                inputFile.close();
-                break; // Exit the loop
-            }
-
-            inputFile.close(); // Close the file, as it doesn't start with "[Map]"
         }
-    }
 
-    // Check if a ".map" file with "[Map]" as the first line was found
-    if (mapFileName.empty()) {
-        std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
-        return 1; // Return an error code
-    }
+        cout << "You can open the following files: " << endl;
+        for (const string &mapFile : mapFiles)
+        {
+            cout << mapFile << endl;
+        }
 
-    // Open the selected ".map" file
-    std::ifstream inputFile(mapFileName);
+        while (true)
+        {
+            cout << "\nSelect the file you want to load: ";
+            cin >> mapFileName;
 
-    // Check if the file is open
-    if (!inputFile.is_open()) {
-        std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
-        return 1; // Return an error code
-    }
-
-    std::string line;
-
-    // Read the file line by line
-    while (std::getline(inputFile, line)) {
-        // If the line is empty or contains only spaces and tabs, consider it a new line
-        if (line.empty() || line.find_first_not_of(" \t\n\r\f\v") == std::string::npos) {
-            std::cout << "New Line" << std::endl;
-        } else {
-            // Create a stringstream to parse the line
-            std::stringstream ss(line);
-            std::string word;
-
-            // Vector to store words
-            std::vector<std::string> words;
-
-            // Split the line using commas as delimiters
-            while (std::getline(ss, word, ',')) {
-                // Remove leading and trailing spaces from each word
-                word.erase(0, word.find_first_not_of(" \t\n\r\f\v"));
-                word.erase(word.find_last_not_of(" \t\n\r\f\v") + 1);
-                
-                // Add the word to the vector if it's not empty
-                if (!word.empty()) {
-                    words.push_back(word);
+            bool isValidFile = false;
+            for (int i = 0; i < mapFiles.size(); i++)
+            {
+                if (mapFileName == mapFiles[i])
+                {
+                    isValidFile = true;
+                    break;
                 }
             }
 
-            // Process the words (you can replace this with your logic)
-            for (const std::string& w : words) {
-                std::cout << "Word: " << w << std::endl;
+            if (isValidFile)
+            {
+                cout << "\nLoading: " << mapFileName <<"...\n\n"<< endl;
+                break;
+            }
+            else
+            {
+                cout << "\nInvalid file name, please try again" << endl;
             }
         }
-    }
 
-    // Close the input file
-    inputFile.close();
+        // Check if a ".map" file with "[Map]" as the first line was found
+        if (mapFileName.empty())
+        {
+            std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
+        }
 
-    return 0; // Return 0 to indicate success
+        // Open the selected ".map" file
+        std::ifstream file(mapFileName);
+
+        // Check if the file is open
+        if (!file.is_open())
+        {
+            std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+        }
+
+        string line;
+        bool isContinentSection = false;
+        bool isTerritorySection = false;
+
+        Map *map = new Map();
+        vector<Territory *> territories; // Store territories temporarily
+
+        while (getline(file, line))
+        {
+            if (line == "[Continents]")
+            {
+                isTerritorySection = false;
+                isContinentSection = true;
+                continue;
+            }
+            else if (line == "[Territories]")
+            {
+                isContinentSection = false;
+                isTerritorySection = true;
+                continue;
+            }
+
+            if (isContinentSection && line != "")
+            {
+                string continentName = line.substr(0, line.find('='));
+                Continent *continent = new Continent(continentName);
+                map->addContinent(continent);
+            }
+            else if (isTerritorySection && line != "")
+            {
+                stringstream ss(line);
+                string territoryName;
+                getline(ss, territoryName, ',');
+                string x, y, continentName;
+                getline(ss, x, ',');
+                getline(ss, y, ',');
+                getline(ss, continentName, ',');
+                Territory *territory = new Territory(territoryName, continentName);
+                territories.push_back(territory);
+            }
+        }
+
+        file.close();
+
+        // Now that all territories are created, let's add their neighbors
+        file.open(mapFileName); // Reopen the file
+        isContinentSection = false;
+        isTerritorySection = false;
+
+        while (getline(file, line))
+        {
+            if (line == "[Continents]")
+            {
+                isTerritorySection = false;
+                isContinentSection = true;
+                continue;
+            }
+            else if (line == "[Territories]")
+            {
+                isContinentSection = false;
+                isTerritorySection = true;
+                continue;
+            }
+
+            if (isTerritorySection && line != "")
+            {
+                stringstream ss(line);
+                string territoryName;
+                getline(ss, territoryName, ',');
+                Territory *territory = nullptr;
+
+                for (Territory *t : territories)
+                {
+                    if (t->getName() == territoryName)
+                    {
+                        territory = t;
+                        break;
+                    }
+                }
+
+                if (territory)
+                {
+                    string neighbors;
+                    while (getline(ss, neighbors, ','))
+                    {
+                        Territory *neighbor = nullptr;
+
+                        for (Territory *t : territories)
+                        {
+                            if (t->getName() == neighbors)
+                            {
+                                neighbor = t;
+                                break;
+                            }
+                        }
+
+                        if (neighbor)
+                        {
+                            territory->addNeighbor(neighbor);
+                        }
+                    }
+
+                    for (Continent *continent : map->getContinents())
+                    {
+                        if (territory->getContinent() == continent->getContinentName())
+                        {
+                            continent->addTerritory(territory);
+                        }
+                    }
+                }
+            }
+        }
+
+        file.close();
+
+        cout << *map << endl;
+
+        if (map->validate())
+        {
+            cout << "\n\nMap is valid" << endl;
+        }
+        else
+        {
+            cout << "Map is not valid" << endl;
+        }
+
+        break;
     }
 };
 
 int main(){
+
     testLoadMaps();
+
     return 0;
-};
+}
+

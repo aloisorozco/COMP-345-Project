@@ -46,6 +46,9 @@ ostream& operator << (ostream& out, const Territory& territory)
     out << "Player " << territory.getPlayer() << endl;
     out << "Army " << territory.getArmy() << endl;
     out << "Continent " << territory.getContinent() << endl;
+    for (Territory* neighbor : territory.getNeighbors()) {
+        out << "Neighbor: " << neighbor->getName() << endl;
+    }
 	return out;
 }
 
@@ -174,7 +177,7 @@ void Map::setContinents(const vector<Continent*>& continents) {
 
 ostream& operator<<(std::ostream& os, const Map& m){
 
-    os << "Map Information:\n" << std::endl;
+   
     
     // Iterate through continents and territories and print their details.
     for (const Continent* continent : m.continents) {
@@ -243,6 +246,7 @@ bool Map::isContinentConnected() {
         // Mark the current territory as visited.
         visited.insert(currentTerritory);
         
+        
         // Get the neighbors of the current territory.
         for (Territory* neighbor : currentTerritory->getNeighbors()) {
             if (visited.find(neighbor) == visited.end()) {
@@ -283,15 +287,18 @@ bool Map::checkTerritoriesInContinents() {
 
 bool Map::validate() {
     if (this->getContinents().empty()) {
+        cout<<"No continents"<<endl;
         // If there are no continents, the map is not valid.
         return false;
     }
 
     if (!isMapConnected() || !isContinentConnected()) {
+        cout<<"Map is not connected"<<endl;
         // If the map is not connected, it is not valid.
         return false;
     }
     if (!checkTerritoriesInContinents()) {
+        cout<<"Territories are not in continents"<<endl;
         // If a territory is assigned to multiple continents, the map is not valid.
         return false;
     }
@@ -301,8 +308,8 @@ bool Map::validate() {
 
 
 
-/* To test map Functionality
 
+/* Test for map functionality
 int main(){
 
     Territory* t1 = new Territory("Canada", "North America");
