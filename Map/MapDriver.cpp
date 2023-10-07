@@ -20,6 +20,8 @@ void testLoadMaps()
     {
         // Get the current working directory
         fs::path currentDir = fs::current_path();
+        
+        
 
         // Search for a ".map" file in the current directory
         vector<string> mapFiles;
@@ -232,11 +234,4 @@ void testLoadMaps()
         break;
     }
 };
-
-int main(){
-
-    testLoadMaps();
-
-    return 0;
-}
 

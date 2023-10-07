@@ -7,7 +7,7 @@
 #include "Cards/Cards.h"
 #include "Orders/Orders.h"
 #include "Player/Player.h"
-//#include "Map/Map.h"
+#include "Map/Map.h"
 
 
 void printMenu() {
