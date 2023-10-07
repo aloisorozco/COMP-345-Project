@@ -6,9 +6,9 @@
 #include <string>
 #include <map>
 #include <vector>
+using namespace std;
 
-
-
+// copy constructor, assignment operator, and stream insertion operator.
 
 // The GameState class represents a single state in a game.
 // Each state has a name and a set of transitions that lead to other states.
@@ -16,7 +16,9 @@ class GameState {
 public:
     // Constructor that initializes the state with a name.
     GameState(std::string name);
-
+    GameState(const GameState&); // 1.copy constructor
+    GameState& operator =(const GameState&); // 2.copy operator
+    friend ostream& operator<<(ostream&,const GameState&); // 3.stream insertion
     // Returns the name of the state.
     std::string getName() const;
 
@@ -46,7 +48,9 @@ class GameEngine {
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
-
+    GameEngine(const GameEngine&); // 1.copy constructor
+    GameEngine& operator =(const GameEngine&); // 2.copy operator
+    friend ostream& operator<<(ostream&,const GameEngine&); // 3.stream insertion
     // Destructor that cleans up the game engine.
     ~GameEngine();
 
