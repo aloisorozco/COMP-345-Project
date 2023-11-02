@@ -16,31 +16,50 @@ vector<Territory*> getTerritoryArray() {
     // Create Territories
 	Territory* temp = new Territory("Yukon", "c1");
 	temp->setPlayer(2);
-	territoryArray.push_back(temp);
 
-	temp = new Territory("Quebec", "c1");
-	temp->setPlayer(2);
-	territoryArray.push_back(temp);
+	Territory* temp1 = new Territory("Quebec", "c1");
+	temp1->setPlayer(2);
 
-	temp = new Territory("Ontario", "c1");
-	temp->setPlayer(2);
-	territoryArray.push_back(temp);
+	Territory* temp2 = new Territory("Ontario", "c1");
+	temp2->setPlayer(2);
 
-	temp = new Territory("Manitoba", "c1");
-	temp->setPlayer(1);
-	territoryArray.push_back(temp);
+	Territory* temp3 = new Territory("Manitoba", "c1");
+	temp3->setPlayer(1);
 
-	temp = new Territory("BC", "c1");
-	temp->setPlayer(1);
-	territoryArray.push_back(temp);
+	Territory* temp4 = new Territory("BC", "c1");
+	temp4->setPlayer(1);
 
-	temp = new Territory("Mexico", "c1");
-	temp->setPlayer(1);
-	territoryArray.push_back(temp);
+	Territory* temp5 = new Territory("Mexico", "c1");
+	temp5->setPlayer(1);
 
-	temp = new Territory("USA", "c1");
-	temp->setPlayer(1);
+	Territory* temp6 = new Territory("USA", "c1");
+	temp6->setPlayer(1);
+
+	temp->addNeighbor(temp1);
+	temp1->addNeighbor(temp);
+
+	temp1->addNeighbor(temp2);
+	temp2->addNeighbor(temp1);
+
+	temp->addNeighbor(temp2);
+	temp2->addNeighbor(temp);
+
+	temp5->addNeighbor(temp6);
+	temp6->addNeighbor(temp5);
+
+	temp1->addNeighbor(temp6);
+	temp6->addNeighbor(temp1);
+
+	temp2->addNeighbor(temp6);
+	temp6->addNeighbor(temp2);
+
 	territoryArray.push_back(temp);
+	territoryArray.push_back(temp1);
+	territoryArray.push_back(temp2);
+	territoryArray.push_back(temp3);
+	territoryArray.push_back(temp4);
+	territoryArray.push_back(temp5);
+	territoryArray.push_back(temp6);
 
 	return territoryArray;
 }
