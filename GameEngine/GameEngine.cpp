@@ -41,7 +41,9 @@ ostream &operator<<(ostream& out, const GameState &) {
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(nullptr) {}
+GameEngine::GameEngine() : currentState(nullptr) {
+
+}
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
 GameEngine::~GameEngine() {
@@ -102,4 +104,11 @@ GameEngine &GameEngine::operator=(const GameEngine &) {
 }
 ostream &operator<<(ostream& out, const GameEngine &) {
     return out;
+}
+
+void GameEngine::play() {
+    
+    //will be hardcoding some stuff here we will need to change this once part 1 & 2 are done
+
+
 }

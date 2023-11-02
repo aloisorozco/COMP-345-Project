@@ -72,6 +72,8 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
+    void play();
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;

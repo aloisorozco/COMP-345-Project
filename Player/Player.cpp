@@ -21,6 +21,24 @@ Player::Player() {
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
 	hand = NULL;
+	map = NULL;
+
+	sizeOfToAttack = new int(0);
+	sizeOfToDefend = new int(0);
+}
+
+Player::Player(Map* map) {
+	playerID = new int(*playerCount);
+	(*playerCount)++;
+
+	this->map = map;
+	territoryArray = NULL;
+	sizeOfTerritoryArray = new int(0);
+	ordersList = new OrdersList();
+	hand = NULL;
+
+	sizeOfToAttack = new int(0);
+	sizeOfToDefend = new int(0);
 }
 
 //initializing a player with a collection of territories
@@ -32,6 +50,10 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
 	ordersList = new OrdersList();
 	hand = NULL;
+	map = NULL;
+
+	sizeOfToAttack = new int(0);
+	sizeOfToDefend = new int(0);
 }
 
 //copy constructor
@@ -41,6 +63,9 @@ Player::Player(const Player& copyPlayer) {
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
 	this->ordersList = copyPlayer.ordersList;
 	this->hand = copyPlayer.hand;
+	this->map = copyPlayer.map;
+	this->sizeOfToAttack = copyPlayer.sizeOfToAttack;
+	this->sizeOfToDefend = copyPlayer.sizeOfToDefend;
 }
 
 //destructor to avoid any memory leaks
@@ -56,22 +81,66 @@ Player::~Player() {
 
 	delete this->hand;
 	hand = NULL;
+
+	delete this->map;
+	map = NULL;
 }
 
-//territories to defend - for now just returns the territoryArray
+//territories to defend
 Territory* Player::toDefend() {
-	if (this->sizeOfTerritoryArray == 0) {
-		return NULL;
+	if (map == NULL) {
+		return 0;
 	}
-	return territoryArray;
+
+	Territory* temp = new Territory[map->getTerritories().size()];
+	int count = 0;
+	for (Territory* territory: map->getTerritories()) {
+		if (territory->getPlayer() == *playerID) {
+			temp[count] = *territory;
+			count++;
+		}
+	}
+
+	Territory* toDefend = new Territory[count];
+	for (int i = 0; i < count; i++) {
+		toDefend[i] = temp[i];
+	}
+
+	sizeOfToDefend = new int(count);
+	return toDefend;
 }
 
-//territories to attack - for now just returns the territoryArray
+//territories to attack - super inefficient but what can you do
 Territory* Player::toAttack() {
-	if (this->sizeOfTerritoryArray == 0) {
-		return NULL;
+	if (map == NULL) {
+		return 0;
 	}
-	return territoryArray;
+
+	Territory* temp = new Territory[map->getTerritories().size()];
+	int count = 0;
+	//loop through all territories on the map
+	for (Territory* territory: map->getTerritories()) {
+		//if the current territory belongs to this player
+		if (territory->getPlayer() == *playerID) {
+			//loop through neighbouring territories
+			for (Territory* neighbor: territory->getNeighbors()) {
+				//if neighbouring territory is not already in the array and the neighbouring territory does not belong to this player
+				if (!isAlreadyInToAttack(temp, count, neighbor) && neighbor->getPlayer() != *playerID) {
+					//add it to the array
+					temp[count] = *neighbor;
+					count++;
+				}
+			}
+		}
+	}
+
+	Territory* toAttack = new Territory[count];
+	for (int i = 0; i < count; i++) {
+		toAttack[i] = temp[i];
+	}
+
+	sizeOfToAttack = new int(count);
+	return toAttack;
 }
 
 //issuing order
@@ -148,6 +217,10 @@ Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
 	this->setHand(*player.hand);
+	this->setMap(*player.map);
+
+	this->setSizeOfToAttack(*player.sizeOfToAttack);
+	this->setSizeOfToDefend(*player.sizeOfToDefend);
 
 	return *this;
 }
@@ -169,6 +242,10 @@ Hand Player::getHand() {
 	return *this->hand;
 }
 
+Map Player::getMap() {
+	return *this->map;
+}
+
 void Player::setPlayerID(int playerID) {
 	*this->playerID = playerID;
 }
@@ -184,5 +261,9 @@ void Player::setOrdersList(OrdersList ordersList) {
 
 void Player::setHand(Hand hand) {
 	*this->hand = hand;
+}
+
+void Player::setMap(Map map) {
+	*this->map = map;
 }
 

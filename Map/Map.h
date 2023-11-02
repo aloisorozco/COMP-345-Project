@@ -73,6 +73,9 @@ public:
 class Map {
 	private:
     vector<Continent*> continents;
+
+	//vector of all territories on the map
+	vector<Territory*> territories;
 public:
     Map();
     Map(const Map& m); // Copy constructor
@@ -94,6 +97,8 @@ public:
 	vector<Continent*> getContinents() const;
 
 	void setContinents(const vector<Continent*>& continents);
+
+	vector<Territory*> getTerritories();
 };
 
 void testLoadMaps();
