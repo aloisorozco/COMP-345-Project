@@ -74,6 +74,8 @@ public:
 
     void play();
 
+    void mainGameLoop();
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;

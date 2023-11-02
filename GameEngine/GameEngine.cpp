@@ -107,8 +107,9 @@ ostream &operator<<(ostream& out, const GameEngine &) {
 }
 
 void GameEngine::play() {
-    
-    //will be hardcoding some stuff here we will need to change this once part 1 & 2 are done
 
+}
 
+void GameEngine::mainGameLoop() {
+    //part 3 here
 }
