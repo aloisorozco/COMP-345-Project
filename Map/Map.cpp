@@ -18,10 +18,10 @@ Territory::Territory(const string& territoryName, const string& territoryContine
 
 //Copy constructor (Territory)
 Territory::Territory(const Territory& copyTerritory){
-    this->name = copyTerritory.name;
-    this->player = copyTerritory.player;
-    this->army = copyTerritory.army;
-    this->continent = copyTerritory.continent;
+    this->name = new string(*copyTerritory.name);
+    this->player = new int(*copyTerritory.player);
+    this->army = new int(*copyTerritory.army);
+    this->continent = new string(*copyTerritory.continent);
 }
 
 //Destructor (Territory)
@@ -93,16 +93,19 @@ void Territory::setContinent(const string& territoryContinent) {*continent = ter
 
 
 // Default Constructor (Continent) 
-Continent::Continent(): name(new string ("")) {} 
+Continent::Continent(): name(new string ("")), bonus(new int(0)) {} 
 
 //Constructor (Continent)
 Continent::Continent(const string& continentName): name(new string(continentName)){}
+
+Continent::Continent(const string& continentName, int b) : name(new string(continentName)), bonus(new int(b)) {}
 
 //Copy constructor (Continent)
 Continent::Continent(const Continent& copyContinent) {
     for (Territory* territory : copyContinent.territories) {
         territories.push_back(territory);
     }
+    this->bonus = new int(*copyContinent.bonus);
 }
 
 //Destructor (Continent)
@@ -113,6 +116,9 @@ Continent::~Continent(){
         delete territory;
         territory = NULL;               
     }
+
+    delete bonus;
+    bonus = NULL;
 }
 
 //Add Territory to Continent 
@@ -131,6 +137,7 @@ ostream& operator << (std::ostream& os, const Continent& c)
 Continent& Continent::operator=(const Continent& continent) {
 	this->setName(*continent.name);
 	this->setTerritories(continent.territories);
+    this->setBonus(*continent.bonus);
 	return *this;
 }
 
@@ -161,10 +168,32 @@ void Continent::setTerritories(const vector<Territory*>& continentTerritories) {
 //=============================================================================================================================================================================================================//
 
 
-Map::Map() {}
+Map::Map() {
+    
+}
+
+Map::Map(const Map& m) {
+    this->continents = m.continents;
+    this->territories = m.territories;
+}
+
+Map::~Map() {
+    for (Continent* c : continents) {
+        delete c;
+        c = NULL;
+    }
+
+    for (Territory* t : territories) {
+        delete t;
+        t = NULL;
+    }
+}
 
 void Map::addContinent(Continent* continent) {
     continents.push_back(continent);
+    for (Territory* territory : continent->getTerritories()) {
+        territories.push_back(territory);
+    }
 }
 
 vector<Continent*> Map::getContinents() const {
@@ -173,6 +202,15 @@ vector<Continent*> Map::getContinents() const {
 
 void Map::setContinents(const vector<Continent*>& continents) {
     this->continents = continents;
+    for (Continent* continent : continents) {
+        for (Territory* territory : continent->getTerritories()) {
+            territories.push_back(territory);
+        }
+    }
+}
+
+vector<Territory*> Map::getTerritories() {
+    return territories;
 }
 
 ostream& operator<<(std::ostream& os, const Map& m){

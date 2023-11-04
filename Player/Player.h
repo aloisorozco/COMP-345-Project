@@ -18,13 +18,35 @@ private:
 	Territory* territoryArray;
 	int* sizeOfTerritoryArray;
 	OrdersList* ordersList;
+	int* orderListIndex;
 	Hand* hand;
+
+	int* troopsToDeploy;
+
+	int* sizeOfToDefend;
+	int* sizeOfToAttack;
+	
+	//reference of map
+	Map* map;
+
+	//check to make sure we do not add duplicate territories in the toAttack array
+	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
+		for (int i = 0; i < sizeOfCurToAttack; i++) {
+			//assuming each territory has a unique name
+			if (curToAttack[i].getName() == territoryToAdd->getName()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	friend ostream& operator << (ostream& out, const Player& player);
 
 public:
 
 	Player();
+	
+	Player(Map* map);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
@@ -36,7 +58,15 @@ public:
 
 	Territory* toAttack();
 
-	void issueOrder();
+	bool issueOrder();
+
+	//void orderOrdersList();
+
+	bool hasTerritory(string territoryName);
+
+	bool Player::hasTerritory(Territory territory);
+
+	Order* getNextInOrdersList();
 
 	int getPlayerID();
 
@@ -46,6 +76,8 @@ public:
 
 	Hand getHand();
 
+	Map getMap();
+
 	void setPlayerID(int playerID);
 
 	void setTerritoryArray(Territory* territoryArray);
@@ -53,6 +85,40 @@ public:
 	void setOrdersList(OrdersList ordersList);
 
 	void setHand(Hand hand);
+
+	void setMap(Map map);
+
+	int getSizeOfToDefend() {
+		return *sizeOfToDefend;
+	}
+
+	int getSizeOfToAttack() {
+		return *sizeOfToAttack;
+	}
+
+	void setSizeOfToDefend(int i) {
+		*sizeOfToDefend = i;
+	}
+
+	void setSizeOfToAttack(int i) {
+		*sizeOfToAttack = i;
+	}
+
+	int* getTroopsToDeploy() {
+		return troopsToDeploy;
+	}
+
+	void setTroopsToDeploy(int troops) {
+		*this->troopsToDeploy = troops;
+	}
+
+	int getOrderListIndex() {
+		return *orderListIndex;
+	}
+
+	void setOrderListIndex(int index) {
+		*this->orderListIndex = index;
+	}
 
 	Player& operator=(const Player& player);
 
