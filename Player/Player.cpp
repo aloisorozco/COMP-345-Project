@@ -175,7 +175,22 @@ Territory* Player::toAttack() {
 //issuing order
 bool Player::issueOrder() {
 
-	//TODO: print toDefend & toAttack to show player what he has
+	//print toDefend & toAttack to show player what he has
+	Territory* toDefendTerritories = toDefend();
+	Territory* toAttackTerritories = toAttack();
+
+	cout << "\nTerritories to defend for player " << *playerID << endl;
+	for (int i = 0; i < getSizeOfToDefend(); i++) {
+		cout << toDefendTerritories[i] << endl;
+	}
+	cout << "---\n" << endl;
+
+	cout << "Territories to attack for player " << *playerID << endl;
+	for (int i = 0; i < getSizeOfToAttack(); i++) {
+		cout << toAttackTerritories[i] << endl;
+	}
+	cout << "---\n" << endl;
+	
 
 	if (*troopsToDeploy > 0) {
 
@@ -206,7 +221,7 @@ bool Player::issueOrder() {
 		return false;
 	}
 
-	//TODO: add choices: either advance troops or play a card if have one
+	//choose advance troops or play a card if have one or end turn
 	int actionInput;
 	
 	while (true) {
@@ -294,74 +309,12 @@ bool Player::issueOrder() {
 //	orderListIndex = new int (0);
 //}
 
-//TODO: test might fuck up cuz there is no copy constructor for sub classes of order
 Order* Player::getNextInOrdersList() {
 	if (*orderListIndex >= ordersList->getOrders().size()) {
 		return NULL;
 	}
 	return ordersList->get(*orderListIndex++);
 }
-
-/*void Player::issueOrder() {
-	int playerInput;
-
-	//The different kinds of orders are: deploy, advance,
-	//bomb, blockade, airlift, and negotiate
-	cout << "Choose an order:\n";
-	cout << "1.Deploy\n2. Advance\n3. Bomb\n4. Blockade\n5. Airlift\n6. Negotiate\n";
-
-	//getting player input
-	cin >> playerInput;
-
-	Order* order;
-
-	//creating and adding order object to player's order list
-	switch (playerInput) {
-	case 1:
-		order = new Deploy();
-		this->ordersList->add(*order);
-		cout << "Deploy order added";
-		break;
-
-	case 2:
-		order = new Advance();
-		this->ordersList->add(*order);
-		cout << "Advance order added";
-		break;
-
-	case 3:
-		order = new Bomb();
-		this->ordersList->add(*order);
-		cout << "Bomb order added";
-		break;
-
-	case 4:
-		order = new Blockade();
-		this->ordersList->add(*order);
-		cout << "Blockade order added";
-		break;
-
-	case 5:
-		order = new Airlift();
-		this->ordersList->add(*order);
-		cout << "Airlift order added";
-		break;
-
-	case 6:
-		order = new Negotiate();
-		this->ordersList->add(*order);
-		cout << "Negotiate order added";
-		break;
-	
-	default:
-		cout << "Incorrect input\n";
-		return;
-		//break;
-
-	}
-	cout << " for " << *this << endl;
-
-}*/
 
 //stream insertion operator
 ostream& operator << (ostream& out, const Player& player)

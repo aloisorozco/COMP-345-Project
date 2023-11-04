@@ -57,20 +57,12 @@ class Deploy : public Order {
         bool validate() override;
         int execute() override;
 
-        /*friend std::istream& operator>>(std::istream& in, const Deploy& deploy) {
-            cout << "Enter territory name: ";
-            in >> *deploy.territoryName;
-            cout << "Enter troops to deploy: ";
-            in >> *deploy.troopsDeployed;
-            return in;
-        }*/
 
 };
 
 class Advance : public Order {
 
     private:
-        //TODO: implement these after
         string* srcTerritoryName;
         string* dstTerritoryName;
         int* troopsToAdvance;
