@@ -3,6 +3,8 @@
 #include <iostream>
 #include <map>
 
+#include "../Player/Player.h"
+
 // Constructor for GameState. Initializes the state with a name.
 GameState::GameState(std::string name) : name(name) {}
 
@@ -41,7 +43,7 @@ ostream &operator<<(ostream& out, const GameState &) {
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(nullptr) {
+GameEngine::GameEngine() : currentState(nullptr), playerArray(NULL), sizeofPlayerArray(new int(0)) {
 
 }
 
@@ -50,6 +52,12 @@ GameEngine::~GameEngine() {
     for (std::map<std::string, GameState*>::iterator it = states.begin(); it != states.end(); ++it) {
         delete it->second;
     }
+
+    delete this->playerArray;
+    playerArray = NULL;
+
+    delete this->sizeofPlayerArray;
+    sizeofPlayerArray = NULL;
 }
 
 // Returns the current state of the game.
@@ -108,8 +116,77 @@ ostream &operator<<(ostream& out, const GameEngine &) {
 
 void GameEngine::play() {
 
+    //part 2
+
+    //part 3
+    mainGameLoop();
+}
+
+void GameEngine::reinforcementPhase() {
+    //TODO: check if player does not have territories if not remove him from the game
+    cout << "Reinforcement Phase\n" << endl;
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerArray[i].toDefend();
+        int troops = (playerArray[i].getSizeOfToDefend() / 3) + 3;//TODO: check if owns entire continents
+        playerArray[i].setTroopsToDeploy(troops);
+    }
+    cout << "--------------------\n" << endl;
+}
+
+void GameEngine::issueOrdersPhase() {
+    cout << "Issuing Orders Phase\n" << endl;
+    bool* playersDoneArray = new bool[*sizeofPlayerArray];
+    while (true) {
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playersDoneArray[i] = false;
+        }
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            if (playersDoneArray[i]) {
+                break;
+            }
+            playersDoneArray[i] = playerArray[i].issueOrder();
+        }
+        //TODO: test
+        bool playersDone = true;
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playersDone = playersDone && playersDoneArray[i];
+        }
+        if (playersDone) {
+            break;
+        }
+    }
+    cout << "--------------------\n" << endl;
+}
+
+void GameEngine::executeOrdersPhase() {
+    cout << "Execute Orders Phase\n" << endl;
+    while (true) {
+        bool executeOrdersDone = true;
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            Order* order = playerArray[i].getNextInOrdersList();
+            if (order != NULL) {
+                executeOrdersDone = false;
+                order->execute();
+            }
+        }
+
+        if (executeOrdersDone) {
+            break;
+        }
+    }
+    cout << "--------------------\n" << endl;
 }
 
 void GameEngine::mainGameLoop() {
-    //part 3 here
+    //part 3 here - players already have to be set
+
+    //getting & setting troops
+    reinforcementPhase();
+
+    //issuing orders phase
+    issueOrdersPhase();
+
+    //executing orders phase
+    executeOrdersPhase();
+
 }

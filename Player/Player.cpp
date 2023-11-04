@@ -20,11 +20,14 @@ Player::Player() {
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
+	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
 	hand = NULL;
 	map = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
+
+	troopsToDeploy = new int(0);
 }
 
 Player::Player(Map* map) {
@@ -35,10 +38,13 @@ Player::Player(Map* map) {
 	territoryArray = NULL;
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
+	orderListIndex = new int(-1);
 	hand = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
+
+	troopsToDeploy = new int(0);
 }
 
 //initializing a player with a collection of territories
@@ -49,11 +55,14 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	this->territoryArray = territoryArray;
 	this->sizeOfTerritoryArray = new int(sizeOfTerritoryArray);
 	ordersList = new OrdersList();
+	orderListIndex = new int(-1);
 	hand = NULL;
 	map = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
+
+	troopsToDeploy = new int(0);
 }
 
 //copy constructor
@@ -62,10 +71,12 @@ Player::Player(const Player& copyPlayer) {
 	this->territoryArray = copyPlayer.territoryArray;
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
 	this->ordersList = copyPlayer.ordersList;
+	this->orderListIndex = copyPlayer.orderListIndex;
 	this->hand = copyPlayer.hand;
 	this->map = copyPlayer.map;
 	this->sizeOfToAttack = copyPlayer.sizeOfToAttack;
 	this->sizeOfToDefend = copyPlayer.sizeOfToDefend;
+	this->troopsToDeploy = copyPlayer.troopsToDeploy;
 }
 
 //destructor to avoid any memory leaks
@@ -79,11 +90,23 @@ Player::~Player() {
 	delete this->ordersList;
 	ordersList = NULL;
 
+	delete this->orderListIndex;
+	orderListIndex = NULL;
+
 	delete this->hand;
 	hand = NULL;
 
 	delete this->map;
 	map = NULL;
+
+	delete this->sizeOfToAttack;
+	sizeOfToAttack = NULL;
+
+	delete this->sizeOfToDefend;
+	sizeOfToDefend = NULL;
+
+	delete this->troopsToDeploy;
+	troopsToDeploy = NULL;
 }
 
 //territories to defend
@@ -105,6 +128,9 @@ Territory* Player::toDefend() {
 	for (int i = 0; i < count; i++) {
 		toDefend[i] = temp[i];
 	}
+
+	delete temp;
+	temp = NULL;
 
 	sizeOfToDefend = new int(count);
 	return toDefend;
@@ -139,12 +165,144 @@ Territory* Player::toAttack() {
 		toAttack[i] = temp[i];
 	}
 
+	delete[] temp;
+	temp = NULL;
+
 	sizeOfToAttack = new int(count);
 	return toAttack;
 }
 
 //issuing order
-void Player::issueOrder() {
+bool Player::issueOrder() {
+
+	//TODO: print toDefend & toAttack to show player what he has
+
+	if (*troopsToDeploy > 0) {
+
+		string tempString;
+		int tempInt;
+		cout << "Deploy troops: " << endl;
+		cout << "Number of troops left to deploy: " << *troopsToDeploy << endl;
+
+		while (true) {
+			cout << "Enter territory name: ";
+			cin >> tempString;
+			cout << "Enter troops to deploy: ";
+			cin >> tempInt;
+
+			//TODO: also need to call validate function to see if territory belongs to player
+			if (tempInt <= *troopsToDeploy && hasTerritory(tempString)) {
+				break;
+			}
+			else {
+				cout << "Invalid input please try again" << endl;
+			}
+		}
+
+		Deploy* deploy = new Deploy(tempString, tempInt);
+		ordersList->add(*deploy);
+		troopsToDeploy = new int(*troopsToDeploy - tempInt);
+		
+		return false;
+	}
+
+	//TODO: add choices: either advance troops or play a card if have one
+	int actionInput;
+	
+	while (true) {
+		cout << "Choose an action: " << endl;
+
+		cout << "1. Advance troops" << endl;
+		cout << "2. Play a card" << endl;
+		cout << "3. End turn" << endl;
+
+		cin >> actionInput;
+
+		if (actionInput > 0 && actionInput < 4) {
+			if (actionInput == 2 && hand->getHandSize() == 0) {
+				cout << "No cards in hand at the moment please select another option" << endl;
+			}
+			else {
+				break;
+			}
+		}
+	}
+	if (actionInput == 1) {
+		//makes an advance object with inputs but does not validate input
+		string srcInput;
+		string dstInput;
+		int tempInt;
+		while (true) {
+			
+			cout << "Option 1: Advance troops\n" << endl;
+
+			cout << "Enter source territory name: ";
+			cin >> srcInput;
+
+			cout << "Enter destination territory name: ";
+			cin >> dstInput;
+			;
+			cout << "Enter troops to advance: ";
+			cin >> tempInt;
+
+			if (tempInt > 0) {
+				break;
+			}
+			else {
+				cout << "Invalid number of troops to advance please try again" << endl;
+			}
+		}
+		
+
+		Advance* advance = new Advance(srcInput, dstInput, tempInt);
+		ordersList->add(*advance);
+		return false;
+	}
+	else if (actionInput == 2) {
+		//TODO: honestly idek how to fix card class will have to check way later
+		cout << "Option 2: Play a card\n\n" << endl;
+
+		return false;
+	}
+	else if (actionInput == 3) {
+		//signals to game engine that no more orders will be done
+		cout << "Option 4: End turn\n" << endl;
+		return true;
+	}
+	
+}
+
+//put all deploy orders first
+//void Player::orderOrdersList() {
+//	if (ordersList->getOrders().size() == 0) {
+//		return;
+//	}
+//	vector<Order> orderedOrdersList(ordersList->getOrders());
+//	for (int i = 0; i < (ordersList->getOrders().size() - 1); i++) {
+//		for (int j = i + 1; j < ordersList->getOrders().size(); j++) {
+//			bool rightIsDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) != NULL;
+//			bool leftIsNotDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) == NULL;
+//
+//			if (rightIsDeploy && leftIsNotDeploy) {
+//				Order temp = orderedOrdersList[i];
+//				orderedOrdersList[i] = *ordersList->get(j);
+//				orderedOrdersList[j] = temp;
+//			}
+//		}
+//	}
+//
+//	orderListIndex = new int (0);
+//}
+
+//TODO: test might fuck up cuz there is no copy constructor for sub classes of order
+Order* Player::getNextInOrdersList() {
+	if (*orderListIndex >= ordersList->getOrders().size()) {
+		return NULL;
+	}
+	return ordersList->get(*orderListIndex++);
+}
+
+/*void Player::issueOrder() {
 	int playerInput;
 
 	//The different kinds of orders are: deploy, advance,
@@ -203,7 +361,7 @@ void Player::issueOrder() {
 	}
 	cout << " for " << *this << endl;
 
-}
+}*/
 
 //stream insertion operator
 ostream& operator << (ostream& out, const Player& player)
@@ -214,13 +372,18 @@ ostream& operator << (ostream& out, const Player& player)
 
 //assignment operator
 Player& Player::operator=(const Player& player) {
+	this->setPlayerID(*player.playerID);
+
 	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
+	this->setOrderListIndex(*player.orderListIndex);
 	this->setHand(*player.hand);
 	this->setMap(*player.map);
 
 	this->setSizeOfToAttack(*player.sizeOfToAttack);
 	this->setSizeOfToDefend(*player.sizeOfToDefend);
+
+	this->troopsToDeploy = player.troopsToDeploy;
 
 	return *this;
 }
@@ -247,7 +410,7 @@ Map Player::getMap() {
 }
 
 void Player::setPlayerID(int playerID) {
-	*this->playerID = playerID;
+	this->playerID = new int(playerID);
 }
 
 

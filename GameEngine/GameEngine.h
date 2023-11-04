@@ -2,6 +2,7 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
+#include "../Player/Player.h"
 
 #include <string>
 #include <map>
@@ -76,12 +77,38 @@ public:
 
     void mainGameLoop();
 
+    void reinforcementPhase();
+
+    void issueOrdersPhase();
+
+    void executeOrdersPhase();
+
+    void setPlayers(Player* players, int sizeofPlayers) {
+        playerArray = players;
+        sizeofPlayerArray = new int(sizeofPlayers);
+    }
+
+    void addPlayer(Player player) {
+        Player* temp = new Player[*sizeofPlayerArray];
+        playerArray = new Player[*sizeofPlayerArray + 1];
+
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playerArray[i] = temp[i];
+        }
+
+        playerArray[*sizeofPlayerArray] = player;
+        sizeofPlayerArray++;
+    }
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;
 
     // The current state of the game.
     GameState* currentState;
+
+    Player* playerArray;
+    int* sizeofPlayerArray;
 };
 
 //free functions declaration

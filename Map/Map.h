@@ -82,8 +82,7 @@ public:
     Map& operator=(const Map& m); // Assignment operator
     friend std::ostream& operator<<(std::ostream& os, const Map& m); // Stream insertion operator
 
-    
-    
+	~Map();
 
     void addContinent(Continent* c);
 

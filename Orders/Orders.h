@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class Order {
 
     protected:
@@ -35,27 +37,61 @@ class Order {
         }
 };
 
-class Deploy : public Order{
+class Deploy : public Order {
+
+    private:
+        string* territoryName;
+        int* troopsDeployed;
 
     public:
         Deploy(){
             description = "This is a deploy order";
+            territoryName = new string();
+            troopsDeployed = new int(0);
+        }
+
+        Deploy(string tName, int troops) : territoryName(new string(tName)), troopsDeployed(new int(troops)) {
+
         }
 
         bool validate() override;
         int execute() override;
 
+        /*friend std::istream& operator>>(std::istream& in, const Deploy& deploy) {
+            cout << "Enter territory name: ";
+            in >> *deploy.territoryName;
+            cout << "Enter troops to deploy: ";
+            in >> *deploy.troopsDeployed;
+            return in;
+        }*/
+
 };
 
-class Advance : public Order{
+class Advance : public Order {
+
+    private:
+        //TODO: implement these after
+        string* srcTerritoryName;
+        string* dstTerritoryName;
+        int* troopsToAdvance;
 
     public:
         Advance(){
             description = "This is an Advance order";
+            srcTerritoryName = new string();
+            dstTerritoryName = new string();
+            troopsToAdvance = new int(0);
+        }
+
+        Advance(string src, string dst, int troops) : 
+            srcTerritoryName(new string(src)), dstTerritoryName(new string(dst)), troopsToAdvance(new int (troops)) {
+
         }
 
         bool validate() override;
         int execute() override;
+
+
 
 };
 
@@ -125,6 +161,19 @@ class OrdersList {
         int remove();
         int remove(int index);
         int executeAll();
+
+        //keep this function returning a pointer!!!
+        Order* get(int index) {
+            return &orders[index];
+        }
+
+        vector<Order> getOrders() {
+            return orders;
+        }
+
+        void setOrder(vector<Order> ordersVector) {
+            orders = ordersVector;
+        }
 
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
 };

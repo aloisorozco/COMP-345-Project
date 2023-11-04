@@ -170,6 +170,18 @@ Map::Map(const Map& m) {
     this->territories = m.territories;
 }
 
+Map::~Map() {
+    for (Continent* c : continents) {
+        delete c;
+        c = NULL;
+    }
+
+    for (Territory* t : territories) {
+        delete t;
+        t = NULL;
+    }
+}
+
 void Map::addContinent(Continent* continent) {
     continents.push_back(continent);
     for (Territory* territory : continent->getTerritories()) {
