@@ -40,16 +40,6 @@ private:
 		return false;
 	}
 
-	bool Player::hasTerritory(string territoryName) {
-		Territory* toDefendArray = toDefend();
-		for (int i = 0; i < *sizeOfToDefend; i++) {
-			if (toDefendArray[i].getName() == territoryName) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	friend ostream& operator << (ostream& out, const Player& player);
 
 public:
@@ -68,11 +58,13 @@ public:
 
 	Territory* toAttack();
 
-	void addToOrderList(Order* order);
-
 	bool issueOrder();
 
 	//void orderOrdersList();
+
+	bool hasTerritory(string territoryName);
+
+	bool Player::hasTerritory(Territory territory);
 
 	Order* getNextInOrdersList();
 
@@ -105,11 +97,11 @@ public:
 	}
 
 	void setSizeOfToDefend(int i) {
-		sizeOfToDefend = new int(i);
+		*sizeOfToDefend = i;
 	}
 
 	void setSizeOfToAttack(int i) {
-		sizeOfToAttack = new int(i);
+		*sizeOfToAttack = i;
 	}
 
 	int* getTroopsToDeploy() {
@@ -117,7 +109,7 @@ public:
 	}
 
 	void setTroopsToDeploy(int troops) {
-		this->troopsToDeploy = new int(troops);
+		*this->troopsToDeploy = troops;
 	}
 
 	int getOrderListIndex() {
@@ -125,7 +117,7 @@ public:
 	}
 
 	void setOrderListIndex(int index) {
-		this->orderListIndex = new int(index);
+		*this->orderListIndex = index;
 	}
 
 	Player& operator=(const Player& player);

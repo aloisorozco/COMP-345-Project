@@ -123,11 +123,55 @@ void GameEngine::play() {
 }
 
 void GameEngine::reinforcementPhase() {
-    //TODO: check if player does not have territories if not remove him from the game
+
     cout << "Reinforcement Phase\n" << endl;
+
+    vector<Player> playerVector;
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerVector.push_back(playerArray[i]);
+    }
+
+    //removes player if they do not have territories from array
     for (int i = 0; i < *sizeofPlayerArray; i++) {
         playerArray[i].toDefend();
-        int troops = (playerArray[i].getSizeOfToDefend() / 3) + 3;//TODO: check if owns entire continents
+        if (playerArray[i].getSizeOfToDefend() == 0) {
+            cout << playerArray[i] << " has no territories, removing them from the game" << endl;
+            playerVector.erase(playerVector.begin() + i);
+        }
+    }
+
+    //if player was removed in vector, update array
+    if (playerVector.size() != *sizeofPlayerArray) {
+        *sizeofPlayerArray = playerVector.size();
+        Player* playerArray = new Player[*sizeofPlayerArray];
+
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playerArray[i] = playerVector[i];
+        }
+    }
+
+    //calculating troops for each player
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerArray[i].toDefend();
+        int troops = (playerArray[i].getSizeOfToDefend() / 3) + 3;
+        
+        //checks if owns entire continents if so add continent bonus to troops
+        vector<Continent*> continents = playerArray[i].getMap().getContinents();
+
+        for (Continent* continent : continents) {
+            vector<Territory*> territories = continent->getTerritories();
+            
+            bool hasContinent = true;
+            for (Territory* territory : territories) {
+                if (!(playerArray[i].hasTerritory(*territory))) {
+                    hasContinent = false;
+                }
+            }
+            if (hasContinent) {
+                troops += continent->getBonus();
+            }
+        }
+
         playerArray[i].setTroopsToDeploy(troops);
     }
     cout << "--------------------\n" << endl;
@@ -142,11 +186,10 @@ void GameEngine::issueOrdersPhase() {
         }
         for (int i = 0; i < *sizeofPlayerArray; i++) {
             if (playersDoneArray[i]) {
-                break;
+                continue;
             }
             playersDoneArray[i] = playerArray[i].issueOrder();
         }
-        //TODO: test
         bool playersDone = true;
         for (int i = 0; i < *sizeofPlayerArray; i++) {
             playersDone = playersDone && playersDoneArray[i];

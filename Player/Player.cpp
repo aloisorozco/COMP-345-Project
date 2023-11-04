@@ -132,7 +132,7 @@ Territory* Player::toDefend() {
 	delete temp;
 	temp = NULL;
 
-	sizeOfToDefend = new int(count);
+	*sizeOfToDefend = count;
 	return toDefend;
 }
 
@@ -168,7 +168,7 @@ Territory* Player::toAttack() {
 	delete[] temp;
 	temp = NULL;
 
-	sizeOfToAttack = new int(count);
+	*sizeOfToAttack = count;
 	return toAttack;
 }
 
@@ -308,6 +308,26 @@ bool Player::issueOrder() {
 //
 //	orderListIndex = new int (0);
 //}
+
+bool Player::hasTerritory(string territoryName) {
+	Territory* toDefendArray = toDefend();
+	for (int i = 0; i < *sizeOfToDefend; i++) {
+		if (toDefendArray[i].getName() == territoryName) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Player::hasTerritory(Territory territory) {
+	Territory* toDefendArray = toDefend();
+	for (int i = 0; i < *sizeOfToDefend; i++) {
+		if (toDefendArray[i].getName() == territory.getName()) {
+			return true;
+		}
+	}
+	return false;
+}
 
 Order* Player::getNextInOrdersList() {
 	if (*orderListIndex >= ordersList->getOrders().size()) {

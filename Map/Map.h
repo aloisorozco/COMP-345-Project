@@ -48,12 +48,13 @@ class Continent {
 private:
 	string* name;
 	vector<Territory*> territories;
-
+	int* bonus;
 	
 
 public:
 	Continent(); 
-	Continent(const string& continentName); 
+	Continent(const string& continentName);
+	Continent(const string& continentName, int bonus);
 	Continent(const Continent& copyContinent); 
 	~Continent();
 
@@ -67,6 +68,15 @@ public:
 
 	void setName(const string& continentName);
 	void setTerritories(const vector<Territory*>& continentTerritories);	
+
+	void setBonus(int bonus) {
+		*this->bonus = bonus;
+	}
+
+	int getBonus() {
+		return *bonus;
+	}
+
 };
 
 

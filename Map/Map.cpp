@@ -93,16 +93,19 @@ void Territory::setContinent(const string& territoryContinent) {*continent = ter
 
 
 // Default Constructor (Continent) 
-Continent::Continent(): name(new string ("")) {} 
+Continent::Continent(): name(new string ("")), bonus(new int(0)) {} 
 
 //Constructor (Continent)
 Continent::Continent(const string& continentName): name(new string(continentName)){}
+
+Continent::Continent(const string& continentName, int b) : name(new string(continentName)), bonus(new int(b)) {}
 
 //Copy constructor (Continent)
 Continent::Continent(const Continent& copyContinent) {
     for (Territory* territory : copyContinent.territories) {
         territories.push_back(territory);
     }
+    this->bonus = new int(*copyContinent.bonus);
 }
 
 //Destructor (Continent)
@@ -113,6 +116,9 @@ Continent::~Continent(){
         delete territory;
         territory = NULL;               
     }
+
+    delete bonus;
+    bonus = NULL;
 }
 
 //Add Territory to Continent 
@@ -131,6 +137,7 @@ ostream& operator << (std::ostream& os, const Continent& c)
 Continent& Continent::operator=(const Continent& continent) {
 	this->setName(*continent.name);
 	this->setTerritories(continent.territories);
+    this->setBonus(*continent.bonus);
 	return *this;
 }
 
