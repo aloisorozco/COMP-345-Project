@@ -114,6 +114,10 @@ ostream &operator<<(ostream& out, const GameEngine &) {
     return out;
 }
 
+void GameEngine::startupPhase(){
+    
+}
+
 void GameEngine::play() {
 
     //part 2
