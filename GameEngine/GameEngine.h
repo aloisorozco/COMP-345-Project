@@ -77,6 +77,8 @@ public:
 
     void mainGameLoop();
 
+    void startupPhase();
+
     void reinforcementPhase();
 
     void issueOrdersPhase();
