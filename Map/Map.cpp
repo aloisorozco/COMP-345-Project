@@ -405,7 +405,7 @@ bool Map::validate()
 // ================================================================================================= //
 
 
-Map* MapLoader::loadMap() const{
+Map* MapLoader::loadMap() {
 
     Map* map = new Map(); 
     

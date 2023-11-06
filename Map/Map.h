@@ -110,7 +110,7 @@ public:
 class MapLoader {
 
 	public:
-		Map* loadMap() const;
+		Map* loadMap() ;
 
 	
 };
