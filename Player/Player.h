@@ -16,6 +16,7 @@ private:
 	//this is equivalent to Territory territoryArray[] but it had
 	//to be done this way because of requirements (all variables must be in pointers)
 	Territory* territoryArray;
+	ReinforcementPool* reinforcement;
 	int* sizeOfTerritoryArray;
 	OrdersList* ordersList;
 	int* orderListIndex;
@@ -45,7 +46,7 @@ private:
 public:
 
 	Player();
-	
+
 	Player(Map* map);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -59,8 +60,6 @@ public:
 	Territory* toAttack();
 
 	bool issueOrder();
-
-	//void orderOrdersList();
 
 	bool hasTerritory(string territoryName);
 
@@ -120,8 +119,44 @@ public:
 		*this->orderListIndex = index;
 	}
 
+	ReinforcementPool getReinforcementPool();
+
+	void setReinforcementPool(ReinforcementPool* reinforcement);
+
 	Player& operator=(const Player& player);
 
+};
+
+class ReinforcementPool{
+
+	private:
+		int* numTroops;
+		int* playerOwnerID;
+
+	public:
+
+		ReinforcementPool() : numTroops(0), playerOwnerID(0) {};
+		ReinforcementPool(int* numTroops, int* playerOwnerID) : numTroops(numTroops), playerOwnerID(playerOwnerID) {};
+
+		int getNumTroops();
+		int getPlayerOwnerID();
+		void setNumTroops(int troops);
+		void setPlayerOwnerID(int playerID);
+
+		void transferTroops(Territory* territory, int troops);
+		void retrieveTroops(Territory* territory, int troops);
+		void clearTroops();
+
+		ReinforcementPool& operator=(const ReinforcementPool& reinforcementPool){
+			if (this != &reinforcementPool) {
+                delete numTroops;
+                delete playerOwnerID;
+
+                this->numTroops = new int(*reinforcementPool.numTroops);
+                this->playerOwnerID = new int(*reinforcementPool.playerOwnerID);
+            }
+            return *this;
+		}
 };
 
 // free function declaration
