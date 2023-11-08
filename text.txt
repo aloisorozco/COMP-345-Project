@@ -1,4 +1,4 @@
-
+[Map]
 author=Sean O'Connor
 warn=yes
 image=Africa.bmp
