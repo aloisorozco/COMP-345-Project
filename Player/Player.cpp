@@ -109,7 +109,7 @@ Player::~Player() {
 	troopsToDeploy = NULL;
 }
 
-//territories to defend - for now just returns the territoryArray
+//territories to defend
 Territory* Player::toDefend() {
 	if (map == NULL) {
 		return 0;
@@ -136,7 +136,7 @@ Territory* Player::toDefend() {
 	return toDefend;
 }
 
-//territories to attack - for now just returns the territoryArray
+//territories to attack - super inefficient but what can you do
 Territory* Player::toAttack() {
 	if (map == NULL) {
 		return 0;
@@ -214,9 +214,9 @@ bool Player::issueOrder() {
 			}
 		}
 
-		/*Deploy* deploy = new Deploy(tempString, tempInt);
+		Deploy* deploy = new Deploy(tempString, tempInt);
 		ordersList->add(*deploy);
-		troopsToDeploy = new int(*troopsToDeploy - tempInt);*/
+		troopsToDeploy = new int(*troopsToDeploy - tempInt);
 		
 		return false;
 	}
@@ -269,8 +269,8 @@ bool Player::issueOrder() {
 		}
 		
 
-		/*Advance* advance = new Advance(srcInput, dstInput, tempInt);
-		ordersList->add(*advance);*/
+		Advance* advance = new Advance(srcInput, dstInput, tempInt);
+		ordersList->add(*advance);
 		return false;
 	}
 	else if (actionInput == 2) {
@@ -286,6 +286,28 @@ bool Player::issueOrder() {
 	}
 	
 }
+
+//put all deploy orders first
+//void Player::orderOrdersList() {
+//	if (ordersList->getOrders().size() == 0) {
+//		return;
+//	}
+//	vector<Order> orderedOrdersList(ordersList->getOrders());
+//	for (int i = 0; i < (ordersList->getOrders().size() - 1); i++) {
+//		for (int j = i + 1; j < ordersList->getOrders().size(); j++) {
+//			bool rightIsDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) != NULL;
+//			bool leftIsNotDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) == NULL;
+//
+//			if (rightIsDeploy && leftIsNotDeploy) {
+//				Order temp = orderedOrdersList[i];
+//				orderedOrdersList[i] = *ordersList->get(j);
+//				orderedOrdersList[j] = temp;
+//			}
+//		}
+//	}
+//
+//	orderListIndex = new int (0);
+//}
 
 bool Player::hasTerritory(string territoryName) {
 	Territory* toDefendArray = toDefend();
@@ -379,46 +401,5 @@ void Player::setHand(Hand hand) {
 
 void Player::setMap(Map map) {
 	*this->map = map;
-}
-
-void Player::setReinforcementPool(ReinforcementPool* reinforcement){
-	*this->reinforcement = *reinforcement;
-}
-
-int ReinforcementPool::getNumTroops() {return *this->numTroops;}
-int ReinforcementPool::getPlayerOwnerID() {return *this->playerOwnerID;}
-void ReinforcementPool::setNumTroops(int troops) {*this->numTroops = troops;}
-void ReinforcementPool::setPlayerOwnerID(int playerID) {*this->playerOwnerID = playerID;}
-
-void ReinforcementPool::transferTroops(Territory* territory, int troops){
-
-	if(*this->playerOwnerID == territory->getPlayer() && *this->numTroops >= troops){
-		territory->addTroops(troops);
-		*this->numTroops = *this->numTroops - troops;
-	}
-
-	else if(*this->numTroops < troops){
-		cout << "Invalid: Insufficient number of troops \n";
-	}
-
-	else{
-		cout << "Invalid: Player does not own the territory. \n";
-	}
-}
-
-void ReinforcementPool::retrieveTroops(Territory* territory, int troops){
-
-	if(*this->playerOwnerID == territory->getPlayer() && territory->getArmy() >= troops){
-		territory->removeTroops(troops);
-		*this->numTroops = *this->numTroops + troops;
-	}
-
-	else if(territory->getArmy() < troops){
-		cout << "Invalid: Insufficient number of troops \n";
-	}
-
-	else{
-		cout << "Invalid: Player does not own the territory. \n";
-	}
 }
 

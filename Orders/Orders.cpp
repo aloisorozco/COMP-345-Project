@@ -5,45 +5,45 @@
 
 using namespace std;
 
+bool Order::validate(){
+    //To be implemented
+    return true;
+}
+
 bool Deploy::validate(){
-    if(this->getPlayerIssuerID() != this->getTarget()->getPlayer()){return false;}
-    else{return true;}
+    //To be implemented
+    return true;
 }
 
 bool Advance::validate(){
-    if(this->getPlayerIssuerID() != this->getSource()->getPlayer()){return false;}
-    else if(!this->getTarget()->isNeighbor(this->getSource())){return false;}
-    else{return true;}
+    //To be implemented
+    return true;
 }
 
 bool Bomb::validate(){
-    if(this->getPlayerIssuerID() == this->getTarget()->getPlayer()){return false;}
-    else {
-        for(Territory* territory : this->getTarget()->getNeighbors()){if(territory->getPlayer() == this->getPlayerIssuerID()){return true;}}
-        return false;
-    }
+    //To be implemented
+    return true;
 }
 
 bool Blockade::validate(){
-    if(this->getTarget()->getPlayer() != 0){return false;}
-    else{return true;}
+    //To be implemented
+    return true;
 }
 
 bool Airlift::validate(){
-    if(this->getPlayerIssuerID() != this->getSource()->getPlayer()){return false;}
-    else if(this->getPlayerIssuerID() != this->getTarget()->getPlayer()){return false;}
-    else{return true;}
+    //To be implemented
+    return true;
 }
 
 bool Negotiate::validate(){
-    if(this->getPlayerIssuerID() == this->getPlayerTargetID()){return false;}
-    else{return true;}
+    //To be implemented
+    return true;
 }
 
 int Order::execute(){
 
     if(validate()){
-        cout << "Generic order executed by player " << this->getPlayerIssuerID() << ". Nothing happens." << "\n";
+        cout << description + "\n";
         return 0;
     }
 
@@ -103,7 +103,7 @@ int Airlift::execute(){
 int Negotiate::execute(){
     
     if(validate()){
-        cout << description << "\n";
+        cout << description + "\n";
         return 0;
     }
 
