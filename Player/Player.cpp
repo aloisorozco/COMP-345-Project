@@ -4,6 +4,7 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 
+
 #include <iostream>
 #include <string>
 
@@ -17,7 +18,7 @@ Player::Player() {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
-	territoryArray = NULL;
+	territoryArray = new Territory[0];
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
@@ -30,16 +31,16 @@ Player::Player() {
 	troopsToDeploy = new int(0);
 }
 
-Player::Player(Map* map) {
+Player::Player(Map* map, Deck* deck) {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
 	this->map = map;
-	territoryArray = NULL;
+	territoryArray = new Territory[0];
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);
-	hand = NULL;
+	hand = new Hand(deck);
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -67,16 +68,22 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 
 //copy constructor
 Player::Player(const Player& copyPlayer) {
-	this->playerID = copyPlayer.playerID;
+	Player();
+
+	this->playerID = new int (*copyPlayer.playerID);
 	this->territoryArray = copyPlayer.territoryArray;
+	this->territoryArray = new Territory[*copyPlayer.sizeOfTerritoryArray];
+	for (int i = 0; i < *copyPlayer.sizeOfTerritoryArray; i++) {
+		this->territoryArray[i] = copyPlayer.territoryArray[i];
+	}
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
-	this->ordersList = copyPlayer.ordersList;
-	this->orderListIndex = copyPlayer.orderListIndex;
-	this->hand = copyPlayer.hand;
-	this->map = copyPlayer.map;
-	this->sizeOfToAttack = copyPlayer.sizeOfToAttack;
-	this->sizeOfToDefend = copyPlayer.sizeOfToDefend;
-	this->troopsToDeploy = copyPlayer.troopsToDeploy;
+	this->ordersList = new OrdersList(*copyPlayer.ordersList);
+	this->orderListIndex = new int(*copyPlayer.orderListIndex);
+	this->hand = new Hand(*copyPlayer.hand);
+	this->map = new Map(*copyPlayer.map);
+	this->sizeOfToAttack = new int(*copyPlayer.sizeOfToAttack);
+	this->sizeOfToDefend = new int(*copyPlayer.sizeOfToDefend);
+	this->troopsToDeploy = new int(*copyPlayer.troopsToDeploy);
 }
 
 //destructor to avoid any memory leaks
@@ -129,9 +136,6 @@ Territory* Player::toDefend() {
 		toDefend[i] = temp[i];
 	}
 
-	delete temp;
-	temp = NULL;
-
 	*sizeOfToDefend = count;
 	return toDefend;
 }
@@ -165,9 +169,6 @@ Territory* Player::toAttack() {
 		toAttack[i] = temp[i];
 	}
 
-	delete[] temp;
-	temp = NULL;
-
 	*sizeOfToAttack = count;
 	return toAttack;
 }
@@ -190,6 +191,10 @@ bool Player::issueOrder() {
 		cout << toAttackTerritories[i] << endl;
 	}
 	cout << "---\n" << endl;
+
+	/*cout << "Map: " << endl;
+	cout << *map << endl;
+	cout << "---\n" << endl;*/
 	
 
 	if (*troopsToDeploy > 0) {
@@ -351,7 +356,7 @@ Player& Player::operator=(const Player& player) {
 	this->setOrdersList(*player.ordersList);
 	this->setOrderListIndex(*player.orderListIndex);
 	this->setHand(*player.hand);
-	this->setMap(*player.map);
+	this->setMap(player.map);
 
 	this->setSizeOfToAttack(*player.sizeOfToAttack);
 	this->setSizeOfToDefend(*player.sizeOfToDefend);
@@ -378,8 +383,8 @@ Hand Player::getHand() {
 	return *this->hand;
 }
 
-Map Player::getMap() {
-	return *this->map;
+Map* Player::getMap() {
+	return this->map;
 }
 
 void Player::setPlayerID(int playerID) {
@@ -399,7 +404,7 @@ void Player::setHand(Hand hand) {
 	*this->hand = hand;
 }
 
-void Player::setMap(Map map) {
-	*this->map = map;
+void Player::setMap(Map* map) {
+	this->map = map;
 }
 
