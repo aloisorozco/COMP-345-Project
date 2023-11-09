@@ -1,14 +1,16 @@
 #ifndef Orders
 #define Orders
-
+#include "../Observer/LoggingObserver.h"
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <fstream>
 using namespace std;
-
-class Order {
-
+class ILoggable;
+class Subject;
+class Order : public Subject, public ILoggable{
+    private:
+        list<Observer *> *_observers;
     protected:
         std::string description;
 
@@ -35,6 +37,8 @@ class Order {
         virtual std::string getDescription() const {
             return this->description;
         }
+
+        string stringToLog() override;
 };
 
 class Deploy : public Order {
@@ -75,7 +79,7 @@ class Advance : public Order {
             troopsToAdvance = new int(0);
         }
 
-        Advance(string src, string dst, int troops) : 
+        Advance(string src, string dst, int troops) :
             srcTerritoryName(new string(src)), dstTerritoryName(new string(dst)), troopsToAdvance(new int (troops)) {
 
         }
@@ -134,11 +138,11 @@ class Negotiate : public Order{
 
 };
 
-class OrdersList {
+class OrdersList : public ILoggable, public Subject{
 
     private:
         std::vector<Order> orders;
-
+        //list<Observer *> *_observers;
         void copyOrders(const OrdersList& other);
 
     public:
@@ -168,6 +172,11 @@ class OrdersList {
         }
 
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
+
+
+        string stringToLog() override;
+
+        void addOrders(const Order& o);
 };
 
 // free function declaration

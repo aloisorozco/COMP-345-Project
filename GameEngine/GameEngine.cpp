@@ -102,6 +102,7 @@ void GameEngine::processCommand(const std::string& command)
         std::cout << "Invalid command." << std::endl;
     } else {
         currentState = nextState;
+        Notify(this);
         std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
     }
 }
@@ -236,4 +237,8 @@ void GameEngine::mainGameLoop() {
     //executing orders phase
     executeOrdersPhase();
 
+}
+
+string GameEngine::stringToLog() {
+    return "Game Engine state: " + getCurrentState()->getName();
 }

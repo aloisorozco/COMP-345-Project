@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Orders.h"
-
+#include "../Observer/LoggingObserver.h"
 using namespace std;
 
 bool Order::validate(){
@@ -39,21 +39,26 @@ bool Negotiate::validate(){
     //To be implemented
     return true;
 }
-
+string Order::stringToLog() {
+    string out = "Executed the Order:" + description;
+    return out;
+}
 int Order::execute(){
-
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
-
     return -1;
 }
+
+
 
 int Deploy::execute(){
 
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -64,6 +69,7 @@ int Advance::execute(){
     
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -74,6 +80,7 @@ int Bomb::execute(){
     
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -84,6 +91,7 @@ int Blockade::execute(){
     
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -94,6 +102,7 @@ int Airlift::execute(){
     
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -104,6 +113,7 @@ int Negotiate::execute(){
     
     if(validate()){
         cout << description + "\n";
+        Notify(this);
         return 0;
     }
 
@@ -112,7 +122,8 @@ int Negotiate::execute(){
 
 int OrdersList::add(Order order){
 
-    orders.push_back(order);
+    this->orders.push_back(order);
+    Notify(this);
     return 0;
 }
 
@@ -195,4 +206,16 @@ std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
         os << order << "\n";
     }
     return os;
+}
+
+string OrdersList::stringToLog() {
+//when any order is put in a player’s OrderList using OrderList::add()
+// the order should be output to the log file using the Observer notification mechanism.
+// Later, when any order gets executed, its effect (as stored in the order itself)
+// should be output to the log file, again using the Observer’s notification mechanism.
+
+//get last order added.
+Order o = orders.back();
+string out = "Issued the Order:" + o.getDescription();
+return out;
 }

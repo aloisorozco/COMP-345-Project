@@ -1,56 +1,95 @@
 #ifndef LOGGINGOBSERVER_H
 #define LOGGINGOBSERVER_H
+
+//#include "../CommandProcessing/CommandProcessing.h"
+#include "../Orders/Orders.h"
+#include "../GameEngine/GameEngine.h"
 #include <string>
 #include <list>
-#include <vector>
-
+#include <iostream>
 using namespace std;
+//Forward Declare everything
+class ILoggable;
+class Observer;
+class Subject;
+class OrdersList;
+class GameEngine;
 
-//Observer class in the Observer Pattern
-class Observer{
-public:
-    ~Observer();
-    virtual void Update()=0;
-protected:
-};
+class LogObserver;
 
-//Subject class in the observer pattern
-class Subject{
-public:
-    //not sure if need to be pure virtual or not
-    virtual void Attach(Observer* observer);
-    virtual void Detach(Observer* observer);
-    virtual void Notify(ILoggable)=0;
-    Subject();
-    ~Subject();
-private:
-list<Observer*> *_observers;
-};
+
 
 //abstract class, with method stringToLog(). all classes inherit this to log data.
 class ILoggable{
-    // create and return string for output into log file gamelog.txt
-    virtual string stringToLog()=0;
-};
-//the observer class in our pattern
+    public:
+        ~ILoggable();
+        ILoggable();
+        ILoggable(const ILoggable&); // copy constructor
+        ILoggable& operator = (const ILoggable&);
+        friend ostream& operator<<(ostream&,const ILoggable&);//3.stream insertion operator for output
+        // pure virtual, create and return string for output into log file gamelog.txt
+        virtual string stringToLog()=0;
+    private:
 
-//our ConcreteObserver (View class)
-class LogObserver : public Observer{
+};
+
+//Observer class in the Observer Pattern
+class Observer{
+    public:
+        ~Observer();
+        Observer();
+        Observer(const Observer&); // copy constructor
+        Observer& operator = (const Observer&);
+        friend ostream &operator<<(ostream &os, const Observer &observer);
+        virtual void Update(ILoggable* iLoggable)=0;
+};
 /*
- * writes every game command read by a CommandProcessor object (or a
-FileCommandProcessorAdapter object) into a log file. The game log observer should be notified by the
-CommandProcessor::saveCommand() method that saves the command into the collection of commands, as well
-as the and Command::saveEffect() method that records the effect of the command into the command object.
-This should result in all the current game’s commands and their effects to be logged into a “gamelog.txt”
+ * writes every game command read by a CommandProcessor object (or a FileCommandProcessorAdapter object)
+game log observer should be notified by the CommandProcessor::saveCommand(), as well as the and Command::saveEffect()
+ This should result in all the current game’s commands and their effects to be logged into a “gamelog.txt”
 file.
  */
-public:
-    LogObserver(CommandProcessor *commandProcessor);
-    LogObserver();
-    LogObserver();
-    ~LogObserver();
-    void Update(ILoggable);
-private:
+class LogObserver : public Observer{
+    public:
+        //A constructor for every subject we wish to observee
+        LogObserver();
+        ~LogObserver();
+        LogObserver(const LogObserver&); // copy constructor
+        LogObserver& operator = (const LogObserver&);
+        friend ostream& operator<<(ostream&,const LogObserver&);//3.stream insertion operator for output
+
+        explicit LogObserver(OrdersList* ordersList);
+        explicit LogObserver(GameEngine* gameEngine);
+        //Missing classes from part 1.
+        //LogObserver(CommandProcessor *commandProcessor);
+        //LogObserver(FileCommandProcessorAdapter *fileCommandProcessorAdapter);
+
+        //notified by CommandProcessor::saveCommand() ,  Command::saveEffect()
+
+        void Update(ILoggable* iLoggable) override;
+    private:
+        OrdersList *_ordersList_subject;
+        GameEngine *_gameEngine_subject;
+        //CommandProcessor* _commandProcessor_subject{};
+        //FileCommandProcessorAdapter* _fileCommandProcessorAdapter_subject{};
 };
+//Subject class in the observer pattern
+class Subject{
+public:
+    virtual void Attach(Observer* o);
+    virtual void Detach(Observer* o);
+    virtual void Notify(ILoggable *);
+    Subject();
+    ~Subject();
+
+    Subject(const Subject&); // copy constructor
+    Subject& operator = (const Subject&);
+    friend ostream& operator<<(ostream&,const Subject&);//3.stream insertion operator for output
+private:
+    list<Observer*> *_observers;
+};
+
+
+//our ConcreteObserver (View class)
 
 #endif //LOGGINGOBSERVER_H
