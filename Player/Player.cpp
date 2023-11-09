@@ -1,9 +1,5 @@
 #include "Player.h"
 
-#include "../Map/Map.h"
-#include "../Orders/Orders.h"
-#include "../Cards/Cards.h"
-
 #include <iostream>
 #include <string>
 
@@ -40,6 +36,29 @@ Player::Player(Map* map) {
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);
 	hand = NULL;
+
+	sizeOfToAttack = new int(0);
+	sizeOfToDefend = new int(0);
+
+	troopsToDeploy = new int(0);
+}
+
+Player::Player(bool neutral){
+	if(neutral == false){
+		playerID = new int(*playerCount);
+		(*playerCount)++;
+	}
+
+	else{
+		playerID = 0;
+	}
+
+	territoryArray = NULL;
+	sizeOfTerritoryArray = new int(0);
+	ordersList = new OrdersList();
+	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
+	hand = NULL;
+	map = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -284,6 +303,8 @@ bool Player::issueOrder() {
 		cout << "Option 4: End turn\n" << endl;
 		return true;
 	}
+
+	return true;
 	
 }
 
@@ -379,10 +400,6 @@ void Player::setHand(Hand hand) {
 
 void Player::setMap(Map map) {
 	*this->map = map;
-}
-
-void Player::setReinforcementPool(ReinforcementPool* reinforcement){
-	*this->reinforcement = *reinforcement;
 }
 
 int ReinforcementPool::getNumTroops() {return *this->numTroops;}

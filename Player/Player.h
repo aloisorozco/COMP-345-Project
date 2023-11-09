@@ -5,6 +5,38 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 
+class ReinforcementPool{
+
+	private:
+		int* numTroops;
+		int* playerOwnerID;
+
+	public:
+
+		ReinforcementPool() : numTroops(0), playerOwnerID(0) {};
+		ReinforcementPool(int* numTroops, int* playerOwnerID) : numTroops(numTroops), playerOwnerID(playerOwnerID) {};
+
+		int getNumTroops();
+		int getPlayerOwnerID();
+		void setNumTroops(int troops);
+		void setPlayerOwnerID(int playerID);
+
+		void transferTroops(Territory* territory, int troops);
+		void retrieveTroops(Territory* territory, int troops);
+		void clearTroops();
+
+		ReinforcementPool& operator=(const ReinforcementPool& reinforcementPool){
+			if (this != &reinforcementPool) {
+                delete numTroops;
+                delete playerOwnerID;
+
+                this->numTroops = new int(*reinforcementPool.numTroops);
+                this->playerOwnerID = new int(*reinforcementPool.playerOwnerID);
+            }
+            return *this;
+		}
+};
+
 class Player {
 
 private:
@@ -47,6 +79,8 @@ public:
 
 	Player();
 
+	Player(bool neutral);
+
 	Player(Map* map);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -63,7 +97,7 @@ public:
 
 	bool hasTerritory(string territoryName);
 
-	bool Player::hasTerritory(Territory territory);
+	bool hasTerritory(Territory territory);
 
 	Order* getNextInOrdersList();
 
@@ -119,45 +153,19 @@ public:
 		*this->orderListIndex = index;
 	}
 
-	ReinforcementPool getReinforcementPool();
+	ReinforcementPool getReinforcementPool(){
+		return *reinforcement;
+	}
 
-	void setReinforcementPool(ReinforcementPool* reinforcement);
+	void setReinforcementPool(ReinforcementPool reinforcementt){
+		*this->reinforcement = reinforcementt;
+	}
 
 	Player& operator=(const Player& player);
 
 };
 
-class ReinforcementPool{
 
-	private:
-		int* numTroops;
-		int* playerOwnerID;
-
-	public:
-
-		ReinforcementPool() : numTroops(0), playerOwnerID(0) {};
-		ReinforcementPool(int* numTroops, int* playerOwnerID) : numTroops(numTroops), playerOwnerID(playerOwnerID) {};
-
-		int getNumTroops();
-		int getPlayerOwnerID();
-		void setNumTroops(int troops);
-		void setPlayerOwnerID(int playerID);
-
-		void transferTroops(Territory* territory, int troops);
-		void retrieveTroops(Territory* territory, int troops);
-		void clearTroops();
-
-		ReinforcementPool& operator=(const ReinforcementPool& reinforcementPool){
-			if (this != &reinforcementPool) {
-                delete numTroops;
-                delete playerOwnerID;
-
-                this->numTroops = new int(*reinforcementPool.numTroops);
-                this->playerOwnerID = new int(*reinforcementPool.playerOwnerID);
-            }
-            return *this;
-		}
-};
 
 // free function declaration
 void testPlayers();

@@ -102,6 +102,17 @@ public:
         sizeofPlayerArray++;
     }
 
+    Player* getPlayer(int playerID){
+
+        for(int i = 0; i < *sizeofPlayerArray; i++){
+            if(playerArray[i].getPlayerID() == playerID){
+                return &playerArray[i];
+            }
+        }
+
+        return nullptr;
+    }
+
     /*static Player* gamePlayerArray;
     static int* sizeOfPlayersArray;
     static void setGamePlayerArray(Player* playerArray, int sizeOfPlayersArray) {

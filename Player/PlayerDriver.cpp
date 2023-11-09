@@ -1,9 +1,5 @@
 #include "Player.h"
 
-#include "../Map/Map.h"
-#include "../Orders/Orders.h"
-#include "../Cards/Cards.h"
-
 #include <iostream>
 #include <string>
 #include <vector>

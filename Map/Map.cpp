@@ -114,7 +114,7 @@ void Territory::transferTroops(Territory* territory, int troops){
 
         this->removeTroops(remaining);
 
-        while(remaining > 0 && territory->army > 0){
+        while(remaining > 0 && *territory->army > 0){
             chance = rand() % 100;
             if(chance >= 40){
                 territory->removeTroops(1);
@@ -126,7 +126,7 @@ void Territory::transferTroops(Territory* territory, int troops){
             }
         }
 
-        if(territory->army <= 0){
+        if(*territory->army <= 0){
             territory->setPlayer(this->getPlayer());
             territory->setArmy(remaining);
         }

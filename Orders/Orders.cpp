@@ -13,11 +13,13 @@ bool Deploy::validate(){
 bool Advance::validate(){
     if(this->getPlayerIssuerID() != this->getSource()->getPlayer()){return false;}
     else if(!this->getTarget()->isNeighbor(this->getSource())){return false;}
+    else if(Negotiate::isNegotiation(this->getSource()->getPlayer(), this->getTarget()->getPlayer())){return false;}
     else{return true;}
 }
 
 bool Bomb::validate(){
     if(this->getPlayerIssuerID() == this->getTarget()->getPlayer()){return false;}
+    else if(Negotiate::isNegotiation(*this->playerIssuerID, this->getTarget()->getPlayer())){return false;}
     else {
         for(Territory* territory : this->getTarget()->getNeighbors()){if(territory->getPlayer() == this->getPlayerIssuerID()){return true;}}
         return false;
@@ -37,6 +39,7 @@ bool Airlift::validate(){
 
 bool Negotiate::validate(){
     if(this->getPlayerIssuerID() == this->getPlayerTargetID()){return false;}
+    else if(Negotiate::isNegotiation(this->getPlayerIssuerID(), this->getPlayerTargetID())){return false;}
     else{return true;}
 }
 
@@ -93,7 +96,12 @@ int Bomb::execute(){
 int Blockade::execute(){
     
     if(validate()){
-        cout << description + "\n";
+
+        target->setPlayer(0);
+        target->setArmy(target->getArmy() * 2);
+
+        cout << this->target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << target->getArmy();
+
         return 0;
     }
 
@@ -103,7 +111,8 @@ int Blockade::execute(){
 int Airlift::execute(){
     
     if(validate()){
-        cout << description + "\n";
+        this->source->transferTroops(this->target, *this->troops);
+        cout << *this->troops << " troops have been airlifted from " << this->source->getName() << " to " << this->target->getName();
         return 0;
     }
 
@@ -113,7 +122,8 @@ int Airlift::execute(){
 int Negotiate::execute(){
     
     if(validate()){
-        cout << description << "\n";
+        addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
+        cout << "Player " << *this->playerIssuerID << " has negotiated with Player " << *this->targetPlayerID << ". No attacks between them shall be launched.";
         return 0;
     }
 

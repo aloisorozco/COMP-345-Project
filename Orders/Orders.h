@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include "../Map/Map.h"
-#include "../GameEngine/GameEngine.h"
 
 class Order {
 
@@ -293,6 +292,7 @@ class Negotiate : public Order{
 
     private:
         int* targetPlayerID;
+        static std::vector<std::pair<int, int>> negotiations;
 
     public:
         Negotiate() : Order() {
@@ -321,6 +321,23 @@ class Negotiate : public Order{
         friend ostream& operator<<(std::ostream& os, const Negotiate& order) {
             os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Negotiate";
             return os;
+        }
+
+        static void addNegotiation(int player1, int player2){
+            negotiations.push_back(std::make_pair(player1, player2));
+        }
+
+        static bool isNegotiation(int player1, int player2){
+            for(std::pair pair : negotiations){
+                if((pair.first == player1 || pair.second == player1) && (pair.first == player2 || pair.second == player2) && (player1 != player2))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static void emptyNegotiations(){
+            negotiations.clear();
         }
 
         bool validate() override;
