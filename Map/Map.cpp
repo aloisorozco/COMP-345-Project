@@ -162,7 +162,6 @@ string Continent::getContinentName() const { return *name; }
 int Continent::getBonus() const { return *bonus; }
 const vector<Territory *> &Continent::getTerritories() const { return territories; }
 
-
 // Setter (Continent)
 void Continent::setName(const string &continentName)
 {
@@ -176,10 +175,10 @@ void Continent::setName(const string &continentName)
     }
 }
 
-void Continent::setBonus(int bonus){
-    
-	*this->bonus = bonus;
-	
+void Continent::setBonus(int bonus)
+{
+
+    *this->bonus = bonus;
 }
 
 void Continent::setTerritories(const vector<Territory *> &continentTerritories)
@@ -245,6 +244,17 @@ void Map::setContinents(const vector<Continent *> &continents)
 
 vector<Territory *> Map::getTerritories()
 {
+    vector <Territory*> territories;
+
+    continents = this->getContinents();
+
+
+    for (Continent *continent: continents){
+        for (Territory *territory: continent->getTerritories()){
+            territories.push_back(territory);
+        }
+    }
+
     return territories;
 }
 
@@ -255,8 +265,10 @@ ostream &operator<<(std::ostream &os, const Map &m)
     for (const Continent *continent : m.continents)
     {
 
-        os << "Continent: " << continent->getContinentName() << "\n"<< std::endl;
-        os << "Bonus: " << continent->getBonus() << "\n"<< std::endl;
+        os << "Continent: " << continent->getContinentName() << "\n"
+           << std::endl;
+        os << "Bonus: " << continent->getBonus() << "\n"
+           << std::endl;
         for (const Territory *territory : continent->getTerritories())
         {
             os << *territory << endl;
@@ -404,229 +416,388 @@ bool Map::validate()
 
 // ================================================================================================= //
 
+Map *MapLoader::loadMap()
+{
 
-Map* MapLoader::loadMap() {
+    Map *map = new Map();
 
-    Map* map = new Map(); 
-    
     // Get the current working directory
     fs::path currentDir = fs::current_path();
 
     // Search for a ".map" file in the current directory
-    std::string mapFileName;
+    vector<string> mapFiles;
+    string mapFileName;
 
-    while (true)
+    for (const auto &entry : fs::directory_iterator(currentDir))
     {
-        // Get the current working directory
-        fs::path currentDir = fs::current_path();
-
-        // Search for a ".map" file in the current directory
-        vector<string> mapFiles;
-        std::string mapFileName;
-
-        for (const auto &entry : fs::directory_iterator(currentDir))
+        if (entry.is_regular_file() && (entry.path().extension() == ".map" || entry.path().extension() == ".txt"))
         {
-            if (entry.is_regular_file() && (entry.path().extension() == ".map" || entry.path().extension() == ".txt"))
+            mapFileName = entry.path().filename().string();
+
+            // Open the ".map" file
+            std::ifstream file(mapFileName);
+
+            // Check if the file is open
+            if (!file.is_open())
             {
-                mapFileName = entry.path().filename().string();
+                std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+                continue; // Skip to the next file
+            }
 
-                // Open the ".map" file
-                std::ifstream file(mapFileName);
+            std::string firstLine;
+            if (std::getline(file, firstLine) && firstLine.find("[Map]") == 0)
+            {
+                // The first line starts with "[Map]", so this is the correct file
+                mapFiles.push_back(mapFileName);
+                file.close();
+            }
 
-                // Check if the file is open
-                if (!file.is_open())
-                {
-                    std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
-                    continue; // Skip to the next file
-                }
+            if (std::getline(file, firstLine) && firstLine.find("[Map]") != 0)
+            {
+                file.close(); // Close the file, as it doesn't start with "[Map]"
+            }
+        }
+    }
 
-                std::string firstLine;
-                if (std::getline(file, firstLine) && firstLine.find("[Map]") == 0)
-                {
-                    // The first line starts with "[Map]", so this is the correct file
-                    mapFiles.push_back(mapFileName);
-                    file.close();
-                }
+    cout << "You can open the following files: " << endl;
+    for (const string &mapFile : mapFiles)
+    {
+        cout << mapFile << endl;
+    }
 
-                if (std::getline(file, firstLine) && firstLine.find("[Map]") != 0)
-                {
-                    file.close(); // Close the file, as it doesn't start with "[Map]"
-                }
+    bool test = true;
+
+    while (test)
+    {
+        cout << "\nSelect the file you want to load: ";
+        cin >> mapFileName;
+
+        bool isValidFile = false;
+        for (int i = 0; i < mapFiles.size(); i++)
+        {
+            if (mapFileName == mapFiles[i])
+            {
+                isValidFile = true;
+                break;
             }
         }
 
-        cout << "You can open the following files: " << endl;
-        for (const string &mapFile : mapFiles)
+        if (isValidFile)
         {
-            cout << mapFile << endl;
+            cout << "\nLoading: " << mapFileName << "...\n\n"
+                 << endl;
+            break;
+        }
+        else
+        {
+            cout << "\nInvalid file name, please try again" << endl;
+        }
+    }
+
+    // Check if a ".map" file with "[Map]" as the first line was found
+    if (mapFileName.empty())
+    {
+        std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
+    }
+
+    // Open the selected ".map" file
+    std::ifstream file(mapFileName);
+    cout << mapFileName << endl;
+
+    // Check if the file is open
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+    }
+
+    string line;
+    bool isContinentSection = false;
+    bool isTerritorySection = false;
+
+    vector<Territory *> territories; // Store territories temporarily
+
+    while (getline(file, line))
+    {
+        if (line == "[Continents]")
+        {
+            isTerritorySection = false;
+            isContinentSection = true;
+            continue;
+        }
+        else if (line == "[Territories]")
+        {
+            isContinentSection = false;
+            isTerritorySection = true;
+            continue;
         }
 
-        bool test = true;
-
-        while (test)
+        if (isContinentSection && line != "")
         {
-            cout << "\nSelect the file you want to load: ";
-            cin >> mapFileName;
+            string continentName = line.substr(0, line.find('='));
+            int bonus = stoi(line.substr(line.find('=') + 1));
+            Continent *continent = new Continent(continentName, bonus);
+            map->addContinent(continent);
+        }
+        else if (isTerritorySection && line != "")
+        {
+            stringstream ss(line);
+            string territoryName;
+            getline(ss, territoryName, ',');
+            string x, y, continentName;
+            getline(ss, x, ',');
+            getline(ss, y, ',');
+            getline(ss, continentName, ',');
+            Territory *territory = new Territory(territoryName, continentName);
+            territories.push_back(territory);
+        }
+    }
 
-            bool isValidFile = false;
-            for (int i = 0; i < mapFiles.size(); i++)
+    file.close();
+
+    // Now that all territories are created, let's add their neighbors
+    file.open(mapFileName); // Reopen the file
+    isContinentSection = false;
+    isTerritorySection = false;
+
+    while (getline(file, line))
+    {
+        if (line == "[Continents]")
+        {
+            isTerritorySection = false;
+            isContinentSection = true;
+            continue;
+        }
+        else if (line == "[Territories]")
+        {
+            isContinentSection = false;
+            isTerritorySection = true;
+            continue;
+        }
+
+        if (isTerritorySection && line != "")
+        {
+            stringstream ss(line);
+            string territoryName;
+            getline(ss, territoryName, ',');
+            Territory *territory = nullptr;
+
+            for (Territory *t : territories)
             {
-                if (mapFileName == mapFiles[i])
+                if (t->getName() == territoryName)
                 {
-                    isValidFile = true;
+                    territory = t;
                     break;
                 }
             }
 
-            if (isValidFile)
+            if (territory)
             {
-                cout << "\nLoading: " << mapFileName << "...\n\n"<< endl;
-                break;
-            }
-            else
-            {
-                cout << "\nInvalid file name, please try again" << endl;
-            }
-        }
-
-        // Check if a ".map" file with "[Map]" as the first line was found
-        if (mapFileName.empty())
-        {
-            std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
-        }
-
-        // Open the selected ".map" file
-        std::ifstream file(mapFileName);
-
-        // Check if the file is open
-        if (!file.is_open())
-        {
-            std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
-        }
-
-        string line;
-        bool isContinentSection = false;
-        bool isTerritorySection = false;
-
-        vector<Territory *> territories; // Store territories temporarily
-
-        while (getline(file, line))
-        {
-            if (line == "[Continents]")
-            {
-                isTerritorySection = false;
-                isContinentSection = true;
-                continue;
-            }
-            else if (line == "[Territories]")
-            {
-                isContinentSection = false;
-                isTerritorySection = true;
-                continue;
-            }
-
-            if (isContinentSection && line != "")
-            {
-                string continentName = line.substr(0, line.find('='));
-                int bonus = stoi(line.substr(line.find('=') + 1));
-                Continent *continent = new Continent(continentName, bonus);
-                map->addContinent(continent);
-            }
-            else if (isTerritorySection && line != "")
-            {
-                stringstream ss(line);
-                string territoryName;
-                getline(ss, territoryName, ',');
-                string x, y, continentName;
-                getline(ss, x, ',');
-                getline(ss, y, ',');
-                getline(ss, continentName, ',');
-                Territory *territory = new Territory(territoryName, continentName);
-                territories.push_back(territory);
-            }
-        }
-
-        file.close();
-
-        // Now that all territories are created, let's add their neighbors
-        file.open(mapFileName); // Reopen the file
-        isContinentSection = false;
-        isTerritorySection = false;
-
-        while (getline(file, line))
-        {
-            if (line == "[Continents]")
-            {
-                isTerritorySection = false;
-                isContinentSection = true;
-                continue;
-            }
-            else if (line == "[Territories]")
-            {
-                isContinentSection = false;
-                isTerritorySection = true;
-                continue;
-            }
-
-            if (isTerritorySection && line != "")
-            {
-                stringstream ss(line);
-                string territoryName;
-                getline(ss, territoryName, ',');
-                Territory *territory = nullptr;
-
-                for (Territory *t : territories)
+                string neighbors;
+                while (getline(ss, neighbors, ','))
                 {
-                    if (t->getName() == territoryName)
+                    Territory *neighbor = nullptr;
+
+                    for (Territory *t : territories)
                     {
-                        territory = t;
-                        break;
+                        if (t->getName() == neighbors)
+                        {
+                            neighbor = t;
+                            break;
+                        }
+                    }
+
+                    if (neighbor)
+                    {
+                        territory->addNeighbor(neighbor);
                     }
                 }
 
-                if (territory)
+                for (Continent *continent : map->getContinents())
                 {
-                    string neighbors;
-                    while (getline(ss, neighbors, ','))
+                    if (territory->getContinent() == continent->getContinentName())
                     {
-                        Territory *neighbor = nullptr;
-
-                        for (Territory *t : territories)
-                        {
-                            if (t->getName() == neighbors)
-                            {
-                                neighbor = t;
-                                break;
-                            }
-                        }
-
-                        if (neighbor)
-                        {
-                            territory->addNeighbor(neighbor);
-                        }
-                    }
-
-                    for (Continent *continent : map->getContinents())
-                    {
-                        if (territory->getContinent() == continent->getContinentName())
-                        {
-                            continent->addTerritory(territory);
-                        }
+                        continent->addTerritory(territory);
                     }
                 }
             }
-        }
-
-        file.close();
-
-        if (map->validate()){
-            break;
-            
-        }else
-        {
-            cout << "Map is not valid, please select another file" << endl;
         }
     }
 
+    file.close();
+
     return map;
 };
+
+Map *MapLoader::loadMap_withName(string mapName)
+{
+
+    Map *map = new Map();
+
+    // Get the current working directory
+    fs::path currentDir = fs::current_path();
+
+    // Search for a ".map" file in the current directory
+    string mapFileName = mapName;
+
+    // Check if a ".map" file with "[Map]" as the first line was found
+    if (mapFileName.empty())
+    {
+        std::cerr << "No '.map' file with '[Map]' as the first line found in the current directory." << std::endl;
+    }
+
+    // Open the selected ".map" file
+    std::ifstream file(mapFileName);
+
+    // Check if the file is open
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the '.map' file: " << mapFileName << std::endl;
+    }
+
+    string line;
+    bool isContinentSection = false;
+    bool isTerritorySection = false;
+
+    vector<Territory *> territories; // Store territories temporarily
+
+    while (getline(file, line))
+    {
+        if (line == "[Continents]")
+        {
+            isTerritorySection = false;
+            isContinentSection = true;
+            continue;
+        }
+        else if (line == "[Territories]")
+        {
+            isContinentSection = false;
+            isTerritorySection = true;
+            continue;
+        }
+
+        if (isContinentSection && line != "")
+        {
+            string continentName = line.substr(0, line.find('='));
+            int bonus = stoi(line.substr(line.find('=') + 1));
+            Continent *continent = new Continent(continentName, bonus);
+            map->addContinent(continent);
+        }
+        else if (isTerritorySection && line != "")
+        {
+            stringstream ss(line);
+            string territoryName;
+            getline(ss, territoryName, ',');
+            string x, y, continentName;
+            getline(ss, x, ',');
+            getline(ss, y, ',');
+            getline(ss, continentName, ',');
+            Territory *territory = new Territory(territoryName, continentName);
+            territories.push_back(territory);
+        }
+    }
+
+    file.close();
+
+    // Now that all territories are created, let's add their neighbors
+    file.open(mapFileName); // Reopen the file
+    isContinentSection = false;
+    isTerritorySection = false;
+
+    while (getline(file, line))
+    {
+        if (line == "[Continents]")
+        {
+            isTerritorySection = false;
+            isContinentSection = true;
+            continue;
+        }
+        else if (line == "[Territories]")
+        {
+            isContinentSection = false;
+            isTerritorySection = true;
+            continue;
+        }
+
+        if (isTerritorySection && line != "")
+        {
+            stringstream ss(line);
+            string territoryName;
+            getline(ss, territoryName, ',');
+            Territory *territory = nullptr;
+
+            for (Territory *t : territories)
+            {
+                if (t->getName() == territoryName)
+                {
+                    territory = t;
+                    break;
+                }
+            }
+
+            if (territory)
+            {
+                string neighbors;
+                while (getline(ss, neighbors, ','))
+                {
+                    Territory *neighbor = nullptr;
+
+                    for (Territory *t : territories)
+                    {
+                        if (t->getName() == neighbors)
+                        {
+                            neighbor = t;
+                            break;
+                        }
+                    }
+
+                    if (neighbor)
+                    {
+                        territory->addNeighbor(neighbor);
+                    }
+                }
+
+                for (Continent *continent : map->getContinents())
+                {
+                    if (territory->getContinent() == continent->getContinentName())
+                    {
+                        continent->addTerritory(territory);
+                    }
+                }
+            }
+        }
+    }
+
+    file.close();
+
+    return map;
+};
+
+// int main()
+// {
+
+//     MapLoader loader;
+//     string mapName = "Aden.map";
+//     // Map *testMap = loader.loadMap_withName(mapName);
+//     Map* testMap = loader.loadMap();
+
+//     cout << *testMap << endl;
+
+//     cout << testMap->getTerritories().size() << endl;
+
+//     for (Territory* territory: testMap->getTerritories()){
+//         cout << territory->getName() << endl;
+//     }
+
+//     if (testMap->validate())
+//     {
+//         cout << "\n\nMap is valid" << endl;
+//     }
+//     else
+//     {
+//         cout << "Map is not valid" << endl;
+//     }
+
+//     delete testMap;
+
+//     return 0;
+// }
