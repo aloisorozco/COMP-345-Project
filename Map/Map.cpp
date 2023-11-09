@@ -17,8 +17,7 @@ Territory::Territory(const string &territoryName, const string &territoryContine
                                                                                       continent(new string(territoryContinent)),
                                                                                       player(new int(0)),
                                                                                       army(new int(2))
-{
-}
+{}
 
 // Copy constructor (Territory)
 Territory::Territory(const Territory &copyTerritory)
@@ -28,6 +27,7 @@ Territory::Territory(const Territory &copyTerritory)
     this->army = new int(*copyTerritory.army);
     this->continent = new string(*copyTerritory.continent);
 }
+
 
 // Destructor (Territory)
 Territory::~Territory()
@@ -175,10 +175,24 @@ void Continent::setName(const string &continentName)
     }
 }
 
-void Continent::setBonus(int bonus)
-{
 
-    *this->bonus = bonus;
+// Setter (Continent)
+void Continent::setName(const string &continentName)
+{
+    if (name == nullptr)
+    {
+        name = new string(continentName);
+    }
+    else
+    {
+        *name = continentName;
+    }
+}
+
+void Continent::setBonus(int bonus){
+    
+	*this->bonus = bonus;
+
 }
 
 void Continent::setTerritories(const vector<Territory *> &continentTerritories)
@@ -244,6 +258,7 @@ void Map::setContinents(const vector<Continent *> &continents)
 
 vector<Territory *> Map::getTerritories()
 {
+
     vector <Territory*> territories;
 
     continents = this->getContinents();
@@ -255,6 +270,8 @@ vector<Territory *> Map::getTerritories()
         }
     }
 
+
+
     return territories;
 }
 
@@ -264,11 +281,9 @@ ostream &operator<<(std::ostream &os, const Map &m)
     // Iterate through continents and territories and print their details.
     for (const Continent *continent : m.continents)
     {
+        os << "Continent: " << continent->getContinentName() << "\n"<< std::endl;
+        os << "Bonus: " << continent->getBonus() << "\n"<< std::endl;
 
-        os << "Continent: " << continent->getContinentName() << "\n"
-           << std::endl;
-        os << "Bonus: " << continent->getBonus() << "\n"
-           << std::endl;
         for (const Territory *territory : continent->getTerritories())
         {
             os << *territory << endl;
@@ -415,6 +430,7 @@ bool Map::validate()
 }
 
 // ================================================================================================= //
+
 
 Map *MapLoader::loadMap()
 {
@@ -801,3 +817,4 @@ Map *MapLoader::loadMap_withName(string mapName)
 
 //     return 0;
 // }
+
