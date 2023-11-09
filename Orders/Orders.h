@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "../Map/Map.h"
+#include "../GameEngine/GameEngine.h"
 
 class Order {
 
@@ -56,20 +57,18 @@ class Deploy : public Order{
 
     private:
         int* troops;
-        Territory* source;
         Territory* target;
 
     public:
         Deploy() : Order() {
             *description = "This is a deploy order";
             troops = new int(0);
-            source = nullptr;
             target = nullptr;
         }
 
-        Deploy(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {}
+        Deploy(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {}
 
-        Deploy(const Deploy& other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
+        Deploy(const Deploy& other) : Order(other), troops(new int(*other.troops)), target(other.target) {}
 
         ~Deploy() {
 
@@ -82,7 +81,6 @@ class Deploy : public Order{
                 Order::operator=(other);
                 delete troops;
                 this->troops = new int(*other.troops);
-                this->source = other.source;
                 this->target = other.target;
             }
             return *this;
@@ -98,9 +96,6 @@ class Deploy : public Order{
 
         int getTroops() const { return *troops; }
         void setTroops(int value) { *troops = value; }
-
-        Territory* getSource() const { return source; }
-        void setSource(Territory* value) { source = value; }
 
         Territory* getTarget() const { return target; }
         void setTarget(Territory* value) { target = value; }
@@ -355,6 +350,18 @@ class OrdersList {
         int remove();
         int remove(int index);
         int executeAll();
+
+        Order* get(int index) {
+            return &orders[index];
+        }
+
+        vector<Order> getOrders() {
+            return orders;
+        }
+
+        void setOrder(vector<Order> ordersVector) {
+            orders = ordersVector;
+        }
 
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
 };

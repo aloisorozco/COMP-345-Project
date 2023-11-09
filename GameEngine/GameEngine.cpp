@@ -3,6 +3,8 @@
 #include <iostream>
 #include <map>
 
+#include "../Player/Player.h"
+
 // Constructor for GameState. Initializes the state with a name.
 GameState::GameState(std::string name) : name(name) {}
 
@@ -41,13 +43,21 @@ ostream &operator<<(ostream& out, const GameState &) {
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(nullptr) {}
+GameEngine::GameEngine() : currentState(nullptr), playerArray(NULL), sizeofPlayerArray(new int(0)) {
+
+}
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
 GameEngine::~GameEngine() {
     for (std::map<std::string, GameState*>::iterator it = states.begin(); it != states.end(); ++it) {
         delete it->second;
     }
+
+    delete this->playerArray;
+    playerArray = NULL;
+
+    delete this->sizeofPlayerArray;
+    sizeofPlayerArray = NULL;
 }
 
 // Returns the current state of the game.
@@ -102,4 +112,124 @@ GameEngine &GameEngine::operator=(const GameEngine &) {
 }
 ostream &operator<<(ostream& out, const GameEngine &) {
     return out;
+}
+
+void GameEngine::play() {
+
+    //part 2
+
+    //part 3
+    mainGameLoop();
+}
+
+void GameEngine::reinforcementPhase() {
+
+    cout << "Reinforcement Phase\n" << endl;
+
+    vector<Player> playerVector;
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerVector.push_back(playerArray[i]);
+    }
+
+    //removes player if they do not have territories from array
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerArray[i].toDefend();
+        if (playerArray[i].getSizeOfToDefend() == 0) {
+            cout << playerArray[i] << " has no territories, removing them from the game" << endl;
+            playerVector.erase(playerVector.begin() + i);
+        }
+    }
+
+    //if player was removed in vector, update array
+    if (playerVector.size() != *sizeofPlayerArray) {
+        *sizeofPlayerArray = playerVector.size();
+        Player* playerArray = new Player[*sizeofPlayerArray];
+
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playerArray[i] = playerVector[i];
+        }
+    }
+
+    //calculating troops for each player
+    for (int i = 0; i < *sizeofPlayerArray; i++) {
+        playerArray[i].toDefend();
+        int troops = (playerArray[i].getSizeOfToDefend() / 3) + 3;
+        
+        //checks if owns entire continents if so add continent bonus to troops
+        vector<Continent*> continents = playerArray[i].getMap().getContinents();
+
+        for (Continent* continent : continents) {
+            vector<Territory*> territories = continent->getTerritories();
+            
+            bool hasContinent = true;
+            for (Territory* territory : territories) {
+                if (!(playerArray[i].hasTerritory(*territory))) {
+                    hasContinent = false;
+                }
+            }
+            if (hasContinent) {
+                troops += continent->getBonus();
+            }
+        }
+
+        playerArray[i].setTroopsToDeploy(troops);
+    }
+    cout << "--------------------\n" << endl;
+}
+
+void GameEngine::issueOrdersPhase() {
+    cout << "Issuing Orders Phase\n" << endl;
+    bool* playersDoneArray = new bool[*sizeofPlayerArray];
+    while (true) {
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playersDoneArray[i] = false;
+        }
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            if (playersDoneArray[i]) {
+                continue;
+            }
+            playersDoneArray[i] = playerArray[i].issueOrder();
+        }
+        bool playersDone = true;
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playersDone = playersDone && playersDoneArray[i];
+        }
+        if (playersDone) {
+            break;
+        }
+    }
+    cout << "--------------------\n" << endl;
+}
+
+void GameEngine::executeOrdersPhase() {
+    cout << "Execute Orders Phase\n" << endl;
+    while (true) {
+        bool executeOrdersDone = true;
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            Order* order = playerArray[i].getNextInOrdersList();
+            if (order != NULL) {
+                executeOrdersDone = false;
+                order->execute();
+            }
+        }
+
+        if (executeOrdersDone) {
+            break;
+        }
+    }
+    cout << "--------------------\n" << endl;
+}
+
+void GameEngine::mainGameLoop() {
+    //part 3 here - players already have to be set
+
+    //getting & setting troops
+    reinforcementPhase();
+
+    //issuing orders phase
+    issueOrdersPhase();
+
+    //executing orders phase
+    executeOrdersPhase();
+
 }

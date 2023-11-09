@@ -5,45 +5,45 @@
 
 using namespace std;
 
-bool Order::validate(){
-    //To be implemented
-    return true;
-}
-
 bool Deploy::validate(){
-    //To be implemented
-    return true;
+    if(this->getPlayerIssuerID() != this->getTarget()->getPlayer()){return false;}
+    else{return true;}
 }
 
 bool Advance::validate(){
-    //To be implemented
-    return true;
+    if(this->getPlayerIssuerID() != this->getSource()->getPlayer()){return false;}
+    else if(!this->getTarget()->isNeighbor(this->getSource())){return false;}
+    else{return true;}
 }
 
 bool Bomb::validate(){
-    //To be implemented
-    return true;
+    if(this->getPlayerIssuerID() == this->getTarget()->getPlayer()){return false;}
+    else {
+        for(Territory* territory : this->getTarget()->getNeighbors()){if(territory->getPlayer() == this->getPlayerIssuerID()){return true;}}
+        return false;
+    }
 }
 
 bool Blockade::validate(){
-    //To be implemented
-    return true;
+    if(this->getTarget()->getPlayer() != 0){return false;}
+    else{return true;}
 }
 
 bool Airlift::validate(){
-    //To be implemented
-    return true;
+    if(this->getPlayerIssuerID() != this->getSource()->getPlayer()){return false;}
+    else if(this->getPlayerIssuerID() != this->getTarget()->getPlayer()){return false;}
+    else{return true;}
 }
 
 bool Negotiate::validate(){
-    //To be implemented
-    return true;
+    if(this->getPlayerIssuerID() == this->getPlayerTargetID()){return false;}
+    else{return true;}
 }
 
 int Order::execute(){
 
     if(validate()){
-        cout << description + "\n";
+        cout << "Generic order executed by player " << this->getPlayerIssuerID() << ". Nothing happens." << "\n";
         return 0;
     }
 
@@ -53,7 +53,8 @@ int Order::execute(){
 int Deploy::execute(){
 
     if(validate()){
-        cout << description + "\n";
+        target->addTroops(*troops);
+        cout << *this->troops << " troops have been deployed to " << this->target->getName();
         return 0;
     }
 
@@ -63,7 +64,8 @@ int Deploy::execute(){
 int Advance::execute(){
     
     if(validate()){
-        cout << description + "\n";
+        this->source->transferTroops(this->target, *this->troops);
+        cout << *this->troops << " troops have been sent from " << this->source->getName() << " to " << this->target->getName();
         return 0;
     }
 
@@ -73,7 +75,15 @@ int Advance::execute(){
 int Bomb::execute(){
     
     if(validate()){
-        cout << description + "\n";
+        if(target->getArmy() > 0){
+            target->removeTroops((target->getArmy() / 2) + (target->getArmy() % 2));
+            cout << this->target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << target->getArmy();
+        }
+
+        else{
+            cout << this->target->getName() << " has been bombed, but no one was there";
+        }
+            
         return 0;
     }
 
@@ -103,7 +113,7 @@ int Airlift::execute(){
 int Negotiate::execute(){
     
     if(validate()){
-        cout << description + "\n";
+        cout << description << "\n";
         return 0;
     }
 
