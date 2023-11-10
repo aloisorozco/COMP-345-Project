@@ -2,16 +2,12 @@
 #include <vector>
 #include <stack>
 #include <set>
-
-#include <cstdlib>
-
 #include <filesystem>
 #include <fstream>
 #include <sstream>
-
 #include "Map.h"
 using namespace std;
-namespace fs = std::filesystem; // Namespace alias for filesystem
+namespace fs = std::filesystem;
 
 // Default constructor (Territory)
 Territory::Territory() : name(new string("")), player(new int(0)), army(new int(0)), continent(new string("")) {}
@@ -30,13 +26,10 @@ Territory::Territory(const Territory &copyTerritory)
     this->player = new int(*copyTerritory.player);
     this->army = new int(*copyTerritory.army);
     this->continent = new string(*copyTerritory.continent);
-
 }
 
-
-// Destructor (Territory)
-Territory::~Territory()
-{
+//Destructor (Territory)
+Territory::~Territory() {
     delete this->name;
     name = NULL;
 
@@ -50,60 +43,55 @@ Territory::~Territory()
     continent = NULL;
 }
 
-// stream insertion operator
-ostream &operator<<(ostream &out, const Territory &territory)
+//stream insertion operator
+ostream& operator << (ostream& out, const Territory& territory)
 {
-    out << "Territory " << territory.getName() << endl;
+	out << "Territory " << territory.getName() << endl;
     out << "Player " << territory.getPlayer() << endl;
     out << "Army " << territory.getArmy() << endl;
     out << "Continent " << territory.getContinent() << endl;
-    for (Territory *neighbor : territory.getNeighbors())
-    {
+    for (Territory* neighbor : territory.getNeighbors()) {
         out << "Neighbor: " << neighbor->getName() << endl;
     }
-    return out;
+	return out;
 }
 
-// assignment operator
-Territory &Territory::operator=(const Territory &territory)
-{
-    this->setName(*territory.name);
-    this->setPlayer(*territory.player);
-    this->setArmy(*territory.army);
+//assignment operator
+Territory& Territory::operator=(const Territory& territory) {
+	this->setName(*territory.name);
+	this->setPlayer(*territory.player);
+	this->setArmy(*territory.army);
     this->setContinent(*territory.continent);
 
-    return *this;
+	return *this;
 }
 
-void Territory::addNeighbor(Territory *neighbor)
-{
+void Territory::addNeighbor(Territory* neighbor) {
     adjacentTerritories.push_back(neighbor);
 }
 
-bool Territory::isNeighbor(Territory *territory)
-{
-    for (Territory *neighbor : adjacentTerritories)
-    {
-        if (neighbor == territory)
-        {
+bool Territory::isNeighbor(Territory* territory) {
+    for (Territory* neighbor : adjacentTerritories) {
+        if (neighbor == territory) {
             return true;
         }
     }
     return false;
 }
 
-// Getters (Territory)
+
+//Getters (Territory)
 string Territory::getName() const { return *name; }
 int Territory::getPlayer() const { return *player; }
 int Territory::getArmy() const { return *army; }
 string Territory::getContinent() const { return *continent; }
-vector<Territory *> Territory::getNeighbors() const { return adjacentTerritories; }
+vector<Territory*> Territory::getNeighbors() const { return adjacentTerritories; }
 
-// Setters (Territory)
-void Territory::setName(const string &territoryName) { *name = territoryName; }
-void Territory::setPlayer(int territoryPlayer) { *player = territoryPlayer; }
-void Territory::setArmy(int territoryArmy) { *army = territoryArmy; }
-void Territory::setContinent(const string &territoryContinent) { *continent = territoryContinent; }
+//Setters (Territory)
+void Territory::setName(const string& territoryName) {*name = territoryName;}
+void Territory::setPlayer(int territoryPlayer) {*player = territoryPlayer;}
+void Territory::setArmy(int territoryArmy) {*army = territoryArmy;}
+void Territory::setContinent(const string& territoryContinent) {*continent = territoryContinent;}
 
 void Territory::addTroops(int troops) {*army = *army + troops;}
 void Territory::removeTroops(int troops) {if(troops >= *army){*army = *army - troops;}}
@@ -151,25 +139,23 @@ void Territory::transferTroops(Territory* territory, int troops){
 
 //=============================================================================================================================================================================================================//
 
+
 // Default Constructor (Continent)
 Continent::Continent() : name(new string("")), bonus(new int(0)) {}
-
 
 // Constructor (Continent)
 Continent::Continent(const string &continentName) : name(new string(continentName)) {}
 
-
 Continent::Continent(const string &continentName, int b) : name(new string(continentName)), bonus(new int(b)) {}
-
 
 // Copy constructor (Continent)
 Continent::Continent(const Continent &copyContinent)
 {
     for (Territory *territory : copyContinent.territories)
     {
-
         territories.push_back(territory);
     }
+    this->bonus = new int(*copyContinent.bonus);
 }
 
 // Destructor (Continent)
@@ -182,6 +168,9 @@ Continent::~Continent()
         delete territory;
         territory = NULL;
     }
+
+    delete bonus;
+    bonus = NULL;
 }
 
 // Add Territory to Continent
@@ -204,27 +193,12 @@ Continent &Continent::operator=(const Continent &continent)
     this->setTerritories(continent.territories);
     this->setBonus(*continent.bonus);
     return *this;
-
 }
 
 // Getter (Continent)
 string Continent::getContinentName() const { return *name; }
 int Continent::getBonus() const { return *bonus; }
 const vector<Territory *> &Continent::getTerritories() const { return territories; }
-
-// Setter (Continent)
-void Continent::setName(const string &continentName)
-{
-    if (name == nullptr)
-    {
-        name = new string(continentName);
-    }
-    else
-    {
-        *name = continentName;
-    }
-}
-
 
 // Setter (Continent)
 void Continent::setName(const string &continentName)
@@ -253,11 +227,11 @@ void Continent::setTerritories(const vector<Territory *> &continentTerritories)
     }
 }
 
+
 //=============================================================================================================================================================================================================//
 
-Map::Map()
-{
-}
+
+Map::Map() {}
 
 Map::Map(const Map &m)
 {
@@ -280,27 +254,22 @@ Map::~Map()
     }
 }
 
-
 void Map::addContinent(Continent *continent)
 {
     continents.push_back(continent);
-
     for (Territory *territory : continent->getTerritories())
     {
         territories.push_back(territory);
     }
-
 }
 
-vector<Continent *> Map::getContinents() const
-{
+vector<Continent*> Map::getContinents() const {
     return continents;
 }
 
 void Map::setContinents(const vector<Continent *> &continents)
 {
     this->continents = continents;
-
     for (Continent *continent : continents)
     {
         for (Territory *territory : continent->getTerritories())
@@ -317,17 +286,13 @@ vector<Territory *> Map::getTerritories()
 
     continents = this->getContinents();
 
-
     for (Continent *continent: continents){
         for (Territory *territory: continent->getTerritories()){
             territories.push_back(territory);
         }
     }
 
-
-
     return territories;
-
 }
 
 ostream &operator<<(std::ostream &os, const Map &m)
@@ -349,8 +314,7 @@ ostream &operator<<(std::ostream &os, const Map &m)
     return os;
 }
 
-Map &Map::operator=(const Map &m)
-{
+Map& Map::operator=(const Map& m){
     this->setContinents(m.getContinents());
     return *this;
 }
@@ -843,33 +807,74 @@ Map *MapLoader::loadMap_withName(string mapName)
     return map;
 };
 
-// int main()
-// {
+/* Test for map functionality
+int main(){
 
-//     MapLoader loader;
-//     string mapName = "Aden.map";
-//     // Map *testMap = loader.loadMap_withName(mapName);
-//     Map* testMap = loader.loadMap();
+    Territory* t1 = new Territory("Canada", "North America");
+    Territory* t2 = new Territory("USA", "North America");
+    Territory* t3 = new Territory("Mexico", "North America");
+    Territory* t4 = new Territory("Brazil", "South America");
+    Territory* t5 = new Territory("Argentina", "South America");
+    Territory* t6 = new Territory("Peru", "South America");
+    Territory* t7 = new Territory("England", "Europe");
 
-//     cout << *testMap << endl;
+    t1->addNeighbor(t2);
+    t1->addNeighbor(t3);
+    t2->addNeighbor(t1);
+    t2->addNeighbor(t3);
+    t2->addNeighbor(t4);
+    t3->addNeighbor(t1);
+    t3->addNeighbor(t2);
+    t3->addNeighbor(t4);
+    t4->addNeighbor(t2);
+    t4->addNeighbor(t3);
+    t4->addNeighbor(t5);
+    t4->addNeighbor(t6);
+    t5->addNeighbor(t4);
+    t6->addNeighbor(t4);
+    t7->addNeighbor(t6);
+    t6->addNeighbor(t7);
 
-//     cout << testMap->getTerritories().size() << endl;
+   
 
-//     for (Territory* territory: testMap->getTerritories()){
-//         cout << territory->getName() << endl;
-//     }
+    
 
-//     if (testMap->validate())
-//     {
-//         cout << "\n\nMap is valid" << endl;
-//     }
-//     else
-//     {
-//         cout << "Map is not valid" << endl;
-//     }
+    
 
-//     delete testMap;
+    Continent* c1 = new Continent("North America");
+    Continent* c2 = new Continent("South America");
+    Continent* c3 = new Continent("Europe");
 
-//     return 0;
-// }
+    
+    c1->addTerritory(t1);
+    c1->addTerritory(t2);
+    c1->addTerritory(t3);
+    c2->addTerritory(t4);
+    c2->addTerritory(t5);
+    c2->addTerritory(t6);
+    c3->addTerritory(t7);
 
+   
+    
+
+    Map* m1 = new Map();
+
+    m1->addContinent(c1);
+    m1->addContinent(c2);
+    m1->addContinent(c3);
+
+   
+    // cout<<m1->getContinents().size()<<endl;
+
+    cout<<"Map is "<<m1->validate()<<endl;
+    
+    cout<<*m1<<endl;
+    
+    
+
+
+
+    return 0;
+};
+
+*/

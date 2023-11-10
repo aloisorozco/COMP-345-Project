@@ -42,8 +42,8 @@ string Card::cardTypeToString() const {
     }
 }
 //check hand size, to make sure a card can be played
-void Card::play(Deck **deck, Hand **hand){
-    if((*hand)->getHandSize() == 0){
+void Card::play(Deck *deck, Hand *hand){
+    if((*hand).getHandSize() == 0){
         cout <<"No cards to play."<<endl;
         return;
     }
@@ -52,32 +52,32 @@ void Card::play(Deck **deck, Hand **hand){
     if(type == CardType::Bomb){
         order = new Order(); //havent fetched/merged Order
         cout<<"Creating new Bomb Order to Order List\n";
-        (**hand).getOrdersList().add(*order);
+        (*hand).getOrdersList().add(order);
     }
     else if(type == CardType::Reinforcement){
         //This adds +5 units to your pool of deployable units.
         order = new Order();
         cout<<"Creating new Reinforcement Order to Order List\n";
-        (**hand).getOrdersList().add(*order);
+        (*hand).getOrdersList().add(order);
     }
     else if(type == CardType::Blockade){
         order = new Order();
         cout<<"Creating new Blockade Order to Order List\n";
-        (**hand).getOrdersList().add(*order);
+        (*hand).getOrdersList().add(order);
     }
     else if(type == CardType::Airlift){
         order = new Order();
         cout<<"Creating new Airlift Order to Order List\n";
-        (**hand).getOrdersList().add(*order);
+        (*hand).getOrdersList().add(order);
     }
     else if(type == CardType::Diplomacy){
         order = new Order();
         cout<<"Creating new Diplomacy Order to Order List\n";
-        (**hand).getOrdersList().add(*order);
+        (*hand).getOrdersList().add(order);
     }
     //print the card played
-    (*deck)->returnCard(this);
-    (*hand)->removeCard(this);
+    (*deck).returnCard(this);
+    (*hand).removeCard(this);
 }
 //Deconstructor, but Deck and Hand already clear the cards
 Card::~Card() = default;

@@ -28,4 +28,3 @@ void testLoadMaps()
     delete testMap;
 
 };
-

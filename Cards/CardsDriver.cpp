@@ -32,7 +32,7 @@ void testCards(){
     }
     for(Card* card : cardsToRemove){
         //play the cards(return deck, remove hand)
-        card->play(&deck,&hand);
+        card->play(deck,hand);
     }
     //done playing cards
     //3.b. Check all cards back in deck.
@@ -41,7 +41,7 @@ void testCards(){
     //Test error, hand empty no cards to play
     try{
         cout <<"Check empty hand "<< hand->getCards().at(0)->cardTypeToString() <<endl;
-        hand->getCards().front()->play(&deck, &hand);
+        hand->getCards().front()->play(deck, hand);
     }
     catch(runtime_error& e){
         cerr << "Caught : "<< e.what()<<endl;

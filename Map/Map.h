@@ -54,7 +54,6 @@ private:
 	string* name;
 	vector<Territory*> territories;
 	int* bonus;
-	
 
 public:
 	Continent(); 
@@ -75,15 +74,18 @@ public:
 	void setTerritories(const vector<Territory*>& continentTerritories);
 
 	void setBonus(int bonus);
-	int getBonus() const;
 
+	int getBonus() const;
 };
 
 
 class Map {
 	private:
     vector<Continent*> continents;
+
+	//vector of all territories on the map
 	vector<Territory*> territories;
+
 public:
     Map();
     Map(const Map& m); // Copy constructor
@@ -113,9 +115,6 @@ class MapLoader {
 	public:
 		Map* loadMap() ;
 		Map* loadMap_withName(string mapName);
-
- main
-
 	
 };
 

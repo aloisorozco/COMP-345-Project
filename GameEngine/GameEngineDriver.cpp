@@ -1,239 +1,146 @@
-// GameEngine.cpp
-#include "GameEngine.h"
+//GameEngineDriver.cpp
 #include <iostream>
-#include <map>
+#include <chrono>
+#include <thread>
+#include "GameEngine.h"
 
-#include "../Player/Player.h"
+// Initialisation of the engine, creation of all states and transition.
+GameEngine gameInit() {
 
-// Constructor for GameState. Initializes the state with a name.
-GameState::GameState(std::string name) : name(name) {}
+    //state initialisation
+    GameEngine engine;
+    GameState* startState = new GameState("Start");
+    GameState* mapLoadState = new GameState("Map Loaded");
+    GameState* mapValidationState = new GameState("Map Validated");
+    GameState* addPlayerState = new GameState("Players Added");
+    GameState* reinforcementState = new GameState("Assign Reinforcement");
+    GameState* orderChoiceState = new GameState("Issue Orders");
+    GameState* orderExecuteState = new GameState("Execute Orders");
+    GameState* winState = new GameState("Win");
+    GameState* endState = new GameState("end");
 
-// Returns the name of the GameState.
-std::string GameState::getName() const {
-    return name;
+
+    // Creating all the appropriate transitions.
+    startState->addTransition("loadmap", mapLoadState);
+    mapLoadState->addTransition("loadmap",mapLoadState);
+    mapLoadState->addTransition("validatemap",mapValidationState);
+    mapValidationState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("assigncountries",reinforcementState);
+    reinforcementState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("endissueorders",orderExecuteState);
+    orderExecuteState->addTransition("execorder",orderExecuteState);
+    orderExecuteState->addTransition("endexecorders",reinforcementState);
+    orderExecuteState->addTransition("win",winState);
+    winState->addTransition("play",startState);
+    winState->addTransition("end",endState);
+
+    //Adding all states to the engine
+    engine.addState(startState);
+    engine.addState(mapLoadState);
+    engine.addState(mapValidationState);
+    engine.addState(addPlayerState);
+    engine.addState(reinforcementState);
+    engine.addState(orderChoiceState);
+    engine.addState(orderExecuteState);
+    engine.addState(winState);
+
+    //Setting the initial state
+    engine.setInitialState(startState);
+
+    return engine;
 }
 
-// Adds a transition from the current state to another state, triggered by a command.
-void GameState::addTransition(const std::string& command, GameState* state) {
-    transitions[command] = state;
+// Fucntion for clearing terminal window using ASCII escape code
+void clearScreen() {
+    std::cout << "\x1B[2J\x1B[H";
 }
 
-// Returns the available transitions from this state.
-const std::map<std::string, GameState*>& GameState::getTransitions() const {
-    return transitions;
+// Function for printing a helping box
+void printBox(const std::string& state, const std::string& commands) {
+    std::cout << "***** WARZONE GAME ENGINE ****\n";
+    std::cout << "******************************\n";
+    std::cout << "* Current state: " << state << "\n";
+    std::cout << "* Available commands: \n" << commands << "\n";
+    std::cout << "******************************\n";
 }
 
-// Returns the next GameState based on the given command. If the command does not have a corresponding transition, returns nullptr.
-GameState* GameState::getNextState(const std::string& command) const {
-    std::map<std::string, GameState*>::const_iterator it = transitions.find(command);
-    if (it != transitions.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
+// Console-driven interface that allows the user to navigate through all the states by typing commands
+void testGameStates(){
+    std::chrono::seconds sleepDuration(1);
+    GameEngine engine = gameInit();
+    std::string command;
+    while (true) {
+        // Clearing terminal screen
+        clearScreen();
 
-GameState::GameState(const GameState &) {} //Required but not used
-GameState &GameState::operator=(const GameState &) {
-    return *this;
-}
-
-ostream &operator<<(ostream& out, const GameState &) {
-    out <<"Not called "<<endl;
-    return out;
-}
-
-// Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(nullptr), playerArray(NULL), sizeofPlayerArray(new int(0)) {
-
-}
-
-// Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
-GameEngine::~GameEngine() {
-    for (std::map<std::string, GameState*>::iterator it = states.begin(); it != states.end(); ++it) {
-        delete it->second;
-    }
-
-    delete this->playerArray;
-    playerArray = NULL;
-
-    delete this->sizeofPlayerArray;
-    sizeofPlayerArray = NULL;
-}
-
-// Returns the current state of the game.
-GameState* GameEngine::getCurrentState() {
-    return currentState;
-}
-
-// Returns a list of commands that can be used in the current state.
-std::vector<std::string> GameEngine::getAvailableCommands() {
-    std::vector<std::string> commands;
-
-    if (currentState != nullptr) {
-        const std::map<std::string, GameState*>& transitions = currentState->getTransitions();
-        for (std::map<std::string, GameState*>::const_iterator it = transitions.begin(); it != transitions.end(); ++it) {
-        const std::pair<const std::string, GameState*>& pair = *it;
-            commands.push_back(pair.first);
-        }
-    }
-
-    return commands;
-}
-
-// Adds a new game state to the game engine. It takes a pointer to a GameState object as an argument and adds it to the states map using the game state's name as the key.
-void GameEngine::addState(GameState* state) {
-    states[state->getName()] = state;
-}
-
-// Sets the initial game state for the game engine. It takes a pointer to a GameState object as an argument and sets currentState to this game state.
-void GameEngine::setInitialState(GameState* state) {
-    currentState = state;
-}
-
-// Processes a command from the user. It checks if a current state exists and gets the next state based on the provided command.
-void GameEngine::processCommand(const std::string& command) 
-{
-    if (currentState == nullptr) {
-        std::cout << "The game is not initialized." << std::endl;
-        return;
-    }
-    GameState* nextState = currentState->getNextState(command);
-    if (nextState == nullptr) {
-        std::cout << "Invalid command." << std::endl;
-    } else {
-        currentState = nextState;
-        std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
-    }
-}
-//NOT CALLED
-GameEngine::GameEngine(const GameEngine &) {}
-GameEngine &GameEngine::operator=(const GameEngine &) {
-    return *this;
-}
-ostream &operator<<(ostream& out, const GameEngine &) {
-    return out;
-}
-
-void GameEngine::startupPhase(){
-    
-}
-
-void GameEngine::play() {
-
-    //part 2
-
-    //part 3
-    mainGameLoop();
-}
-
-void GameEngine::reinforcementPhase() {
-
-    cout << "Reinforcement Phase\n" << endl;
-
-    vector<Player> playerVector;
-    for (int i = 0; i < *sizeofPlayerArray; i++) {
-        playerVector.push_back(playerArray[i]);
-    }
-
-    //removes player if they do not have territories from array
-    for (int i = 0; i < *sizeofPlayerArray; i++) {
-        playerArray[i].toDefend();
-        if (playerArray[i].getSizeOfToDefend() == 0) {
-            cout << playerArray[i] << " has no territories, removing them from the game" << endl;
-            playerVector.erase(playerVector.begin() + i);
-        }
-    }
-
-    //if player was removed in vector, update array
-    if (playerVector.size() != *sizeofPlayerArray) {
-        *sizeofPlayerArray = playerVector.size();
-        Player* playerArray = new Player[*sizeofPlayerArray];
-
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            playerArray[i] = playerVector[i];
-        }
-    }
-
-    //calculating troops for each player
-    for (int i = 0; i < *sizeofPlayerArray; i++) {
-        playerArray[i].toDefend();
-        int troops = (playerArray[i].getSizeOfToDefend() / 3) + 3;
+        //getting available commands for current state
+        std::vector<std::string> availableCommands = engine.getAvailableCommands();
         
-        //checks if owns entire continents if so add continent bonus to troops
-        vector<Continent*> continents = playerArray[i].getMap().getContinents();
-
-        for (Continent* continent : continents) {
-            vector<Territory*> territories = continent->getTerritories();
-            
-            bool hasContinent = true;
-            for (Territory* territory : territories) {
-                if (!(playerArray[i].hasTerritory(*territory))) {
-                    hasContinent = false;
-                }
-            }
-            if (hasContinent) {
-                troops += continent->getBonus();
-            }
+        //converting vector of strings into a single string separated by a \n
+        std::string commandsStr;
+        for (std::vector<std::string>::iterator it = availableCommands.begin(); it != availableCommands.end(); ++it) {
+            std::string cmd = *it;
+            commandsStr += "* > " +cmd + "\n";
         }
 
-        playerArray[i].setTroopsToDeploy(troops);
-    }
-    cout << "--------------------\n" << endl;
-}
-
-void GameEngine::issueOrdersPhase() {
-    cout << "Issuing Orders Phase\n" << endl;
-    bool* playersDoneArray = new bool[*sizeofPlayerArray];
-    while (true) {
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            playersDoneArray[i] = false;
-        }
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            if (playersDoneArray[i]) {
-                continue;
-            }
-            playersDoneArray[i] = playerArray[i].issueOrder();
-        }
-        bool playersDone = true;
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            playersDone = playersDone && playersDoneArray[i];
-        }
-        if (playersDone) {
+        // Displaying status box
+        printBox(engine.getCurrentState()->getName(), commandsStr);
+        std::cout << "Enter command: ";
+        std::cin >> command;
+        if (command == "end") {
+            std::cout<<"Game ended";
             break;
         }
+
+        // Displaying result of the command
+        std::cout << "\n- ";
+        engine.processCommand(command);
+        std::cout << "******************************\n";
+        std::this_thread::sleep_for(sleepDuration);
+        
     }
-    cout << "--------------------\n" << endl;
 }
 
-void GameEngine::executeOrdersPhase() {
-    cout << "Execute Orders Phase\n" << endl;
-    while (true) {
-        bool executeOrdersDone = true;
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            Order* order = playerArray[i].getNextInOrdersList();
-            if (order != NULL) {
-                executeOrdersDone = false;
-                order->execute();
-            }
-        }
+void testMainGameLoop() {
 
-        if (executeOrdersDone) {
-            break;
-        }
+    cout << "Choose Africa map for example" << endl;
+
+    MapLoader loader;
+    Map* testMap = loader.loadMap();
+
+    cout << *testMap << endl;
+
+    if (testMap->validate())
+    {
+        cout << "\n\nMap is valid" << endl;
     }
-    cout << "--------------------\n" << endl;
+    else
+    {
+        cout << "Map is not valid" << endl;
+    }
+
+    Deck* deck = new Deck();
+
+    GameEngine* engine = new GameEngine();
+    engine->addPlayer(new Player(testMap, deck));
+    engine->addPlayer(new Player(testMap, deck));
+    engine->addPlayer(new Player(testMap, deck));
+
+    testMap->setContinents(testMap->getContinents());
+
+    for (Territory* territory : testMap->getTerritories()) {
+        territory->setPlayer(1);
+    }
+    testMap->getTerritories()[0]->setPlayer(2);
+
+    cout << "Main Game Loop start: " << endl;
+
+    engine->mainGameLoop();
+
 }
 
-void GameEngine::mainGameLoop() {
-    //part 3 here - players already have to be set
 
-    //getting & setting troops
-    reinforcementPhase();
 
-    //issuing orders phase
-    issueOrdersPhase();
-
-    //executing orders phase
-    executeOrdersPhase();
-
-}
+    

@@ -9,7 +9,10 @@
 class Order {
 
     protected:
+        //ID of the player Issuing the order
         int* playerIssuerID;
+
+        //Description of the order
         string* description;
 
     public:
@@ -55,7 +58,10 @@ class Order {
 class Deploy : public Order{
 
     private:
+        //Number of troops to deploy
         int* troops;
+
+        //Territory to send troops to
         Territory* target;
 
     public:
@@ -65,7 +71,7 @@ class Deploy : public Order{
             target = nullptr;
         }
 
-        Deploy(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {}
+        Deploy(int playerID, const std::string& desc, int troops, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {}
 
         Deploy(const Deploy& other) : Order(other), troops(new int(*other.troops)), target(other.target) {}
 
@@ -104,8 +110,14 @@ class Deploy : public Order{
 class Advance : public Order{
 
     private:
+
+        //Number of troops to advance from source
         int* troops;
+
+        //Source of the troops
         Territory* source;
+
+        //Territory to send troops to
         Territory* target;
 
     public:
@@ -158,6 +170,8 @@ class Advance : public Order{
 class Bomb : public Order{
 
     private:
+
+        //Territory to send the bomb order to
         Territory* target;
 
     public:
@@ -198,6 +212,7 @@ class Bomb : public Order{
 class Blockade : public Order{
 
     private:
+        //Territory to blockade
         Territory* target;
 
     public:
@@ -237,8 +252,14 @@ class Blockade : public Order{
 class Airlift : public Order{
 
     private:
+
+        //Number of troops to send
         int* troops;
+
+        //Source territory
         Territory* source;
+
+        //Target territory
         Territory* target;
 
     public:
@@ -291,7 +312,10 @@ class Airlift : public Order{
 class Negotiate : public Order{
 
     private:
+        //Player ID to negotiate with
         int* targetPlayerID;
+
+        //Array to store negotiations for the negotiations. To be cleared at the end of the turn.
         static std::vector<std::pair<int, int>> negotiations;
 
     public:
@@ -351,38 +375,47 @@ class Negotiate : public Order{
 class OrdersList {
 
     private:
-        std::vector<Order> orders;
+        
+        std::vector<Order*> orders;
 
         void copyOrders(const OrdersList& other);
 
     public:
-
         OrdersList() = default;
         OrdersList(const OrdersList& other);
 
+        ~OrdersList() {
+            for (Order* order : orders) {
+                delete order;
+            }
+
+            orders.clear();
+        }
+
         OrdersList& operator=(const OrdersList& other);
 
-        int add(Order order);
+        int add(Order* order);
         int move(int index1, int index2);
         int remove();
         int remove(int index);
         int executeAll();
 
         Order* get(int index) {
-            return &orders[index];
+            return orders[index];
         }
 
-        vector<Order> getOrders() {
+        vector<Order*> getOrders() {
             return orders;
         }
 
-        void setOrder(vector<Order> ordersVector) {
+        void setOrder(vector<Order*> ordersVector) {
             orders = ordersVector;
         }
 
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
 };
 
+// free function declaration
 int testOrdersLists();
 
 #endif

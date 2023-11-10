@@ -5,38 +5,6 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 
-class ReinforcementPool{
-
-	private:
-		int* numTroops;
-		int* playerOwnerID;
-
-	public:
-
-		ReinforcementPool() : numTroops(0), playerOwnerID(0) {};
-		ReinforcementPool(int* numTroops, int* playerOwnerID) : numTroops(numTroops), playerOwnerID(playerOwnerID) {};
-
-		int getNumTroops();
-		int getPlayerOwnerID();
-		void setNumTroops(int troops);
-		void setPlayerOwnerID(int playerID);
-
-		void transferTroops(Territory* territory, int troops);
-		void retrieveTroops(Territory* territory, int troops);
-		void clearTroops();
-
-		ReinforcementPool& operator=(const ReinforcementPool& reinforcementPool){
-			if (this != &reinforcementPool) {
-                delete numTroops;
-                delete playerOwnerID;
-
-                this->numTroops = new int(*reinforcementPool.numTroops);
-                this->playerOwnerID = new int(*reinforcementPool.playerOwnerID);
-            }
-            return *this;
-		}
-};
-
 class Player {
 
 private:
@@ -48,7 +16,6 @@ private:
 	//this is equivalent to Territory territoryArray[] but it had
 	//to be done this way because of requirements (all variables must be in pointers)
 	Territory* territoryArray;
-	ReinforcementPool* reinforcement;
 	int* sizeOfTerritoryArray;
 	OrdersList* ordersList;
 	int* orderListIndex;
@@ -79,9 +46,7 @@ public:
 
 	Player();
 
-	Player(bool neutral);
-
-	Player(Map* map);
+	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
@@ -119,7 +84,7 @@ public:
 
 	void setHand(Hand hand);
 
-	void setMap(Map map);
+	void setMap(Map* map);
 
 	int getSizeOfToDefend() {
 		return *sizeOfToDefend;
@@ -153,19 +118,9 @@ public:
 		*this->orderListIndex = index;
 	}
 
-	ReinforcementPool getReinforcementPool(){
-		return *reinforcement;
-	}
-
-	void setReinforcementPool(ReinforcementPool reinforcementt){
-		*this->reinforcement = reinforcementt;
-	}
-
 	Player& operator=(const Player& player);
 
 };
-
-
 
 // free function declaration
 void testPlayers();

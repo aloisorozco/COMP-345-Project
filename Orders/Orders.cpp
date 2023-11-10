@@ -5,6 +5,12 @@
 
 using namespace std;
 
+std::vector<std::pair<int, int>> Negotiate::negotiations;
+
+bool Order::validate(){
+    return true;
+}
+
 bool Deploy::validate(){
     if(this->getPlayerIssuerID() != this->getTarget()->getPlayer()){return false;}
     else{return true;}
@@ -50,6 +56,8 @@ int Order::execute(){
         return 0;
     }
 
+    cout << "Invalid order: " << description << "\n";
+
     return -1;
 }
 
@@ -57,9 +65,11 @@ int Deploy::execute(){
 
     if(validate()){
         target->addTroops(*troops);
-        cout << *this->troops << " troops have been deployed to " << this->target->getName();
+        cout << *this->troops << " troops have been deployed to " << this->target->getName() << "\n";
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
@@ -68,9 +78,11 @@ int Advance::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << *this->troops << " troops have been sent from " << this->source->getName() << " to " << this->target->getName();
+        cout << *this->troops << " troops have been sent from " << this->source->getName() << " to " << this->target->getName() << "\n";
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
@@ -80,7 +92,7 @@ int Bomb::execute(){
     if(validate()){
         if(target->getArmy() > 0){
             target->removeTroops((target->getArmy() / 2) + (target->getArmy() % 2));
-            cout << this->target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << target->getArmy();
+            cout << this->target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << target->getArmy() << "\n";
         }
 
         else{
@@ -89,6 +101,8 @@ int Bomb::execute(){
             
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
@@ -100,10 +114,12 @@ int Blockade::execute(){
         target->setPlayer(0);
         target->setArmy(target->getArmy() * 2);
 
-        cout << this->target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << target->getArmy();
+        cout << this->target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << target->getArmy() << "\n";
 
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
@@ -112,9 +128,11 @@ int Airlift::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << *this->troops << " troops have been airlifted from " << this->source->getName() << " to " << this->target->getName();
+        cout << *this->troops << " troops have been airlifted from " << this->source->getName() << " to " << this->target->getName() << "\n";
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
@@ -123,16 +141,18 @@ int Negotiate::execute(){
     
     if(validate()){
         addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
-        cout << "Player " << *this->playerIssuerID << " has negotiated with Player " << *this->targetPlayerID << ". No attacks between them shall be launched.";
+        cout << "Player " << *this->playerIssuerID << " has negotiated with Player " << *this->targetPlayerID << ". No attacks between them shall be launched." << "\n";
         return 0;
     }
+
+    cout << "Invalid order: " << description << "\n";
 
     return -1;
 }
 
-int OrdersList::add(Order order){
-
-    orders.push_back(order);
+int OrdersList::add(Order* order){
+    this->orders.push_back(order);
+    cout << orders.size();
     return 0;
 }
 
@@ -160,7 +180,7 @@ int OrdersList::move(int index1, int index2){
 
     if (index1 >= 0 && index1 < orders.size() && index2 >= 0 && index2 < orders.size() && index1 != index2) {
 
-        Order ordermove = orders[index1];
+        Order* ordermove = orders[index1];
         orders.erase(orders.begin() + index1);
 
         orders.insert(orders.begin() + index2, ordermove);
@@ -175,9 +195,8 @@ int OrdersList::move(int index1, int index2){
 
 int OrdersList::executeAll(){
 
-    for(Order order : orders){
-
-        if(order.execute() != 0){
+    for(Order* order : orders){
+        if(order->execute() != 0){
             return -1;
         }
     }
@@ -187,8 +206,8 @@ int OrdersList::executeAll(){
 
 void OrdersList::copyOrders(const OrdersList& other) {
     orders.reserve(other.orders.size());
-    for (Order order : other.orders) {
-        orders.push_back(Order(order));
+    for (Order* order : other.orders) {
+        orders.push_back(new Order(*order));
     }
 }
 
@@ -211,7 +230,7 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
 
 std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
     
-    for (const Order order : ordersList.orders) {
+    for (const Order* order : ordersList.orders) {
         os << order << "\n";
     }
     return os;

@@ -85,32 +85,21 @@ public:
 
     void executeOrdersPhase();
 
-    void setPlayers(Player* players, int sizeofPlayers) {
+    void setPlayers(vector<Player*> players) {
         playerArray = players;
-        sizeofPlayerArray = new int(sizeofPlayers);
     }
 
-    void addPlayer(Player player) {
-        Player* temp = new Player[*sizeofPlayerArray];
+    void addPlayer(Player* player) {
+        playerArray.push_back(player);
+        /*Player* temp = new Player[*sizeofPlayerArray];
         playerArray = new Player[*sizeofPlayerArray + 1];
 
         for (int i = 0; i < *sizeofPlayerArray; i++) {
             playerArray[i] = temp[i];
         }
 
-        playerArray[*sizeofPlayerArray] = player;
-        sizeofPlayerArray++;
-    }
-
-    Player* getPlayer(int playerID){
-
-        for(int i = 0; i < *sizeofPlayerArray; i++){
-            if(playerArray[i].getPlayerID() == playerID){
-                return &playerArray[i];
-            }
-        }
-
-        return nullptr;
+        playerArray[*sizeofPlayerArray] = *player;
+        sizeofPlayerArray++;*/
     }
 
     /*static Player* gamePlayerArray;
@@ -128,7 +117,7 @@ private:
     // The current state of the game.
     GameState* currentState;
 
-    Player* playerArray;
+    vector<Player*> playerArray;
     int* sizeofPlayerArray;
 };
 
