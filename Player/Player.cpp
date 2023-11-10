@@ -24,6 +24,7 @@ Player::Player() {
 	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -31,6 +32,7 @@ Player::Player() {
 	troopsToDeploy = new int(0);
 }
 
+//main constructor to use other ones i will leave for now but they are not tested to work
 Player::Player(Map* map, Deck* deck) {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
@@ -41,6 +43,7 @@ Player::Player(Map* map, Deck* deck) {
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);
 	hand = new Hand(deck);
+	this->deck = new Deck(*deck);
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -59,6 +62,7 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	orderListIndex = new int(-1);
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -80,6 +84,7 @@ Player::Player(const Player& copyPlayer) {
 	this->ordersList = new OrdersList(*copyPlayer.ordersList);
 	this->orderListIndex = new int(*copyPlayer.orderListIndex);
 	this->hand = new Hand(*copyPlayer.hand);
+	this->deck = new Deck(*copyPlayer.deck);
 	this->map = new Map(*copyPlayer.map);
 	this->sizeOfToAttack = new int(*copyPlayer.sizeOfToAttack);
 	this->sizeOfToDefend = new int(*copyPlayer.sizeOfToDefend);
@@ -102,6 +107,9 @@ Player::~Player() {
 
 	delete this->hand;
 	hand = NULL;
+
+	delete this->deck;
+	deck = NULL;
 
 	delete this->map;
 	map = NULL;
@@ -280,8 +288,39 @@ bool Player::issueOrder() {
 		return false;
 	}
 	else if (actionInput == 2) {
-		//TODO: honestly idek how to fix card class will have to check way later
-		cout << "Option 2: Play a card\n\n" << endl;
+		int cardChoice;
+		vector<Card*> tempCards = hand->getCards();
+
+		while (true) {
+			cout << "Option 2: Play a card\n" << endl;
+			cout << "Displaying cards in hand:\n" << endl;
+
+			for (int i = 0; i < tempCards.size(); i++) {
+				cout << "Card " << i << ": " << *tempCards[i] << endl;
+			}
+
+			cout << "Choose a card to play:\n" << endl;
+			cin >> cardChoice;
+
+			if (cardChoice >= 0 || cardChoice < tempCards.size()) {
+				break;
+			}
+			else {
+				cout << "Invalid card choice please try again" << endl;
+			}
+		}
+		
+		cout << "\nCard chosen:" << endl;
+		cout << *tempCards[cardChoice] << endl;
+
+		Order* order = tempCards[cardChoice]->play(deck, hand);
+
+		if (dynamic_cast<const Deploy*>(order)) {
+			*troopsToDeploy += 5;
+		}
+		else {
+			ordersList->add(*order);
+		}
 
 		return false;
 	}
@@ -292,28 +331,6 @@ bool Player::issueOrder() {
 	}
 	
 }
-
-//put all deploy orders first
-//void Player::orderOrdersList() {
-//	if (ordersList->getOrders().size() == 0) {
-//		return;
-//	}
-//	vector<Order> orderedOrdersList(ordersList->getOrders());
-//	for (int i = 0; i < (ordersList->getOrders().size() - 1); i++) {
-//		for (int j = i + 1; j < ordersList->getOrders().size(); j++) {
-//			bool rightIsDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) != NULL;
-//			bool leftIsNotDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) == NULL;
-//
-//			if (rightIsDeploy && leftIsNotDeploy) {
-//				Order temp = orderedOrdersList[i];
-//				orderedOrdersList[i] = *ordersList->get(j);
-//				orderedOrdersList[j] = temp;
-//			}
-//		}
-//	}
-//
-//	orderListIndex = new int (0);
-//}
 
 bool Player::hasTerritory(string territoryName) {
 	Territory* toDefendArray = toDefend();
@@ -356,7 +373,8 @@ Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
 	this->setOrderListIndex(*player.orderListIndex);
-	this->setHand(*player.hand);
+	this->setHand(player.hand);
+	this->deck = new Deck(*player.deck);
 	this->setMap(player.map);
 
 	this->setSizeOfToAttack(*player.sizeOfToAttack);
@@ -380,8 +398,8 @@ OrdersList Player::getOrdersList() {
 	return *this->ordersList;
 }
 
-Hand Player::getHand() {
-	return *this->hand;
+Hand* Player::getHand() {
+	return this->hand;
 }
 
 Map* Player::getMap() {
@@ -401,8 +419,8 @@ void Player::setOrdersList(OrdersList ordersList) {
 	*this->ordersList = ordersList;
 }
 
-void Player::setHand(Hand hand) {
-	*this->hand = hand;
+void Player::setHand(Hand* hand) {
+	this->hand = hand;
 }
 
 void Player::setMap(Map* map) {

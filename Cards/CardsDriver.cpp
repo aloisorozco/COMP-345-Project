@@ -12,11 +12,11 @@ void testCards(){
     Hand* hand2 =new Hand(deck);
     //2.b.Draw cards, which adds them to hand
     for(int i =0; i< 5; i++){
-        deck->draw(&hand);   //ref to hand.
+        deck->draw(hand);   //ref to hand.
     }
     //testing for an extra player hand
     for(int i =0; i< 5; i++){
-        deck->draw(&hand2);   //ref to hand.
+        deck->draw(hand2);   //ref to hand.
     }
     cout<<*hand;
     //second player hand works
