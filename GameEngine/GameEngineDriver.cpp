@@ -124,9 +124,18 @@ void testMainGameLoop() {
     Deck* deck = new Deck();
 
     GameEngine* engine = new GameEngine();
-    engine->addPlayer(new Player(testMap, deck));
-    engine->addPlayer(new Player(testMap, deck));
-    engine->addPlayer(new Player(testMap, deck));
+
+    Player* p1 = new Player(testMap, deck);
+    Player* p2 = new Player(testMap, deck);
+    Player* p3 = new Player(testMap, deck);
+
+    for (int i = 0; i < 5; i++) {
+        deck->draw(p1->getHand());
+    }
+
+    engine->addPlayer(p1);
+    engine->addPlayer(p2);
+    engine->addPlayer(p3);
 
     testMap->setContinents(testMap->getContinents());
 
