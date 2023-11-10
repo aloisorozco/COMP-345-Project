@@ -54,7 +54,7 @@ ostream &operator<<(ostream &out, const GameState &)
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(NULL), sizeofPlayerArray(new int(0))
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray{}, sizeofPlayerArray(new int(0))
 {
 }
 
@@ -136,6 +136,19 @@ ostream &operator<<(ostream &out, const GameEngine &)
     return out;
 }
 
+void GameEngine::addPlayer(Player* player) {
+        playerArray.push_back(player);
+        /*Player* temp = new Player[*sizeofPlayerArray];
+        playerArray = new Player[*sizeofPlayerArray + 1];
+
+        for (int i = 0; i < *sizeofPlayerArray; i++) {
+            playerArray[i] = temp[i];
+        }
+
+        playerArray[*sizeofPlayerArray] = *player;
+        sizeofPlayerArray++;*/
+    }
+
 GameEngine GameEngine::gameInit()
 {
 
@@ -200,16 +213,26 @@ void GameEngine::printBox(const std::string &state, const std::string &commands)
     std::cout << "******************************\n";
 }
 
+void GameEngine::addMap(Map *map)
+{
+    this->map = map;
+}
+
 void GameEngine::startupPhase(/*Command &command*/)
 { // will input a command object
 
     // Initialize game    
     GameEngine *engine = new GameEngine();
     GameEngine *initializer = new GameEngine();
-    *engine = initializer->gameInit();
-    delete initializer;
-    initializer = NULL;
+    // *engine = initializer->gameInit();
+    // delete initializer;
+    // initializer = NULL;
 
+    // //get commands - check if there are commands inputed through text file
+    // CommandProcessor *commandProcessor = new CommandProcessor();
+    // vector <Command*> commands;
+    // commmands = commandProcessor->getCommand();
+    
     // intialize map
     Map *map = new Map();
     MapLoader *mapLoader = new MapLoader();
@@ -224,29 +247,37 @@ void GameEngine::startupPhase(/*Command &command*/)
     // validate map command - getCommand() from CommandProcessor object
     if (map->validate())
     {
+        engine->addMap(map);
         // transition game state
     }
 
     else
     {
         cout << "Map is not valid. Please select another map using the loadmap command" << endl; // still in map loaded state can call loadmap again
-        delete map;
-        map = NULL; // avoid memory leaks - might cause error so delete oopsie
+        // delete map;
+        // map = NULL; // avoid memory leaks - might cause error so delete oopsie
     }
 
-    // Delete loader for map
-    delete mapLoader;
-    mapLoader = NULL;
+    // // Delete loader for map
+    // delete mapLoader;
+    // mapLoader = NULL;
 
     // Add players command - getCommand() from CommandProcessor object - prob a if satement here + call validate
-    if (*sizeofPlayerArray < 6)
+    if (*sizeofPlayerArray > 6)
     {
         cout << "Too many players. Please use the gamestart command to start the game" << endl;
     }
     else
     {
-        engine->addPlayer(new Player(map, deck));
+        Player* p = new Player (map, deck);
+        Player* p1 = new Player (map, deck);
+        engine->addPlayer(p);
         *sizeofPlayerArray = playerArray.size();
+        engine->addPlayer(p1);
+        *sizeofPlayerArray = playerArray.size();
+
+        cout<<*sizeofPlayerArray<<endl;
+        cout<<playerArray[0]<<endl;
     }
 
     // gamestart command
@@ -316,12 +347,12 @@ void GameEngine::startupPhase(/*Command &command*/)
         }
         cout << "\b\b" << endl;
 
-        // Add trops to players reinforcment pools
-        vector<ReinforcementPool *> reinforcements;
-        for (Player *player : playerArray)
-        {
-            reinforcements.push_back(new ReinforcementPool(50, player->getPlayerID()));
-        }
+        // // Add trops to players reinforcment pools
+        // vector<ReinforcementPool *> reinforcements;
+        // for (Player *player : playerArray)
+        // {
+        //     reinforcements.push_back(new ReinforcementPool(50, player->getPlayerID()));
+        // }
 
         // Each Player draws two cards from the deck
         for (Player *player : playerArray)
@@ -336,6 +367,19 @@ void GameEngine::startupPhase(/*Command &command*/)
         //switch to play state ? call fn? transition state will get to other phase
 
     }
+}
+
+Map* GameEngine::getMap() const {
+    return map;
+}
+
+int main (){
+
+    GameEngine *engine = new GameEngine();
+    engine->startupPhase();
+    cout<<"HI"<<endl;
+
+    return 0;
 }
 
 void GameEngine::play()

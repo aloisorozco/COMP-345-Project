@@ -64,7 +64,7 @@ public:
 
 	bool hasTerritory(string territoryName);
 
-	bool Player::hasTerritory(Territory territory);
+	bool hasTerritory(Territory territory);
 
 	Order* getNextInOrdersList();
 

@@ -177,18 +177,6 @@ void Continent::setName(const string &continentName)
 }
 
 
-// Setter (Continent)
-void Continent::setName(const string &continentName)
-{
-    if (name == nullptr)
-    {
-        name = new string(continentName);
-    }
-    else
-    {
-        *name = continentName;
-    }
-}
 
 void Continent::setBonus(int bonus){
     
@@ -275,6 +263,9 @@ vector<Territory *> Map::getTerritories()
 
     return territories;
 }
+
+
+
 
 ostream &operator<<(std::ostream &os, const Map &m)
 {
@@ -430,13 +421,22 @@ bool Map::validate()
     return true;
 }
 
+Map* Map::getMap() const{
+    return (Map*)this;
+}
+
 // ================================================================================================= //
 
+
+Map* MapLoader::getMap() const
+{
+    return map;
+}
 
 Map *MapLoader::loadMap()
 {
 
-    Map *map = new Map();
+    map = new Map();
 
     // Get the current working directory
     fs::path currentDir = fs::current_path();
@@ -648,7 +648,7 @@ Map *MapLoader::loadMap()
 Map *MapLoader::loadMap_withName(string mapName)
 {
 
-    Map *map = new Map();
+    map = new Map();
 
     // Get the current working directory
     fs::path currentDir = fs::current_path();
@@ -792,9 +792,9 @@ Map *MapLoader::loadMap_withName(string mapName)
 // int main()
 // {
 
-//     MapLoader loader;
+//     MapLoader* loader = new MapLoader();
 //     string mapName = "Aden.map";
-//     Map *testMap = loader.loadMap_withName(mapName);
+//     Map *testMap = loader->loadMap_withName(mapName);
 //     // Map* testMap = loader.loadMap();
 
 //     // cout << *testMap << endl;
@@ -840,45 +840,46 @@ Map *MapLoader::loadMap_withName(string mapName)
 
 
 
-//     cout << *testMap << endl;
+//     cout << *testMap->getMap() << endl;
+//     cout<<*testMap<<endl;
 
-//     vector <Territory*> testTerr;
-//     testTerr = testMap->getTerritories();
+//     // vector <Territory*> testTerr;
+//     // testTerr = testMap->getTerritories();
 
-//     int cP1 =0;
-//     int cP2 =0;
-//     int Cp3=0;
-//     int cP4 =0;
-//     int cP5 =0;
-//     int cP6 =0;
+//     // int cP1 =0;
+//     // int cP2 =0;
+//     // int Cp3=0;
+//     // int cP4 =0;
+//     // int cP5 =0;
+//     // int cP6 =0;
 
-//     for (Territory* territory: testTerr){
-//         if (territory->getPlayer() == 1){
-//             cP1++;
-//         }
-//         if (territory->getPlayer() == 2){
-//             cP2++;
-//         }
-//         if (territory->getPlayer() == 3){
-//             Cp3++;
-//         }
-//         if (territory->getPlayer() == 4){
-//             cP4++;
-//         }
-//         if (territory->getPlayer() == 5){
-//             cP5++;
-//         }
-//         if (territory->getPlayer() == 6){
-//             cP6++;
-//         }
-//     }
+//     // for (Territory* territory: testTerr){
+//     //     if (territory->getPlayer() == 1){
+//     //         cP1++;
+//     //     }
+//     //     if (territory->getPlayer() == 2){
+//     //         cP2++;
+//     //     }
+//     //     if (territory->getPlayer() == 3){
+//     //         Cp3++;
+//     //     }
+//     //     if (territory->getPlayer() == 4){
+//     //         cP4++;
+//     //     }
+//     //     if (territory->getPlayer() == 5){
+//     //         cP5++;
+//     //     }
+//     //     if (territory->getPlayer() == 6){
+//     //         cP6++;
+//     //     }
+//     // }
 
-//     cout<< cP1<<endl;
-//     cout<< cP2<<endl;
-//     cout<< Cp3<<endl;
-//     cout<< cP4<<endl;
-//     cout<< cP5<<endl;
-//     cout<< cP6<<endl;
+//     // cout<< cP1<<endl;
+//     // cout<< cP2<<endl;
+//     // cout<< Cp3<<endl;
+//     // cout<< cP4<<endl;
+//     // cout<< cP5<<endl;
+//     // cout<< cP6<<endl;
 
 //     if (testMap->validate())
 //     {

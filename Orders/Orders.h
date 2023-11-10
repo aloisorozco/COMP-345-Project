@@ -1,5 +1,5 @@
-#ifndef Orders
-#define Orders
+#ifndef ORDERS_H
+#define ORDERS_H
 
 #include <iostream>
 #include <string>
