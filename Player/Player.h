@@ -46,7 +46,7 @@ public:
 
 	Player();
 	
-	Player(Map* map);
+	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
@@ -76,7 +76,7 @@ public:
 
 	Hand getHand();
 
-	Map getMap();
+	Map* getMap();
 
 	void setPlayerID(int playerID);
 
@@ -86,7 +86,7 @@ public:
 
 	void setHand(Hand hand);
 
-	void setMap(Map map);
+	void setMap(Map* map);
 
 	int getSizeOfToDefend() {
 		return *sizeOfToDefend;
