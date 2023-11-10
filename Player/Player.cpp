@@ -191,6 +191,7 @@ bool Player::issueOrder() {
 		cout << toAttackTerritories[i] << endl;
 	}
 	cout << "---\n" << endl;
+	cout << "Player " << *playerID << "'s turn" << endl;
 
 	/*cout << "Map: " << endl;
 	cout << *map << endl;
