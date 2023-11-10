@@ -74,13 +74,9 @@ public:
 	void setName(const string& continentName);
 	void setTerritories(const vector<Territory*>& continentTerritories);
 
-	void setBonus(int bonus) {
-		*this->bonus = bonus;
-	}
+	void setBonus(int bonus);
+	int getBonus() const;
 
-	int getBonus() {
-		return *bonus;
-	}	
 };
 
 
@@ -110,6 +106,17 @@ public:
 	void setContinents(const vector<Continent*>& continents);
 
 	vector<Territory*> getTerritories();
+};
+
+class MapLoader {
+
+	public:
+		Map* loadMap() ;
+		Map* loadMap_withName(string mapName);
+
+ main
+
+	
 };
 
 void testLoadMaps();
