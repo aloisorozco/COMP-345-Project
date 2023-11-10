@@ -166,10 +166,10 @@ void GameEngine::reinforcementPhase() {
 void GameEngine::issueOrdersPhase() {
     std::cout << "Issuing Orders Phase\n" << endl;
     bool* playersDoneArray = new bool[*sizeofPlayerArray];
+    for (int i = 0; i < playerArray.size(); i++) {
+        playersDoneArray[i] = false;
+    }
     while (true) {
-        for (int i = 0; i < playerArray.size(); i++) {
-            playersDoneArray[i] = false;
-        }
         for (int i = 0; i < playerArray.size(); i++) {
             if (playersDoneArray[i]) {
                 continue;
