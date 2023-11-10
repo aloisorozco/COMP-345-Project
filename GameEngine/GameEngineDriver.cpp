@@ -103,6 +103,51 @@ void testGameStates(){
     }
 }
 
+void testMainGameLoop() {
+
+    MapLoader loader;
+    Map* testMap = loader.loadMap();
+
+    cout << *testMap << endl;
+
+    if (testMap->validate())
+    {
+        cout << "\n\nMap is valid" << endl;
+    }
+    else
+    {
+        cout << "Map is not valid" << endl;
+    }
+
+    Deck* deck = new Deck();
+
+    GameEngine* engine = new GameEngine();
+
+    Player* p1 = new Player(testMap, deck);
+    Player* p2 = new Player(testMap, deck);
+    Player* p3 = new Player(testMap, deck);
+
+    for (int i = 0; i < 5; i++) {
+        deck->draw(p1->getHand());
+    }
+
+    engine->addPlayer(p1);
+    engine->addPlayer(p2);
+    engine->addPlayer(p3);
+
+    testMap->setContinents(testMap->getContinents());
+
+    for (Territory* territory : testMap->getTerritories()) {
+        territory->setPlayer(1);
+    }
+    testMap->getTerritories()[0]->setPlayer(2);
+
+    cout << "Main Game Loop start: " << endl;
+
+    engine->mainGameLoop();
+
+}
+
 
 
     
