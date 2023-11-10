@@ -73,11 +73,17 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
+    GameEngine gameInit();
+
+    void clearScreen();
+
+    void printBox(const std::string& state, const std::string& commands);
+
     void play();
 
     void mainGameLoop();
 
-    void startupPhase();
+    void startupPhase(/*Command& command*/);
 
     void reinforcementPhase();
 

@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <random>
 #include "Map.h"
 using namespace std;
 namespace fs = std::filesystem; // Namespace alias for filesystem
@@ -793,16 +794,91 @@ Map *MapLoader::loadMap_withName(string mapName)
 
 //     MapLoader loader;
 //     string mapName = "Aden.map";
-//     // Map *testMap = loader.loadMap_withName(mapName);
-//     Map* testMap = loader.loadMap();
+//     Map *testMap = loader.loadMap_withName(mapName);
+//     // Map* testMap = loader.loadMap();
+
+//     // cout << *testMap << endl;
+
+//     // cout << testMap->getTerritories().size() << endl;
+
+
+//     // gamestart command
+//     int minLimit = 0;
+//     int maxLimit = 0;
+//     vector <int> numberOfPlayers = {1,2,3,4,5,6};
+
+//     // set max limit
+//     maxLimit = testMap->getTerritories().size()-1;
+    
+    
+
+//     vector <Territory*> territories;
+//     territories = testMap->getTerritories();
+//     std::random_device rd;  // Seed the random number generator
+//     std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
+//     std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
+
+//     for (int i=0; i<maxLimit; i++){
+//         int randomIndex1 = distribution(gen);
+//         int randomIndex2 = distribution(gen);
+//         swap (territories[randomIndex1], territories[randomIndex2]);
+//     }
+
+//     for (Territory* territory: territories){
+//         cout << territory->getName() << endl;
+//     }
+
+//     cout<<"radomized order"<<endl;
+
+//     int playerIndex =0;
+//     int territoryIndex=0;
+//     for (Territory* territory: territories){
+//         territory->setPlayer(numberOfPlayers[playerIndex]);
+//         playerIndex = (playerIndex+1)%numberOfPlayers.size();
+//         territoryIndex = (territoryIndex+1)%territories.size();
+//     }
+
+
 
 //     cout << *testMap << endl;
 
-//     cout << testMap->getTerritories().size() << endl;
+//     vector <Territory*> testTerr;
+//     testTerr = testMap->getTerritories();
 
-//     for (Territory* territory: testMap->getTerritories()){
-//         cout << territory->getName() << endl;
+//     int cP1 =0;
+//     int cP2 =0;
+//     int Cp3=0;
+//     int cP4 =0;
+//     int cP5 =0;
+//     int cP6 =0;
+
+//     for (Territory* territory: testTerr){
+//         if (territory->getPlayer() == 1){
+//             cP1++;
+//         }
+//         if (territory->getPlayer() == 2){
+//             cP2++;
+//         }
+//         if (territory->getPlayer() == 3){
+//             Cp3++;
+//         }
+//         if (territory->getPlayer() == 4){
+//             cP4++;
+//         }
+//         if (territory->getPlayer() == 5){
+//             cP5++;
+//         }
+//         if (territory->getPlayer() == 6){
+//             cP6++;
+//         }
 //     }
+
+//     cout<< cP1<<endl;
+//     cout<< cP2<<endl;
+//     cout<< Cp3<<endl;
+//     cout<< cP4<<endl;
+//     cout<< cP5<<endl;
+//     cout<< cP6<<endl;
 
 //     if (testMap->validate())
 //     {
