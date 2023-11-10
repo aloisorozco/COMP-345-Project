@@ -52,7 +52,7 @@ bool Negotiate::validate(){
 int Order::execute(){
 
     if(validate()){
-        cout << "Generic order executed by player " << this->getPlayerIssuerID() << ". Nothing happens." << "\n";
+        cout << this;
         return 0;
     }
 
@@ -65,7 +65,7 @@ int Deploy::execute(){
 
     if(validate()){
         target->addTroops(*troops);
-        cout << *this->troops << " troops have been deployed to " << this->target->getName() << "\n";
+        cout << this;
         return 0;
     }
 
@@ -78,7 +78,7 @@ int Advance::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << *this->troops << " troops have been sent from " << this->source->getName() << " to " << this->target->getName() << "\n";
+        cout << this;
         return 0;
     }
 
@@ -92,7 +92,7 @@ int Bomb::execute(){
     if(validate()){
         if(target->getArmy() > 0){
             target->removeTroops((target->getArmy() / 2) + (target->getArmy() % 2));
-            cout << this->target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << target->getArmy() << "\n";
+            cout << this;
         }
 
         else{
@@ -114,7 +114,7 @@ int Blockade::execute(){
         target->setPlayer(0);
         target->setArmy(target->getArmy() * 2);
 
-        cout << this->target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << target->getArmy() << "\n";
+        cout << this;
 
         return 0;
     }
@@ -128,7 +128,7 @@ int Airlift::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << *this->troops << " troops have been airlifted from " << this->source->getName() << " to " << this->target->getName() << "\n";
+        cout << this;
         return 0;
     }
 
@@ -141,7 +141,7 @@ int Negotiate::execute(){
     
     if(validate()){
         addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
-        cout << "Player " << *this->playerIssuerID << " has negotiated with Player " << *this->targetPlayerID << ". No attacks between them shall be launched." << "\n";
+        cout << this;
         return 0;
     }
 
@@ -231,7 +231,7 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
 std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
     
     for (const Order* order : ordersList.orders) {
-        os << order << "\n";
+        os << order->getDescription() << "\n";
     }
     return os;
 }

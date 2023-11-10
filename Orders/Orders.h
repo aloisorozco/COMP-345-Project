@@ -16,7 +16,7 @@ class Order {
         string* description;
 
     public:
-        Order() : playerIssuerID(nullptr), description(new string("This is a generic order description."))  {}
+        Order() : playerIssuerID(nullptr), description(new string("This is a generic order"))  {}
         Order(int playerID, const std::string desc) : playerIssuerID(new int(playerID)), description(new string(desc)) {}
         Order(const Order& other) : playerIssuerID(new int(*other.playerIssuerID)), description(new string(*other.description)) {}
 
@@ -42,7 +42,7 @@ class Order {
         virtual int execute();
 
         friend ostream& operator<<(std::ostream& os, const Order& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID;
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". Nothing happens. \n";
             return os;
         }
 
@@ -92,7 +92,7 @@ class Deploy : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Deploy& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Deploy";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been deployed to " << order.target->getName() << "\n";
             return os;
         }
 
@@ -149,7 +149,7 @@ class Advance : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Advance& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Advance";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been sent from " << order.source->getName() << " to " << order.target->getName() << "\n";
             return os;
         }
 
@@ -197,7 +197,7 @@ class Bomb : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Bomb& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Bomb";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << order.target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << order.target->getArmy() << "\n";
             return os;
         }
 
@@ -238,7 +238,7 @@ class Blockade : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Blockade& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Blockade";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << order.target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << order.target->getArmy() << "\n";
             return os;
         }
 
@@ -291,7 +291,7 @@ class Airlift : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Airlift& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Airlift";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been airlifted from " << order.source->getName() << " to " << order.target->getName() << "\n";
             return os;
         }
 
@@ -343,7 +343,7 @@ class Negotiate : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Negotiate& order) {
-            os << "Description: " << order.getDescription() << ", PlayerIssuerID: " << order.playerIssuerID << ", Type: Negotiate";
+            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << "Player " << *order.playerIssuerID << " has negotiated with Player " << *order.targetPlayerID << ". No attacks between them shall be launched." << "\n";
             return os;
         }
 
