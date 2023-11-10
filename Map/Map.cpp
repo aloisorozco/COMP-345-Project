@@ -17,7 +17,7 @@ Territory::Territory() : name(new string("")), player(new int(0)), army(new int(
 Territory::Territory(const string &territoryName, const string &territoryContinent) : name(new string(territoryName)),
                                                                                       continent(new string(territoryContinent)),
                                                                                       player(new int(0)),
-                                                                                      army(new int(2))
+                                                                                      army(new int(0))
 {}
 
 // Copy constructor (Territory)

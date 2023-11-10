@@ -54,8 +54,8 @@ ostream &operator<<(ostream &out, const GameState &)
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(NULL), sizeofPlayerArray(new int(0)){
-
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(NULL), sizeofPlayerArray(new int(0))
+{
 }
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
@@ -200,78 +200,142 @@ void GameEngine::printBox(const std::string &state, const std::string &commands)
     std::cout << "******************************\n";
 }
 
-
-GameState GameEngine::startupPhase(/*Command &command*/)
+void GameEngine::startupPhase(/*Command &command*/)
 { // will input a command object
+
+    // Initialize game    
+    GameEngine *engine = new GameEngine();
+    GameEngine *initializer = new GameEngine();
+    *engine = initializer->gameInit();
+    delete initializer;
+    initializer = NULL;
 
     // intialize map
     Map *map = new Map();
     MapLoader *mapLoader = new MapLoader();
 
-    // Load map command
-    mapLoader->loadMap_withName("name of map from command input or text file");
+    // intialize deck
+    Deck *deck = new Deck();
+
+    // Load map command from start (state is start)
+    map = mapLoader->loadMap();
+    // add transition to mapLoaded state
+
+    // validate map command - getCommand() from CommandProcessor object
+    if (map->validate())
+    {
+        // transition game state
+    }
+
+    else
+    {
+        cout << "Map is not valid. Please select another map using the loadmap command" << endl; // still in map loaded state can call loadmap again
+        delete map;
+        map = NULL; // avoid memory leaks - might cause error so delete oopsie
+    }
+
+    // Delete loader for map
     delete mapLoader;
+    mapLoader = NULL;
 
-    // Validate map command
-
-    if (!map->validate())
+    // Add players command - getCommand() from CommandProcessor object - prob a if satement here + call validate
+    if (*sizeofPlayerArray < 6)
     {
-        cout << "Map was not valid. Please review your input commands and select a valid map. " << endl;
-        return;
+        cout << "Too many players. Please use the gamestart command to start the game" << endl;
     }
-
-    // Add players command
-    int numberOfPlayers = 0;
-
-    if (numberOfPlayers < 2 || numberOfPlayers > 6)
+    else
     {
-        cout << "Invalid number of players. Please select a number between 2 and 6." << endl;
-        return;
+        engine->addPlayer(new Player(map, deck));
+        *sizeofPlayerArray = playerArray.size();
     }
-
-    for (int i = 0; i < numberOfPlayers; i++)
-    {
-        Player *player = new Player(map);
-        playerArray[i] = *player;
-        delete player;
-    }
-
-
 
     // gamestart command
-    int minLimit = 0;
-    int maxLimit = 0;
-    vector <int> players = {1,2,3,4,5,6};
-
-    // Set Randomization function
-    maxLimit = map->getTerritories().size()-1;
-    std::random_device rd;  // Seed the random number generator
-    std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
-    std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
-
-
-    //Get territories
-    vector <Territory*> territories;
-    territories = map->getTerritories();
-    
-    // Randomize order of territories in territories vector created above
-    for (int i=0; i<maxLimit; i++){
-        int randomIndex1 = distribution(gen);
-        int randomIndex2 = distribution(gen);
-        swap (territories[randomIndex1], territories[randomIndex2]);
+    if (*sizeofPlayerArray < 2)
+    {
+        cout << "Not enough players. Please add more players using the addplayer command" << endl;
     }
+    else
+    {
+        // transition to assign reinforcement state
 
-    // Assign territories to players in round robin fashion
-    int playerIndex =0;
-    int territoryIndex=0;
-    for (Territory* territory: territories){
-        territory->setPlayer(players[playerIndex]);
-        playerIndex = (playerIndex+1)%players.size();
-        territoryIndex = (territoryIndex+1)%territories.size();
+        // Assign territories to players
+
+        // Vector of player IDs/Number
+        vector<int> players;
+        for (int i = 0; i < *sizeofPlayerArray; i++)
+        {
+            players.push_back(i);
+        }
+
+        // Set Randomization function
+        int minLimit = 0;
+        int maxLimit = 0;
+        maxLimit = map->getTerritories().size() - 1;
+        std::random_device rd;  // Seed the random number generator
+        std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
+        std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
+
+        // Get territories
+        vector<Territory *> territories;
+        territories = map->getTerritories();
+
+        // Randomize order of territories in territories vector created above
+        for (int i = 0; i < maxLimit; i++)
+        {
+            int randomIndex1 = distribution(gen);
+            int randomIndex2 = distribution(gen);
+            swap(territories[randomIndex1], territories[randomIndex2]);
+        }
+
+        // Assign territories to players in round robin fashion
+        int playerIndex = 0;
+        int territoryIndex = 0;
+        for (Territory *territory : territories)
+        {
+            territory->setPlayer(players[playerIndex]);
+            playerIndex = (playerIndex + 1) % players.size();
+            territoryIndex = (territoryIndex + 1) % territories.size();
+        }
+
+        // Determine order of play by reaaranging player array in random order
+        minLimit = 0;
+        maxLimit = *sizeofPlayerArray - 1;
+        std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
+        for (int i = 0; i < *sizeofPlayerArray; i++)
+        {
+            int randomIndex1 = distribution(gen);
+            int randomIndex2 = distribution(gen);
+            swap(playerArray[randomIndex1], playerArray[randomIndex2]);
+        }
+
+        // Print order of play
+        cout << "Order of play: " << endl;
+        for (Player *player : playerArray)
+        {
+            cout << "Player: " << player->getPlayerID() << " > " << endl;
+        }
+        cout << "\b\b" << endl;
+
+        // Add trops to players reinforcment pools
+        vector<ReinforcementPool *> reinforcements;
+        for (Player *player : playerArray)
+        {
+            reinforcements.push_back(new ReinforcementPool(50, player->getPlayerID()));
+        }
+
+        // Each Player draws two cards from the deck
+        for (Player *player : playerArray)
+        {
+            Hand hand = player->getHand();
+            Hand *handPointer = &hand; 
+            deck->draw(&handPointer);
+            deck->draw(&handPointer);
+        }
+
+        //transition to assign reinforcement state
+        //switch to play state ? call fn? transition state will get to other phase
+
     }
-
-
-    return *currentState;
 }
 
 void GameEngine::play()
@@ -279,41 +343,45 @@ void GameEngine::play()
 
     // part 2
 
-    
-    //part 3
+    // part 3
     this->mainGameLoop();
-
 }
 
 void GameEngine::reinforcementPhase()
 {
 
-    std::cout << "Reinforcement Phase\n" << endl;
+    std::cout << "Reinforcement Phase\n"
+              << endl;
 
-    //removes player if they do not have territories from array
-    for (int i = 0; i < playerArray.size(); i++) {
+    // removes player if they do not have territories from array
+    for (int i = 0; i < playerArray.size(); i++)
+    {
         playerArray[i]->toDefend();
-        if (playerArray[i]->getSizeOfToDefend() == 0) {
+        if (playerArray[i]->getSizeOfToDefend() == 0)
+        {
             std::cout << "Player " << playerArray[i]->getPlayerID() << " has no territories, removing them from the game" << endl;
             playerArray.erase(playerArray.begin() + i);
         }
     }
 
-    //calculating troops for each player
-    for (int i = 0; i < playerArray.size(); i++) {
+    // calculating troops for each player
+    for (int i = 0; i < playerArray.size(); i++)
+    {
         playerArray[i]->toDefend();
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
-        
-        //checks if owns entire continents if so add continent bonus to troops
-        vector<Continent*> continents = playerArray[i]->getMap()->getContinents();
+
+        // checks if owns entire continents if so add continent bonus to troops
+        vector<Continent *> continents = playerArray[i]->getMap()->getContinents();
 
         for (Continent *continent : continents)
         {
             vector<Territory *> territories = continent->getTerritories();
 
             bool hasContinent = true;
-            for (Territory* territory : territories) {
-                if (!(playerArray[i]->hasTerritory(*territory))) {
+            for (Territory *territory : territories)
+            {
+                if (!(playerArray[i]->hasTerritory(*territory)))
+                {
                     hasContinent = false;
                 }
             }
@@ -325,24 +393,32 @@ void GameEngine::reinforcementPhase()
 
         playerArray[i]->setTroopsToDeploy(troops);
     }
-    std::cout << "--------------------\n" << endl;
+    std::cout << "--------------------\n"
+              << endl;
 }
 
-void GameEngine::issueOrdersPhase() {
-    std::cout << "Issuing Orders Phase\n" << endl;
-    bool* playersDoneArray = new bool[*sizeofPlayerArray];
-    while (true) {
-        for (int i = 0; i < playerArray.size(); i++) {
+void GameEngine::issueOrdersPhase()
+{
+    std::cout << "Issuing Orders Phase\n"
+              << endl;
+    bool *playersDoneArray = new bool[*sizeofPlayerArray];
+    while (true)
+    {
+        for (int i = 0; i < playerArray.size(); i++)
+        {
             playersDoneArray[i] = false;
         }
-        for (int i = 0; i < playerArray.size(); i++) {
-            if (playersDoneArray[i]) {
+        for (int i = 0; i < playerArray.size(); i++)
+        {
+            if (playersDoneArray[i])
+            {
                 continue;
             }
             playersDoneArray[i] = playerArray[i]->issueOrder();
         }
         bool playersDone = true;
-        for (int i = 0; i < playerArray.size(); i++) {
+        for (int i = 0; i < playerArray.size(); i++)
+        {
             playersDone = playersDone && playersDoneArray[i];
         }
         if (playersDone)
@@ -350,16 +426,22 @@ void GameEngine::issueOrdersPhase() {
             break;
         }
     }
-    std::cout << "--------------------\n" << endl;
+    std::cout << "--------------------\n"
+              << endl;
 }
 
-void GameEngine::executeOrdersPhase() {
-    std::cout << "Execute Orders Phase\n" << endl;
-    while (true) {
+void GameEngine::executeOrdersPhase()
+{
+    std::cout << "Execute Orders Phase\n"
+              << endl;
+    while (true)
+    {
         bool executeOrdersDone = true;
-        for (int i = 0; i < playerArray.size(); i++) {
-            Order* order = playerArray[i]->getNextInOrdersList();
-            if (order != NULL) {
+        for (int i = 0; i < playerArray.size(); i++)
+        {
+            Order *order = playerArray[i]->getNextInOrdersList();
+            if (order != NULL)
+            {
                 executeOrdersDone = false;
                 order->execute();
             }
@@ -370,23 +452,27 @@ void GameEngine::executeOrdersPhase() {
             break;
         }
     }
-    std::cout << "--------------------\n" << endl;
+    std::cout << "--------------------\n"
+              << endl;
 }
 
-void GameEngine::mainGameLoop() {
-    //part 3 here - players already have to be set
-    while (true) {
+void GameEngine::mainGameLoop()
+{
+    // part 3 here - players already have to be set
+    while (true)
+    {
 
-        //getting & setting troops
+        // getting & setting troops
         reinforcementPhase();
 
-        //issuing orders phase
+        // issuing orders phase
         issueOrdersPhase();
 
-        //executing orders phase
+        // executing orders phase
         executeOrdersPhase();
 
-        if (*sizeofPlayerArray == 1) {
+        if (*sizeofPlayerArray == 1)
+        {
             std::cout << playerArray[0] << " wins" << endl;
             break;
         }
