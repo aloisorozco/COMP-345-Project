@@ -47,7 +47,8 @@ int main() {
 
             case 2:
                 // call function to test player
-                testPlayers();
+                //testPlayers();
+                testMainGameLoop();
                 break;
 
             case 3:

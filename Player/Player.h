@@ -45,7 +45,7 @@ private:
 public:
 
 	Player();
-
+  
 	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -74,7 +74,7 @@ public:
 
 	Hand getHand();
 
-	Map getMap();
+	Map* getMap();
 
 	void setPlayerID(int playerID);
 

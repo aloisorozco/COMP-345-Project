@@ -385,8 +385,8 @@ Hand Player::getHand() {
 	return *this->hand;
 }
 
-Map Player::getMap() {
-	return *this->map;
+Map* Player::getMap() {
+	return this->map;
 }
 
 void Player::setPlayerID(int playerID) {

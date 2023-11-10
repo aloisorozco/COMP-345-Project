@@ -123,4 +123,7 @@ private:
 
 //free functions declaration
 void testGameStates();
+
+void testMainGameLoop();
+
 #endif // GAME_ENGINE_H

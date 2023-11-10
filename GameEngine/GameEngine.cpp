@@ -43,7 +43,9 @@ ostream &operator<<(ostream& out, const GameState &) {
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(nullptr), playerArray(NULL), sizeofPlayerArray(new int(0)) {}
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(NULL), sizeofPlayerArray(new int(0)){
+
+}
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
 GameEngine::~GameEngine() {
@@ -121,7 +123,7 @@ void GameEngine::play() {
     //part 2
 
     //part 3
-    mainGameLoop();
+    this->mainGameLoop();
 }
 
 void GameEngine::reinforcementPhase() {
@@ -209,18 +211,20 @@ void GameEngine::executeOrdersPhase() {
 
 void GameEngine::mainGameLoop() {
     //part 3 here - players already have to be set
+    while (true) {
 
-    //getting & setting troops
-    reinforcementPhase();
+        //getting & setting troops
+        reinforcementPhase();
 
-    //issuing orders phase
-    issueOrdersPhase();
+        //issuing orders phase
+        issueOrdersPhase();
 
-    //executing orders phase
-    executeOrdersPhase();
-
-    if (*sizeofPlayerArray == 1) {
-        std::cout << playerArray[0] << " wins" << endl;
+        //executing orders phase
+        executeOrdersPhase();
+      
+        if (*sizeofPlayerArray == 1) {
+            std::cout << playerArray[0] << " wins" << endl;
+            break;
+        }
     }
-
 }

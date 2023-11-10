@@ -105,6 +105,43 @@ void testGameStates(){
 
 void testMainGameLoop() {
 
+
+    cout << "Choose Africa map for example" << endl;
+
+    MapLoader loader;
+    Map* testMap = loader.loadMap();
+
+    cout << *testMap << endl;
+
+    if (testMap->validate())
+    {
+        cout << "\n\nMap is valid" << endl;
+    }
+    else
+    {
+        cout << "Map is not valid" << endl;
+    }
+
+    Deck* deck = new Deck();
+
+    GameEngine* engine = new GameEngine();
+    engine->addPlayer(new Player(testMap, deck));
+    engine->addPlayer(new Player(testMap, deck));
+    engine->addPlayer(new Player(testMap, deck));
+
+    testMap->setContinents(testMap->getContinents());
+
+    for (Territory* territory : testMap->getTerritories()) {
+        territory->setPlayer(1);
+    }
+    testMap->getTerritories()[0]->setPlayer(2);
+
+    cout << "Main Game Loop start: " << endl;
+
+    engine->mainGameLoop();
+
+}
+
     cout << "Choose Africa map for example" << endl;
 
     MapLoader loader;
