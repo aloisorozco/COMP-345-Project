@@ -79,7 +79,9 @@ LogObserver::~LogObserver(){
 //We want to open a file and append to the end of it.
 void LogObserver::Update(ILoggable* iLoggable) {
     ofstream log;
+    //inside cmake-build-debug
     log.open("gamelog.txt", ofstream::app);
+    cout<<iLoggable->stringToLog() << endl;
     log<<iLoggable->stringToLog() << endl;
     log.close();
 }
