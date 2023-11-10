@@ -20,6 +20,7 @@ private:
 	OrdersList* ordersList;
 	int* orderListIndex;
 	Hand* hand;
+	Deck* deck;
 
 	int* troopsToDeploy;
 
@@ -72,7 +73,7 @@ public:
 
 	OrdersList getOrdersList();
 
-	Hand getHand();
+	Hand* getHand();
 
 	Map* getMap();
 
@@ -82,7 +83,7 @@ public:
 
 	void setOrdersList(OrdersList ordersList);
 
-	void setHand(Hand hand);
+	void setHand(Hand* hand);
 
 	void setMap(Map* map);
 

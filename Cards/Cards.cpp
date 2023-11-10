@@ -22,19 +22,19 @@ Card::CardType Card::getType() const{
 }
 string Card::cardTypeToString() const {
     //check type, return the string value
-    if(type == CardType::Bomb){
+    if(type == CardType::BombCT){
         return "Bomb";
     }
-    else if(type == CardType::Reinforcement){
+    else if(type == CardType::ReinforcementCT){
         return "Reinforcement";
     }
-    else if(type == CardType::Blockade){
+    else if(type == CardType::BlockadeCT){
         return "Blockade";
     }
-    else if(type == CardType::Airlift){
+    else if(type == CardType::AirliftCT){
         return "Airlift";
     }
-    else if(type == CardType::Diplomacy){
+    else if(type == CardType::DiplomacyCT){
         return "Diplomacy";
     }
     else{
@@ -42,42 +42,44 @@ string Card::cardTypeToString() const {
     }
 }
 //check hand size, to make sure a card can be played
-void Card::play(Deck *deck, Hand *hand){
+Order* Card::play(Deck *deck, Hand *hand){
     if((*hand).getHandSize() == 0){
         cout <<"No cards to play."<<endl;
-        return;
+        return NULL;
     }
     cout <<"Playing a " << this->cardTypeToString() << " card." << endl;
     Order* order; // play() creates an order outside not to get deleted
-    if(type == CardType::Bomb){
-        order = new Order(); //havent fetched/merged Order
+    if(type == CardType::BombCT){
+        order = new Bomb(); //havent fetched/merged Order
         cout<<"Creating new Bomb Order to Order List\n";
         (*hand).getOrdersList().add(order);
     }
-    else if(type == CardType::Reinforcement){
+    else if(type == CardType::ReinforcementCT){
         //This adds +5 units to your pool of deployable units.
-        order = new Order();
+        order = new Deploy();
         cout<<"Creating new Reinforcement Order to Order List\n";
         (*hand).getOrdersList().add(order);
     }
-    else if(type == CardType::Blockade){
-        order = new Order();
+    else if(type == CardType::BlockadeCT){
+        order = new Blockade();
         cout<<"Creating new Blockade Order to Order List\n";
         (*hand).getOrdersList().add(order);
     }
-    else if(type == CardType::Airlift){
-        order = new Order();
+    else if(type == CardType::AirliftCT){
+        order = new Airlift();
         cout<<"Creating new Airlift Order to Order List\n";
         (*hand).getOrdersList().add(order);
     }
-    else if(type == CardType::Diplomacy){
-        order = new Order();
+    else if(type == CardType::DiplomacyCT){
+        order = new Negotiate();
         cout<<"Creating new Diplomacy Order to Order List\n";
         (*hand).getOrdersList().add(order);
     }
     //print the card played
     (*deck).returnCard(this);
     (*hand).removeCard(this);
+
+    return order;
 }
 //Deconstructor, but Deck and Hand already clear the cards
 Card::~Card() = default;
@@ -87,9 +89,14 @@ Deck::Deck(){
     initializeDeck(); // just adds cards to deck
 }
 //copy constructor
-Deck::Deck(const Deck &) {}
+Deck::Deck(const Deck& copyDeck) {
+    this->cards = copyDeck.cards;
+    this->deckSize = copyDeck.deckSize;
+}
 //assignment operator
-Deck &Deck::operator=(const Deck &) {
+Deck &Deck::operator=(const Deck& copyDeck) {
+    this->cards = copyDeck.cards;
+    this->deckSize = copyDeck.deckSize;
     return *this;
 }
 //stream insertion
@@ -102,14 +109,14 @@ ostream &operator<<(ostream& out, const Deck& deck) {
 }
 //No idea what would trigger Draw method.
 //In the game Risk, you draw one at end of turn if you captured territory.
-void Deck::draw(Hand **hand){
+void Deck::draw(Hand *hand){
     //first we shuffle, then we draw.
    if(!cards.empty()) {
         int randIndex = rand() % cards.size(); // rand() generates same numbers, fine for now
         auto card = cards.begin() + randIndex;
         Card* drawncard = *card;
         cout<<"You drew the card: "<< drawncard->cardTypeToString() << " card." << endl;
-       (*hand) -> addCard(drawncard);
+        hand-> addCard(drawncard);
         cards.erase(card);
    }
     else{
@@ -131,11 +138,11 @@ void Deck::initializeDeck() {
     setDeckSize(temp);
     //emplace_back appends new element to the end
     for(int i =0; i<deckSize; i++){
-        cards.emplace_back(new Card(Card::Bomb));
-        cards.emplace_back(new Card(Card::Reinforcement));
-        cards.emplace_back(new Card(Card::Blockade));
-        cards.emplace_back(new Card(Card::Airlift));
-        cards.emplace_back(new Card(Card::Diplomacy));
+        cards.emplace_back(new Card(Card::BombCT));
+        cards.emplace_back(new Card(Card::ReinforcementCT));
+        cards.emplace_back(new Card(Card::BlockadeCT));
+        cards.emplace_back(new Card(Card::AirliftCT));
+        cards.emplace_back(new Card(Card::DiplomacyCT));
     }
 }
 
@@ -159,7 +166,8 @@ Hand::Hand(Deck* deck){
     //need to add play() cards to OrderList
     ordersList = new OrdersList();
 }
-Hand::Hand(const Hand &) {}
+Hand::Hand(const Hand& copyHand) {
+}
 
 const vector<Card *> & Hand::getCards() const {
     if(cards.empty()){
