@@ -20,6 +20,7 @@ public:
     CommandProcessor(GameEngine* gameEngine) : gameEngine(gameEngine) {}
     Command getCommand();
     void saveEffect(const std::string& effect);
+    bool isCommandsEmpty();
 };
 
 class ConsoleCommandProcessor : public CommandProcessor {

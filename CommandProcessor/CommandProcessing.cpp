@@ -53,13 +53,19 @@ void ConsoleCommandProcessor::readCommand() {
 }
 
 void FileCommandProcessorAdapter::readCommand() {
-    std::string command = getInputFromFile();
-    if (validate(command)) {
-        saveCommand(command);
-    } else {
-        Command cmd;
-        cmd.command = command;
-        cmd.effect = "Invalid command";
-        commands.push_back(cmd);
+    std::string command;
+    while (std::getline(file, command)) {
+        if (validate(command)) {
+            saveCommand(command);
+        } else {
+            Command cmd;
+            cmd.command = command;
+            cmd.effect = "Invalid command";
+            commands.push_back(cmd);
+        }
     }
+}
+
+bool CommandProcessor::isCommandsEmpty() {
+    return commands.empty();
 }
