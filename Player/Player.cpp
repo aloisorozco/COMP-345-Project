@@ -4,6 +4,7 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 
+
 #include <iostream>
 #include <string>
 
@@ -17,12 +18,13 @@ Player::Player() {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
-	territoryArray = NULL;
+	territoryArray = new Territory[0];
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -30,16 +32,18 @@ Player::Player() {
 	troopsToDeploy = new int(0);
 }
 
-Player::Player(Map* map) {
+//main constructor to use other ones i will leave for now but they are not tested to work
+Player::Player(Map* map, Deck* deck) {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
 	this->map = map;
-	territoryArray = NULL;
+	territoryArray = new Territory[0];
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);
-	hand = NULL;
+	hand = new Hand(deck);
+	this->deck = new Deck(*deck);
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -58,6 +62,7 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	orderListIndex = new int(-1);
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -67,16 +72,23 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 
 //copy constructor
 Player::Player(const Player& copyPlayer) {
-	this->playerID = copyPlayer.playerID;
+	Player();
+
+	this->playerID = new int (*copyPlayer.playerID);
 	this->territoryArray = copyPlayer.territoryArray;
+	this->territoryArray = new Territory[*copyPlayer.sizeOfTerritoryArray];
+	for (int i = 0; i < *copyPlayer.sizeOfTerritoryArray; i++) {
+		this->territoryArray[i] = copyPlayer.territoryArray[i];
+	}
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
-	this->ordersList = copyPlayer.ordersList;
-	this->orderListIndex = copyPlayer.orderListIndex;
-	this->hand = copyPlayer.hand;
-	this->map = copyPlayer.map;
-	this->sizeOfToAttack = copyPlayer.sizeOfToAttack;
-	this->sizeOfToDefend = copyPlayer.sizeOfToDefend;
-	this->troopsToDeploy = copyPlayer.troopsToDeploy;
+	this->ordersList = new OrdersList(*copyPlayer.ordersList);
+	this->orderListIndex = new int(*copyPlayer.orderListIndex);
+	this->hand = new Hand(*copyPlayer.hand);
+	this->deck = new Deck(*copyPlayer.deck);
+	this->map = new Map(*copyPlayer.map);
+	this->sizeOfToAttack = new int(*copyPlayer.sizeOfToAttack);
+	this->sizeOfToDefend = new int(*copyPlayer.sizeOfToDefend);
+	this->troopsToDeploy = new int(*copyPlayer.troopsToDeploy);
 }
 
 //destructor to avoid any memory leaks
@@ -95,6 +107,9 @@ Player::~Player() {
 
 	delete this->hand;
 	hand = NULL;
+
+	delete this->deck;
+	deck = NULL;
 
 	delete this->map;
 	map = NULL;
@@ -129,9 +144,6 @@ Territory* Player::toDefend() {
 		toDefend[i] = temp[i];
 	}
 
-	delete temp;
-	temp = NULL;
-
 	*sizeOfToDefend = count;
 	return toDefend;
 }
@@ -165,9 +177,6 @@ Territory* Player::toAttack() {
 		toAttack[i] = temp[i];
 	}
 
-	delete[] temp;
-	temp = NULL;
-
 	*sizeOfToAttack = count;
 	return toAttack;
 }
@@ -190,8 +199,9 @@ bool Player::issueOrder() {
 		cout << toAttackTerritories[i] << endl;
 	}
 	cout << "---\n" << endl;
-	
+	cout << "Player " << *playerID << "'s turn" << endl;
 
+	//if player has troops to deploy, player is forced to deploy them can't issue another order
 	if (*troopsToDeploy > 0) {
 
 		string tempString;
@@ -205,7 +215,7 @@ bool Player::issueOrder() {
 			cout << "Enter troops to deploy: ";
 			cin >> tempInt;
 
-			//TODO: also need to call validate function to see if territory belongs to player
+			//checks to make sure deploy is allowed
 			if (tempInt <= *troopsToDeploy && hasTerritory(tempString)) {
 				break;
 			}
@@ -274,8 +284,40 @@ bool Player::issueOrder() {
 		return false;
 	}
 	else if (actionInput == 2) {
-		//TODO: honestly idek how to fix card class will have to check way later
-		cout << "Option 2: Play a card\n\n" << endl;
+		int cardChoice;
+		vector<Card*> tempCards = hand->getCards();
+
+		while (true) {
+			cout << "Option 2: Play a card\n" << endl;
+			cout << "Displaying cards in hand:\n" << endl;
+
+			for (int i = 0; i < tempCards.size(); i++) {
+				cout << "Card " << i << ": " << *tempCards[i] << endl;
+			}
+
+			cout << "Choose a card to play:\n" << endl;
+			cin >> cardChoice;
+
+			if (cardChoice >= 0 || cardChoice < tempCards.size()) {
+				break;
+			}
+			else {
+				cout << "Invalid card choice please try again" << endl;
+			}
+		}
+		
+		cout << "\nCard chosen:" << endl;
+		cout << *tempCards[cardChoice] << endl;
+
+		Order* order = tempCards[cardChoice]->play(deck, hand);
+
+		//TODO: once david merges to main going to have to dynamic cast for each type of order
+		if (dynamic_cast<const Deploy*>(order)) {
+			*troopsToDeploy += 5;
+		}
+		else {
+			ordersList->add(*order);
+		}
 
 		return false;
 	}
@@ -286,28 +328,6 @@ bool Player::issueOrder() {
 	}
 	
 }
-
-//put all deploy orders first
-//void Player::orderOrdersList() {
-//	if (ordersList->getOrders().size() == 0) {
-//		return;
-//	}
-//	vector<Order> orderedOrdersList(ordersList->getOrders());
-//	for (int i = 0; i < (ordersList->getOrders().size() - 1); i++) {
-//		for (int j = i + 1; j < ordersList->getOrders().size(); j++) {
-//			bool rightIsDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) != NULL;
-//			bool leftIsNotDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) == NULL;
-//
-//			if (rightIsDeploy && leftIsNotDeploy) {
-//				Order temp = orderedOrdersList[i];
-//				orderedOrdersList[i] = *ordersList->get(j);
-//				orderedOrdersList[j] = temp;
-//			}
-//		}
-//	}
-//
-//	orderListIndex = new int (0);
-//}
 
 bool Player::hasTerritory(string territoryName) {
 	Territory* toDefendArray = toDefend();
@@ -350,8 +370,9 @@ Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
 	this->setOrderListIndex(*player.orderListIndex);
-	this->setHand(*player.hand);
-	this->setMap(*player.map);
+	this->setHand(player.hand);
+	this->deck = new Deck(*player.deck);
+	this->setMap(player.map);
 
 	this->setSizeOfToAttack(*player.sizeOfToAttack);
 	this->setSizeOfToDefend(*player.sizeOfToDefend);
@@ -374,12 +395,12 @@ OrdersList Player::getOrdersList() {
 	return *this->ordersList;
 }
 
-Hand Player::getHand() {
-	return *this->hand;
+Hand* Player::getHand() {
+	return this->hand;
 }
 
-Map Player::getMap() {
-	return *this->map;
+Map* Player::getMap() {
+	return this->map;
 }
 
 void Player::setPlayerID(int playerID) {
@@ -395,11 +416,11 @@ void Player::setOrdersList(OrdersList ordersList) {
 	*this->ordersList = ordersList;
 }
 
-void Player::setHand(Hand hand) {
-	*this->hand = hand;
+void Player::setHand(Hand* hand) {
+	this->hand = hand;
 }
 
-void Player::setMap(Map map) {
-	*this->map = map;
+void Player::setMap(Map* map) {
+	this->map = map;
 }
 

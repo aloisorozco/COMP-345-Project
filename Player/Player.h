@@ -20,6 +20,7 @@ private:
 	OrdersList* ordersList;
 	int* orderListIndex;
 	Hand* hand;
+	Deck* deck;
 
 	int* troopsToDeploy;
 
@@ -46,7 +47,7 @@ public:
 
 	Player();
 	
-	Player(Map* map);
+	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
@@ -74,9 +75,9 @@ public:
 
 	OrdersList getOrdersList();
 
-	Hand getHand();
+	Hand* getHand();
 
-	Map getMap();
+	Map* getMap();
 
 	void setPlayerID(int playerID);
 
@@ -84,9 +85,9 @@ public:
 
 	void setOrdersList(OrdersList ordersList);
 
-	void setHand(Hand hand);
+	void setHand(Hand* hand);
 
-	void setMap(Map map);
+	void setMap(Map* map);
 
 	int getSizeOfToDefend() {
 		return *sizeOfToDefend;

@@ -88,24 +88,23 @@ public:
 
     void executeOrdersPhase();
 
-    void setPlayers(Player* players, int sizeofPlayers) {
+    void setPlayers(vector<Player*> players) {
         playerArray = players;
-        sizeofPlayerArray = new int(sizeofPlayers);
     }
 
-    void addPlayer(Player player) {
-        Player* temp = new Player[*sizeofPlayerArray];
+    void addPlayer(Player* player) {
+        playerArray.push_back(player);
+        /*Player* temp = new Player[*sizeofPlayerArray];
         playerArray = new Player[*sizeofPlayerArray + 1];
 
         for (int i = 0; i < *sizeofPlayerArray; i++) {
             playerArray[i] = temp[i];
         }
 
-        playerArray[*sizeofPlayerArray] = player;
-        sizeofPlayerArray++;
-
+        playerArray[*sizeofPlayerArray] = *player;
+        sizeofPlayerArray++;*/
     }
-    string stringToLog() override;
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;
@@ -113,10 +112,13 @@ private:
     // The current state of the game.
     GameState* currentState;
 
-    Player* playerArray;
+    vector<Player*> playerArray;
     int* sizeofPlayerArray;
 };
 
 //free functions declaration
 void testGameStates();
+
+void testMainGameLoop();
+
 #endif // GAME_ENGINE_H
