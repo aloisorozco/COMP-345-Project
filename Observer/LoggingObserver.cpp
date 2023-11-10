@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 
 using namespace std;
@@ -47,21 +48,26 @@ ostream &operator<<(ostream &os, const Observer &observer) {return os;}
 //LOG OBSERVER
 
 LogObserver::LogObserver() = default;
-//LogObserver::~LogObserver(){
-//    //Upon destruction, detaches itself from its Subject
-//    _ordersList_subject->Subject::Detach(this);
+void LogObserver::AddSubject(Subject* s) {
+    _subject.push_back(s);
+    s->Attach(this);
+}
+LogObserver::~LogObserver(){
+    //Upon destruction, detaches itself from its Subject
+    for(Subject* s : _subject)
+        s->Detach(this);
+}
+//LogObserver::LogObserver(OrdersList* s) {
+//    _ordersList_subject = s;
+//    _ordersList_subject->Subject::Attach(this);
+//
 //}
-LogObserver::LogObserver(OrdersList* s) {
-    _ordersList_subject = s;
-    _ordersList_subject->Subject::Attach(this);
-
-}
-
-LogObserver::LogObserver(GameEngine* s) {
-    _gameEngine_subject = s;
-    _gameEngine_subject ->Subject::Attach(this);
-
-}
+//
+//LogObserver::LogObserver(GameEngine* s) {
+//    _gameEngine_subject = s;
+//    _gameEngine_subject ->Subject::Attach(this);
+//
+//}
 //LogObserver::LogObserver(CommandProcessor *commandProcessor) {
 //
 //}
@@ -78,3 +84,9 @@ void LogObserver::Update(ILoggable* iLoggable) {
 LogObserver::LogObserver(const LogObserver &) {}
 LogObserver &LogObserver::operator=(const LogObserver &) {return *this;}
 ostream &operator<<(ostream &os, const LogObserver &logObserver) {return os;}
+
+const vector<Subject *> &LogObserver::getSubject() const {
+    return _subject;
+}
+
+

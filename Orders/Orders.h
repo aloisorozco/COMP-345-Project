@@ -6,8 +6,7 @@
 #include <vector>
 #include <fstream>
 using namespace std;
-class ILoggable;
-class Subject;
+
 class Order : public Subject, public ILoggable{
     private:
         list<Observer *> *_observers;

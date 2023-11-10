@@ -2,11 +2,11 @@
 #define LOGGINGOBSERVER_H
 
 //#include "../CommandProcessing/CommandProcessing.h"
-#include "../Orders/Orders.h"
-#include "../GameEngine/GameEngine.h"
+//#include "../Orders/Orders.h"
+//#include "../GameEngine/GameEngine.h"
 #include <string>
 #include <list>
-#include <iostream>
+#include <vector>
 using namespace std;
 //Forward Declare everything
 class ILoggable;
@@ -57,9 +57,9 @@ class LogObserver : public Observer{
         LogObserver(const LogObserver&); // copy constructor
         LogObserver& operator = (const LogObserver&);
         friend ostream& operator<<(ostream&,const LogObserver&);//3.stream insertion operator for output
-
-        explicit LogObserver(OrdersList* ordersList);
-        explicit LogObserver(GameEngine* gameEngine);
+        void AddSubject(Subject* subject);
+        //explicit LogObserver(OrdersList* ordersList);
+        //explicit LogObserver(GameEngine* gameEngine);
         //Missing classes from part 1.
         //LogObserver(CommandProcessor *commandProcessor);
         //LogObserver(FileCommandProcessorAdapter *fileCommandProcessorAdapter);
@@ -67,9 +67,13 @@ class LogObserver : public Observer{
         //notified by CommandProcessor::saveCommand() ,  Command::saveEffect()
 
         void Update(ILoggable* iLoggable) override;
-    private:
-        OrdersList *_ordersList_subject;
-        GameEngine *_gameEngine_subject;
+
+        const vector<Subject *> &getSubject() const;
+
+private:
+        vector<Subject*> _subject;
+        //OrdersList *_ordersList_subject;
+        //GameEngine *_gameEngine_subject;
         //CommandProcessor* _commandProcessor_subject{};
         //FileCommandProcessorAdapter* _fileCommandProcessorAdapter_subject{};
 };

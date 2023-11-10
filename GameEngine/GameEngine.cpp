@@ -102,6 +102,7 @@ void GameEngine::processCommand(const std::string& command)
         std::cout << "Invalid command." << std::endl;
     } else {
         currentState = nextState;
+        //the equivalent to GameEngine::transition()
         Notify(this);
         std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
     }
