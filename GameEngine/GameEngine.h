@@ -104,7 +104,16 @@ public:
         playerArray[*sizeofPlayerArray] = *player;
         sizeofPlayerArray++;*/
     }
+
+    /*static Player* gamePlayerArray;
+    static int* sizeOfPlayersArray;
+    static void setGamePlayerArray(Player* playerArray, int sizeOfPlayersArray) {
+        if(&gamePlayerArray != &playerArray) {delete gamePlayerArray;} 
+        gamePlayerArray = playerArray;
+        sizeOfPlayersArray = sizeOfPlayersArray;
+    }*/
     string stringToLog() override;
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;

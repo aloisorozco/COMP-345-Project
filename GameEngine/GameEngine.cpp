@@ -94,10 +94,13 @@ void GameEngine::processCommand(const std::string& command)
         std::cout << "The game is not initialized." << std::endl;
         return;
     }
+    
     GameState* nextState = currentState->getNextState(command);
     if (nextState == nullptr) {
         std::cout << "Invalid command." << std::endl;
-    } else {
+    } 
+    
+    else {
         currentState = nextState;
         //the equivalent to GameEngine::transition()
         Notify(this);
@@ -144,7 +147,7 @@ void GameEngine::reinforcementPhase() {
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
         
         //checks if owns entire continents if so add continent bonus to troops
-        vector<Continent*> continents = playerArray[i]->getMap()->getContinents();
+        vector<Continent*> continents = playerArray[i]->getMap().getContinents();
 
         for (Continent* continent : continents) {
             vector<Territory*> territories = continent->getTerritories();
@@ -168,10 +171,10 @@ void GameEngine::reinforcementPhase() {
 void GameEngine::issueOrdersPhase() {
     std::cout << "Issuing Orders Phase\n" << endl;
     bool* playersDoneArray = new bool[*sizeofPlayerArray];
+    for (int i = 0; i < playerArray.size(); i++) {
+        playersDoneArray[i] = false;
+    }
     while (true) {
-        for (int i = 0; i < playerArray.size(); i++) {
-            playersDoneArray[i] = false;
-        }
         for (int i = 0; i < playerArray.size(); i++) {
             if (playersDoneArray[i]) {
                 continue;
@@ -220,7 +223,7 @@ void GameEngine::mainGameLoop() {
 
         //executing orders phase
         executeOrdersPhase();
-
+      
         if (*sizeofPlayerArray == 1) {
             std::cout << playerArray[0] << " wins" << endl;
             break;
