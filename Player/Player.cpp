@@ -201,11 +201,7 @@ bool Player::issueOrder() {
 	cout << "---\n" << endl;
 	cout << "Player " << *playerID << "'s turn" << endl;
 
-	/*cout << "Map: " << endl;
-	cout << *map << endl;
-	cout << "---\n" << endl;*/
-	
-
+	//if player has troops to deploy, player is forced to deploy them can't issue another order
 	if (*troopsToDeploy > 0) {
 
 		string tempString;
@@ -219,7 +215,7 @@ bool Player::issueOrder() {
 			cout << "Enter troops to deploy: ";
 			cin >> tempInt;
 
-			//TODO: also need to call validate function to see if territory belongs to player
+			//checks to make sure deploy is allowed
 			if (tempInt <= *troopsToDeploy && hasTerritory(tempString)) {
 				break;
 			}
@@ -315,6 +311,7 @@ bool Player::issueOrder() {
 
 		Order* order = tempCards[cardChoice]->play(deck, hand);
 
+		//TODO: once david merges to main going to have to dynamic cast for each type of order
 		if (dynamic_cast<const Deploy*>(order)) {
 			*troopsToDeploy += 5;
 		}

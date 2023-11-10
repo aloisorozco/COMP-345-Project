@@ -242,6 +242,15 @@ void Map::setContinents(const vector<Continent *> &continents)
     }
 }
 
+Territory* Map::getTerritory(string name) {
+    for (Territory* territory : territories) {
+        if (territory->getName() == name) {
+            return territory;
+        }
+    }
+    return NULL;
+}
+
 vector<Territory *> Map::getTerritories()
 {
 
