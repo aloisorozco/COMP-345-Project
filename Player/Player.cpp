@@ -223,7 +223,7 @@ bool Player::issueOrder() {
 				cout << "Invalid input please try again" << endl;
 			}
 		}
-
+		//Deploy* deploy = new Deploy(playerID, "", tempInt, map->getTerritory(tempString));
 		Deploy* deploy = new Deploy(tempString, tempInt);
 		ordersList->add(*deploy);
 		troopsToDeploy = new int(*troopsToDeploy - tempInt);
@@ -278,7 +278,7 @@ bool Player::issueOrder() {
 			}
 		}
 		
-
+		//Advance* advance = new Advance(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
 		Advance* advance = new Advance(srcInput, dstInput, tempInt);
 		ordersList->add(*advance);
 		return false;
@@ -315,15 +315,87 @@ bool Player::issueOrder() {
 		if (dynamic_cast<const Deploy*>(order)) {
 			*troopsToDeploy += 5;
 		}
+		else if (dynamic_cast<const Blockade*>(order)) {
+			string targetTerritoryString;
+
+			cout << "Blockade\n" << endl;
+
+			cout << "Enter target territory name: ";
+			cin >> targetTerritoryString;
+
+			//Assuming territory name is correct
+			//ordersList->add(Blockade(playerID, "", map->getTerritory(targetTerritoryString)));
+		}
+		else if (dynamic_cast<const Bomb*>(order)) {
+			string targetTerritoryString;
+
+			cout << "Bomb\n" << endl;
+
+			cout << "Enter target territory name: ";
+			cin >> targetTerritoryString;
+
+			//Assuming territory name is correct
+			//ordersList->add(Bomb(playerID, "", map->getTerritory(targetTerritoryString)));
+		}
+		else if (dynamic_cast<const Airlift*>(order)) {
+			string srcInput;
+			string dstInput;
+			int tempInt;
+
+			while (true) {
+
+				cout << "Airlift\n" << endl;
+
+				cout << "Enter source territory name: ";
+				cin >> srcInput;
+
+				cout << "Enter destination territory name: ";
+				cin >> dstInput;
+				;
+				cout << "Enter troops to advance: ";
+				cin >> tempInt;
+
+				if (tempInt > 0) {
+					break;
+				}
+				else {
+					cout << "Invalid number of troops to advance please try again" << endl;
+				}
+			}
+
+			//Assuming territory name is correct
+			//ordersList->add(Airlift(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput)));
+		}
+		else if (dynamic_cast<const Negotiate*>(order)) {
+			int tempInt;
+			while (true) {
+				cout << "Negotiate\n" << endl;
+
+				cout << "Enter target player's ID: ";
+
+				if (tempInt > 0) {
+					break;
+				}
+				else {
+					cout << "Invalid player ID please try again" << endl;
+				}
+			}
+			
+			cin >> tempInt;
+
+
+			//ordersList->add(Negotiate(playerID, "", tempInt);
+		}
+
 		else {
-			ordersList->add(*order);
+			cout << "Invalid input, please try again" << endl; 
 		}
 
 		return false;
 	}
 	else if (actionInput == 3) {
 		//signals to game engine that no more orders will be done
-		cout << "Option 4: End turn\n" << endl;
+		cout << "Option 3: End turn\n" << endl;
 		return true;
 	}
 	
