@@ -175,20 +175,6 @@ void Continent::setName(const string &continentName)
     }
 }
 
-
-// Setter (Continent)
-void Continent::setName(const string &continentName)
-{
-    if (name == nullptr)
-    {
-        name = new string(continentName);
-    }
-    else
-    {
-        *name = continentName;
-    }
-}
-
 void Continent::setBonus(int bonus){
     
 	*this->bonus = bonus;
