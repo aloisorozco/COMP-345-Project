@@ -24,6 +24,7 @@ Player::Player() {
 	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -31,6 +32,7 @@ Player::Player() {
 	troopsToDeploy = new int(0);
 }
 
+//main constructor to use other ones i will leave for now but they are not tested to work
 Player::Player(Map* map, Deck* deck) {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
@@ -41,6 +43,7 @@ Player::Player(Map* map, Deck* deck) {
 	ordersList = new OrdersList();
 	orderListIndex = new int(-1);
 	hand = new Hand(deck);
+	this->deck = new Deck(*deck);
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -59,6 +62,7 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	orderListIndex = new int(-1);
 	hand = NULL;
 	map = NULL;
+	deck = NULL;
 
 	sizeOfToAttack = new int(0);
 	sizeOfToDefend = new int(0);
@@ -80,6 +84,7 @@ Player::Player(const Player& copyPlayer) {
 	this->ordersList = new OrdersList(*copyPlayer.ordersList);
 	this->orderListIndex = new int(*copyPlayer.orderListIndex);
 	this->hand = new Hand(*copyPlayer.hand);
+	this->deck = new Deck(*copyPlayer.deck);
 	this->map = new Map(*copyPlayer.map);
 	this->sizeOfToAttack = new int(*copyPlayer.sizeOfToAttack);
 	this->sizeOfToDefend = new int(*copyPlayer.sizeOfToDefend);
@@ -102,6 +107,9 @@ Player::~Player() {
 
 	delete this->hand;
 	hand = NULL;
+
+	delete this->deck;
+	deck = NULL;
 
 	delete this->map;
 	map = NULL;
@@ -193,11 +201,7 @@ bool Player::issueOrder() {
 	cout << "---\n" << endl;
 	cout << "Player " << *playerID << "'s turn" << endl;
 
-	/*cout << "Map: " << endl;
-	cout << *map << endl;
-	cout << "---\n" << endl;*/
-	
-
+	//if player has troops to deploy, player is forced to deploy them can't issue another order
 	if (*troopsToDeploy > 0) {
 
 		string tempString;
@@ -211,7 +215,7 @@ bool Player::issueOrder() {
 			cout << "Enter troops to deploy: ";
 			cin >> tempInt;
 
-			//TODO: also need to call validate function to see if territory belongs to player
+			//checks to make sure deploy is allowed
 			if (tempInt <= *troopsToDeploy && hasTerritory(tempString)) {
 				break;
 			}
@@ -219,7 +223,7 @@ bool Player::issueOrder() {
 				cout << "Invalid input please try again" << endl;
 			}
 		}
-
+		//Deploy* deploy = new Deploy(playerID, "", tempInt, map->getTerritory(tempString));
 		Deploy* deploy = new Deploy(tempString, tempInt);
 		ordersList->add(*deploy);
 		troopsToDeploy = new int(*troopsToDeploy - tempInt);
@@ -274,46 +278,128 @@ bool Player::issueOrder() {
 			}
 		}
 		
-
+		//Advance* advance = new Advance(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
 		Advance* advance = new Advance(srcInput, dstInput, tempInt);
 		ordersList->add(*advance);
 		return false;
 	}
 	else if (actionInput == 2) {
-		//TODO: honestly idek how to fix card class will have to check way later
-		cout << "Option 2: Play a card\n\n" << endl;
+		int cardChoice;
+		vector<Card*> tempCards = hand->getCards();
+
+		while (true) {
+			cout << "Option 2: Play a card\n" << endl;
+			cout << "Displaying cards in hand:\n" << endl;
+
+			for (int i = 0; i < tempCards.size(); i++) {
+				cout << "Card " << i << ": " << *tempCards[i] << endl;
+			}
+
+			cout << "Choose a card to play:\n" << endl;
+			cin >> cardChoice;
+
+			if (cardChoice >= 0 || cardChoice < tempCards.size()) {
+				break;
+			}
+			else {
+				cout << "Invalid card choice please try again" << endl;
+			}
+		}
+		
+		cout << "\nCard chosen:" << endl;
+		cout << *tempCards[cardChoice] << endl;
+
+		Order* order = tempCards[cardChoice]->play(deck, hand);
+
+		//TODO: once david merges to main going to have to dynamic cast for each type of order
+		if (dynamic_cast<const Deploy*>(order)) {
+			*troopsToDeploy += 5;
+		}
+		else if (dynamic_cast<const Blockade*>(order)) {
+			string targetTerritoryString;
+
+			cout << "Blockade\n" << endl;
+
+			cout << "Enter target territory name: ";
+			cin >> targetTerritoryString;
+
+			//Assuming territory name is correct
+			//ordersList->add(Blockade(playerID, "", map->getTerritory(targetTerritoryString)));
+		}
+		else if (dynamic_cast<const Bomb*>(order)) {
+			string targetTerritoryString;
+
+			cout << "Bomb\n" << endl;
+
+			cout << "Enter target territory name: ";
+			cin >> targetTerritoryString;
+
+			//Assuming territory name is correct
+			//ordersList->add(Bomb(playerID, "", map->getTerritory(targetTerritoryString)));
+		}
+		else if (dynamic_cast<const Airlift*>(order)) {
+			string srcInput;
+			string dstInput;
+			int tempInt;
+
+			while (true) {
+
+				cout << "Airlift\n" << endl;
+
+				cout << "Enter source territory name: ";
+				cin >> srcInput;
+
+				cout << "Enter destination territory name: ";
+				cin >> dstInput;
+				;
+				cout << "Enter troops to advance: ";
+				cin >> tempInt;
+
+				if (tempInt > 0) {
+					break;
+				}
+				else {
+					cout << "Invalid number of troops to advance please try again" << endl;
+				}
+			}
+
+			//Assuming territory name is correct
+			//ordersList->add(Airlift(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput)));
+		}
+		else if (dynamic_cast<const Negotiate*>(order)) {
+			int tempInt;
+			while (true) {
+				cout << "Negotiate\n" << endl;
+
+				cout << "Enter target player's ID: ";
+
+				if (tempInt > 0) {
+					break;
+				}
+				else {
+					cout << "Invalid player ID please try again" << endl;
+				}
+			}
+			
+			cin >> tempInt;
+
+
+			//ordersList->add(Negotiate(playerID, "", tempInt);
+		}
+
+		else {
+			cout << "Invalid input, please try again" << endl; 
+		}
 
 		return false;
 	}
 	else if (actionInput == 3) {
 		//signals to game engine that no more orders will be done
-		cout << "Option 4: End turn\n" << endl;
+		cout << "Option 3: End turn\n" << endl;
 		return true;
 	}
 	
 }
-
-//put all deploy orders first
-//void Player::orderOrdersList() {
-//	if (ordersList->getOrders().size() == 0) {
-//		return;
-//	}
-//	vector<Order> orderedOrdersList(ordersList->getOrders());
-//	for (int i = 0; i < (ordersList->getOrders().size() - 1); i++) {
-//		for (int j = i + 1; j < ordersList->getOrders().size(); j++) {
-//			bool rightIsDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) != NULL;
-//			bool leftIsNotDeploy = dynamic_cast<Deploy*>(ordersList->get(i)) == NULL;
-//
-//			if (rightIsDeploy && leftIsNotDeploy) {
-//				Order temp = orderedOrdersList[i];
-//				orderedOrdersList[i] = *ordersList->get(j);
-//				orderedOrdersList[j] = temp;
-//			}
-//		}
-//	}
-//
-//	orderListIndex = new int (0);
-//}
 
 bool Player::hasTerritory(string territoryName) {
 	Territory* toDefendArray = toDefend();
@@ -356,7 +442,8 @@ Player& Player::operator=(const Player& player) {
 	this->setTerritoryArray(player.territoryArray);
 	this->setOrdersList(*player.ordersList);
 	this->setOrderListIndex(*player.orderListIndex);
-	this->setHand(*player.hand);
+	this->setHand(player.hand);
+	this->deck = new Deck(*player.deck);
 	this->setMap(player.map);
 
 	this->setSizeOfToAttack(*player.sizeOfToAttack);
@@ -380,8 +467,8 @@ OrdersList Player::getOrdersList() {
 	return *this->ordersList;
 }
 
-Hand Player::getHand() {
-	return *this->hand;
+Hand* Player::getHand() {
+	return this->hand;
 }
 
 Map* Player::getMap() {
@@ -401,8 +488,8 @@ void Player::setOrdersList(OrdersList ordersList) {
 	*this->ordersList = ordersList;
 }
 
-void Player::setHand(Hand hand) {
-	*this->hand = hand;
+void Player::setHand(Hand* hand) {
+	this->hand = hand;
 }
 
 void Player::setMap(Map* map) {

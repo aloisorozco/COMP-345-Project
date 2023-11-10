@@ -441,21 +441,15 @@ void GameEngine::reinforcementPhase()
               << endl;
 }
 
-void GameEngine::issueOrdersPhase()
-{
-    std::cout << "Issuing Orders Phase\n"
-              << endl;
-    bool *playersDoneArray = new bool[*sizeofPlayerArray];
-    while (true)
-    {
-        for (int i = 0; i < playerArray.size(); i++)
-        {
-            playersDoneArray[i] = false;
-        }
-        for (int i = 0; i < playerArray.size(); i++)
-        {
-            if (playersDoneArray[i])
-            {
+void GameEngine::issueOrdersPhase() {
+    std::cout << "Issuing Orders Phase\n" << endl;
+    bool* playersDoneArray = new bool[*sizeofPlayerArray];
+    for (int i = 0; i < playerArray.size(); i++) {
+        playersDoneArray[i] = false;
+    }
+    while (true) {
+        for (int i = 0; i < playerArray.size(); i++) {
+            if (playersDoneArray[i]) {
                 continue;
             }
             playersDoneArray[i] = playerArray[i]->issueOrder();

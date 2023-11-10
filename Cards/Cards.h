@@ -16,7 +16,7 @@ public:
     Deck& operator =(const Deck&); //2.copy operator
     friend ostream& operator<<(ostream&,const Deck&);//3.stream insertion operator for output
 
-    void draw(Hand **hand); // draws a card, removes it from deck adds it to hand
+    void draw(Hand *hand); // draws a card, removes it from deck adds it to hand
     void returnCard(Card* card); // played card is removed from hand, returned to deck
     //potential usage of getter/setter
     int getDeckSize()const;
@@ -56,18 +56,18 @@ private:
 class Card{//Card class, different types of cards, play()
 public:
     enum CardType {
-        Bomb,
-        Reinforcement,
-        Blockade,
-        Airlift,
-        Diplomacy
+        BombCT,
+        ReinforcementCT,
+        BlockadeCT,
+        AirliftCT,
+        DiplomacyCT
     };
     Card(CardType type); //default constructor
     Card(const Card&); //copy constructor, const for no altering
     Card& operator =(const Card&); //Assignment operator of value of Card
     friend ostream& operator<<(ostream&, const Card&);//stream insertion operator for output
 
-    void play(Deck *deck, Hand *hand); // The play function we need
+    Order* play(Deck *deck, Hand *hand); // The play function we need
     CardType getType() const;
     string cardTypeToString() const;
     ~Card(); //Deconstructor for destroying the card if ever needed later

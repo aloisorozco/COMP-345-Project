@@ -100,6 +100,8 @@ public:
 	bool isContinentConnected();
 	bool checkTerritoriesInContinents();
 
+	Territory* getTerritory(string name);
+
 	vector<Continent*> getContinents() const;
 	Map* getMap() const;
 	
