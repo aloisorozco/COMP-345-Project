@@ -112,9 +112,6 @@ class MapLoader {
 	public:
 		Map* loadMap() ;
 		Map* loadMap_withName(string mapName);
-
- main
-
 	
 };
 
