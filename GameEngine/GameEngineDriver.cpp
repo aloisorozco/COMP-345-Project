@@ -105,8 +105,6 @@ void testGameStates(){
 
 void testMainGameLoop() {
 
-    cout << "Choose Africa map for example" << endl;
-
     MapLoader loader;
     Map* testMap = loader.loadMap();
 

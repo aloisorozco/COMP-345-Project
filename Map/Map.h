@@ -100,6 +100,8 @@ public:
 	bool isContinentConnected();
 	bool checkTerritoriesInContinents();
 
+	Territory* getTerritory(string name);
+
 	vector<Continent*> getContinents() const;
 
 	void setContinents(const vector<Continent*>& continents);
@@ -113,9 +115,6 @@ class MapLoader {
 		Map* loadMap() ;
 		Map* loadMap_withName(string mapName);
 
- main
-
-	
 };
 
 void testLoadMaps();

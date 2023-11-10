@@ -18,6 +18,7 @@ void printMenu() {
     std::cout << "4. Card deck/hand\n";
     std::cout << "5. Game Engine\n";
     std::cout << "6. Exit\n";
+    std::cout << "10. Main Game Loop\n";
     std::cout << "Enter number > ";
 }
 
@@ -45,8 +46,7 @@ int main() {
 
             case 2:
                 // call function to test player
-                //testPlayers();
-                testMainGameLoop();
+                testPlayers();
                 break;
 
             case 3:
@@ -66,6 +66,9 @@ int main() {
 
             case 6:
                 return 0;  // Exit the program
+
+            case 10:
+                testMainGameLoop();
 
             default:
                 std::cout << "Invalid choice. Please enter a number between 1 and 6.\n";

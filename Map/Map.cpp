@@ -175,20 +175,6 @@ void Continent::setName(const string &continentName)
     }
 }
 
-
-// Setter (Continent)
-void Continent::setName(const string &continentName)
-{
-    if (name == nullptr)
-    {
-        name = new string(continentName);
-    }
-    else
-    {
-        *name = continentName;
-    }
-}
-
 void Continent::setBonus(int bonus){
     
 	*this->bonus = bonus;
@@ -254,6 +240,15 @@ void Map::setContinents(const vector<Continent *> &continents)
             territories.push_back(territory);
         }
     }
+}
+
+Territory* Map::getTerritory(string name) {
+    for (Territory* territory : territories) {
+        if (territory->getName() == name) {
+            return territory;
+        }
+    }
+    return NULL;
 }
 
 vector<Territory *> Map::getTerritories()
