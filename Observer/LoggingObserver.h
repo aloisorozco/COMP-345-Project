@@ -89,11 +89,17 @@ public:
     Subject(const Subject&); // copy constructor
     Subject& operator = (const Subject&);
     friend ostream& operator<<(ostream&,const Subject&);//3.stream insertion operator for output
+
+    //used to check if Notify was called.
+    bool NotifyCalled() const {
+        return notified;
+    }
 private:
     list<Observer*> *_observers;
+    bool notified = false;
 };
 
-
+void testLoggingObserver();
 //our ConcreteObserver (View class)
 
 #endif //LOGGINGOBSERVER_H

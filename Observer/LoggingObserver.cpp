@@ -1,4 +1,4 @@
-#include "../Observer/LoggingObserver.h"
+#include "LoggingObserver.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -31,6 +31,8 @@ void Subject::Notify(ILoggable *iLoggable) {
     for (; i != _observers->end(); ++i) {
         (*i)->Update(iLoggable);
     }
+    //check if Notify was called.
+    notified = true;
 }
 Subject::Subject(const Subject &) {}
 Subject &Subject::operator=(const Subject &) {return *this;}

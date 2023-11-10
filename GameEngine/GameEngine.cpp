@@ -43,7 +43,7 @@ ostream &operator<<(ostream& out, const GameState &) {
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(NULL), sizeofPlayerArray(new int(0)){
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(0), sizeofPlayerArray(new int(0)){
 
 }
 
@@ -226,4 +226,7 @@ void GameEngine::mainGameLoop() {
             break;
         }
     }
+}
+string GameEngine::stringToLog() {
+    return "Game Engine state: " + getCurrentState()->getName();
 }

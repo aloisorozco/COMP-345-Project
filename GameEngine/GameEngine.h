@@ -104,7 +104,7 @@ public:
         playerArray[*sizeofPlayerArray] = *player;
         sizeofPlayerArray++;*/
     }
-
+    string stringToLog() override;
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;
@@ -120,5 +120,5 @@ private:
 void testGameStates();
 
 void testMainGameLoop();
-
+GameEngine gameInit();
 #endif // GAME_ENGINE_H
