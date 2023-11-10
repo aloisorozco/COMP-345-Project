@@ -2,10 +2,13 @@
 #include "CommandProcessing.h"
 #include <iostream>
 
+
+
 void testCommandProcessor() {
     int choice;
     std::string filename;
-    GameEngine gameEngine;
+    // Initialisation of the engine
+    GameEngine engine;
 
     std::cout << "Pick between the two options:" << std::endl;
     std::cout << "Console Commands (1)" << std::endl;
@@ -14,16 +17,18 @@ void testCommandProcessor() {
     std::cin >> choice;
 
     if (choice == 1) {
-        ConsoleCommandProcessor consoleProcessor(&gameEngine);
+        ConsoleCommandProcessor consoleProcessor(&engine);
         consoleProcessor.readCommand();
 
-        Command cmd = consoleProcessor.getCommand();
-        std::cout << "Command from console: " << cmd.command << ", Effect: " << cmd.effect << std::endl;
+        while (!consoleProcessor.isCommandsEmpty()) {
+            Command cmd = consoleProcessor.getCommand();
+            std::cout << "Command from console: " << cmd.command << ", Effect: " << cmd.effect << std::endl;
+        }
     } else if (choice == 2) {
         std::cout << "Enter filename: ";
         std::cin >> filename;
 
-        FileCommandProcessorAdapter fileProcessor(filename, &gameEngine);
+        FileCommandProcessorAdapter fileProcessor(filename, &engine);
         fileProcessor.readCommand();
 
         while (!fileProcessor.isCommandsEmpty()) {
