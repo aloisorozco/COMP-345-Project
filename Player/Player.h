@@ -46,7 +46,7 @@ private:
 public:
 
 	Player();
-	
+  
 	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -61,11 +61,9 @@ public:
 
 	bool issueOrder();
 
-	//void orderOrdersList();
-
 	bool hasTerritory(string territoryName);
 
-	bool Player::hasTerritory(Territory territory);
+	bool hasTerritory(Territory territory);
 
 	Order* getNextInOrdersList();
 
