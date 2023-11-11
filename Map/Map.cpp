@@ -94,7 +94,7 @@ void Territory::setArmy(int territoryArmy) {*army = territoryArmy;}
 void Territory::setContinent(const string& territoryContinent) {*continent = territoryContinent;}
 
 void Territory::addTroops(int troops) {*army = *army + troops;}
-void Territory::removeTroops(int troops) {if(troops >= *army){*army = *army - troops;}}
+void Territory::removeTroops(int troops) {if(troops <= *army){*army = *army - troops;}}
 
 void Territory::transferTroops(Territory* territory, int troops){
 

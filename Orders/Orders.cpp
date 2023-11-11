@@ -33,7 +33,7 @@ bool Bomb::validate(){
 }
 
 bool Blockade::validate(){
-    if(this->getTarget()->getPlayer() != 0){return false;}
+    if(this->getTarget()->getPlayer() != this->getPlayerIssuerID()){return false;}
     else{return true;}
 }
 
@@ -56,7 +56,7 @@ int Order::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -65,11 +65,11 @@ int Deploy::execute(){
 
     if(validate()){
         target->addTroops(*troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -78,11 +78,11 @@ int Advance::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -92,17 +92,17 @@ int Bomb::execute(){
     if(validate()){
         if(target->getArmy() > 0){
             target->removeTroops((target->getArmy() / 2) + (target->getArmy() % 2));
-            cout << this;
+            cout << "Valid order: " << *this << endl;
         }
 
         else{
-            cout << this->target->getName() << " has been bombed, but no one was there";
+            cout << "Valid order: " << this->target->getName() << " has been bombed, but no one was there";
         }
             
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -114,12 +114,12 @@ int Blockade::execute(){
         target->setPlayer(0);
         target->setArmy(target->getArmy() * 2);
 
-        cout << this;
+        cout << "Valid order: " << *this << endl;
 
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -128,11 +128,11 @@ int Airlift::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -141,11 +141,11 @@ int Negotiate::execute(){
     
     if(validate()){
         addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -226,6 +226,10 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
         }
     }
     return *this;
+}
+
+void OrdersList::clear() {
+    orders.clear();
 }
 
 std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {

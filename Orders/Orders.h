@@ -42,7 +42,8 @@ class Order {
         virtual int execute();
 
         friend ostream& operator<<(std::ostream& os, const Order& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". Nothing happens. \n";
+            os << "Order description: " << endl;
+            //os << order.description << " executed by Player " << order.playerIssuerID << "\n";
             return os;
         }
 
@@ -71,7 +72,10 @@ class Deploy : public Order{
             target = nullptr;
         }
 
-        Deploy(int playerID, const std::string& desc, int troops, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {}
+        Deploy(int playerID, const std::string& desc, int troops, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {
+            description = new string("Deploy order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been deployed to " + target->getName());
+
+        }
 
         Deploy(const Deploy& other) : Order(other), troops(new int(*other.troops)), target(other.target) {}
 
@@ -92,7 +96,7 @@ class Deploy : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Deploy& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been deployed to " << order.target->getName() << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -128,7 +132,10 @@ class Advance : public Order{
             target = nullptr;
         }
 
-        Advance(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {}
+        Advance(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {
+            description = new string("Advance order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been advanced from " + source->getName() + " to " + target->getName());
+
+        }
 
         Advance(const Advance& other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
 
@@ -149,7 +156,7 @@ class Advance : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Advance& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been sent from " << order.source->getName() << " to " << order.target->getName() << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -180,7 +187,9 @@ class Bomb : public Order{
             target = nullptr;
         }
 
-        Bomb(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {}
+        Bomb(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {
+            description = new string("Bomb order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been bombed ");
+        }
 
         Bomb(const Bomb& other) : Order(other), target(other.target) {}
 
@@ -197,7 +206,7 @@ class Bomb : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Bomb& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << order.target->getName() << " has been bombed, half of its army wiped out. Remaining army: " << order.target->getArmy() << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -217,11 +226,13 @@ class Blockade : public Order{
 
     public:
         Blockade() : Order() {
-            *description = "This is a bomb order";
+            *description = "This is a blockade order";
             target = nullptr;
         }
 
-        Blockade(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {}
+        Blockade(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {
+            description = new string("Blockade order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been blockaded ");
+        }
 
         Blockade(const Blockade& other) : Order(other), target(other.target) {}
 
@@ -238,7 +249,7 @@ class Blockade : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Blockade& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << order.target->getName() << " has been blockaded. Ownership is now neutral and the army size is now " << order.target->getArmy() << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -264,13 +275,16 @@ class Airlift : public Order{
 
     public:
         Airlift() : Order() {
-            *description = "This is an advance order";
+            *description = "This is an airlift order";
             troops = new int(0);
             source = nullptr;
             target = nullptr;
         }
 
-        Airlift(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {}
+        Airlift(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {
+            description = new string("Airlift order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been airlifted from " + source->getName() + " to " + target->getName());
+
+        }
 
         Airlift(const Airlift& other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
 
@@ -291,7 +305,7 @@ class Airlift : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Airlift& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << *order.troops << " troops have been airlifted from " << order.source->getName() << " to " << order.target->getName() << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -324,7 +338,9 @@ class Negotiate : public Order{
             targetPlayerID = new int(0);
         }
 
-        Negotiate(int playerID, const std::string& desc, int targetPlayerID) : Order(playerID, desc), targetPlayerID(new int(targetPlayerID)) {}
+        Negotiate(int playerID, const std::string& desc, int targetPlayerID) : Order(playerID, desc), targetPlayerID(new int(targetPlayerID)) {
+            description = new string("Negotiate order executed by Player " + to_string(playerID) + " with Player " + to_string(targetPlayerID));
+        }
 
         Negotiate(const Negotiate& other) : Order(other), targetPlayerID(new int(*other.targetPlayerID)) {}
 
@@ -343,7 +359,7 @@ class Negotiate : public Order{
         }
 
         friend ostream& operator<<(std::ostream& os, const Negotiate& order) {
-            os << *order.description + " executed by Player " << *order.playerIssuerID << ". " << "Player " << *order.playerIssuerID << " has negotiated with Player " << *order.targetPlayerID << ". No attacks between them shall be launched." << "\n";
+            os << *order.description;
             return os;
         }
 
@@ -398,6 +414,7 @@ class OrdersList {
         int move(int index1, int index2);
         int remove();
         int remove(int index);
+        void clear();
         int executeAll();
 
         Order* get(int index) {

@@ -223,9 +223,9 @@ bool Player::issueOrder() {
 				cout << "Invalid input please try again" << endl;
 			}
 		}
-		//Deploy* deploy = new Deploy(playerID, "", tempInt, map->getTerritory(tempString));
-		Deploy* deploy = new Deploy(tempString, tempInt);
-		ordersList->add(*deploy);
+		Deploy* deploy = new Deploy(*playerID, "", tempInt, map->getTerritory(tempString));
+		//Deploy* deploy = new Deploy(tempString, tempInt);
+		ordersList->add(deploy);
 		troopsToDeploy = new int(*troopsToDeploy - tempInt);
 		
 		return false;
@@ -278,9 +278,9 @@ bool Player::issueOrder() {
 			}
 		}
 		
-		//Advance* advance = new Advance(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
-		Advance* advance = new Advance(srcInput, dstInput, tempInt);
-		ordersList->add(*advance);
+		Advance* advance = new Advance(*playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
+		//Advance* advance = new Advance(srcInput, dstInput, tempInt);
+		ordersList->add(advance);
 		return false;
 	}
 	else if (actionInput == 2) {
@@ -309,44 +309,38 @@ bool Player::issueOrder() {
 		cout << "\nCard chosen:" << endl;
 		cout << *tempCards[cardChoice] << endl;
 
-		Order* order = tempCards[cardChoice]->play(deck, hand);
+		string orderString = tempCards[cardChoice]->play(deck, hand);
 
 		//TODO: once david merges to main going to have to dynamic cast for each type of order
-		if (dynamic_cast<const Deploy*>(order)) {
+		if (orderString == "Deploy") {
 			*troopsToDeploy += 5;
 		}
-		else if (dynamic_cast<const Blockade*>(order)) {
+		else if (orderString == "Blockade") {
 			string targetTerritoryString;
 
-			cout << "Blockade\n" << endl;
-
-			cout << "Enter target territory name: ";
+			cout << "\nEnter target territory name: ";
 			cin >> targetTerritoryString;
 
 			//Assuming territory name is correct
-			//ordersList->add(Blockade(playerID, "", map->getTerritory(targetTerritoryString)));
+			ordersList->add(new Blockade(*playerID, "", map->getTerritory(targetTerritoryString)));
 		}
-		else if (dynamic_cast<const Bomb*>(order)) {
+		else if (orderString == "Bomb") {
 			string targetTerritoryString;
 
-			cout << "Bomb\n" << endl;
-
-			cout << "Enter target territory name: ";
+			cout << "\nEnter target territory name: ";
 			cin >> targetTerritoryString;
 
 			//Assuming territory name is correct
-			//ordersList->add(Bomb(playerID, "", map->getTerritory(targetTerritoryString)));
+			ordersList->add(new Bomb(*playerID, "", map->getTerritory(targetTerritoryString)));
 		}
-		else if (dynamic_cast<const Airlift*>(order)) {
+		else if (orderString == "Airlift") {
 			string srcInput;
 			string dstInput;
 			int tempInt;
 
 			while (true) {
 
-				cout << "Airlift\n" << endl;
-
-				cout << "Enter source territory name: ";
+				cout << "\nEnter source territory name: ";
 				cin >> srcInput;
 
 				cout << "Enter destination territory name: ";
@@ -364,14 +358,14 @@ bool Player::issueOrder() {
 			}
 
 			//Assuming territory name is correct
-			//ordersList->add(Airlift(playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput)));
+			ordersList->add(new Airlift(*playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput)));
 		}
-		else if (dynamic_cast<const Negotiate*>(order)) {
+		else if (orderString == "Negotiate") {
 			int tempInt;
 			while (true) {
-				cout << "Negotiate\n" << endl;
 
-				cout << "Enter target player's ID: ";
+				cout << "\nEnter target player's ID: ";
+				cin >> tempInt;
 
 				if (tempInt > 0) {
 					break;
@@ -380,11 +374,8 @@ bool Player::issueOrder() {
 					cout << "Invalid player ID please try again" << endl;
 				}
 			}
-			
-			cin >> tempInt;
 
-
-			//ordersList->add(Negotiate(playerID, "", tempInt);
+			ordersList->add(new Negotiate(*playerID, "", tempInt));
 		}
 
 		else {
@@ -425,7 +416,9 @@ Order* Player::getNextInOrdersList() {
 	if (*orderListIndex >= ordersList->getOrders().size()) {
 		return NULL;
 	}
-	return ordersList->get(*orderListIndex++);
+	Order* order = ordersList->get(*orderListIndex);
+	*orderListIndex += 1;
+	return order;
 }
 
 //stream insertion operator
@@ -463,8 +456,8 @@ Territory Player::getTerritoryArray() {
 	return *this->territoryArray;
 }
 
-OrdersList Player::getOrdersList() {
-	return *this->ordersList;
+OrdersList* Player::getOrdersList() {
+	return this->ordersList;
 }
 
 Hand* Player::getHand() {

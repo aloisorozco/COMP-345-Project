@@ -79,7 +79,7 @@ public:
 
     void startupPhase();
 
-    void reinforcementPhase();
+    bool reinforcementPhase();
 
     void issueOrdersPhase();
 
