@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <random>
+#include <sstream>
 
 #include "../Player/Player.h"
 #include "../Map/Map.h"
@@ -164,7 +165,7 @@ void GameEngine::gameInit(GameEngine &engineArg)
     mapLoadState->addTransition("validatemap", mapValidationState);
     mapValidationState->addTransition("addplayer", addPlayerState);
     addPlayerState->addTransition("addplayer", addPlayerState);
-    addPlayerState->addTransition("assigncountries", reinforcementState);
+    addPlayerState->addTransition("gamestart", reinforcementState);
     reinforcementState->addTransition("issueorder", orderChoiceState);
     orderChoiceState->addTransition("issueorder", orderChoiceState);
     orderChoiceState->addTransition("endissueorders", orderExecuteState);
@@ -250,7 +251,7 @@ void GameEngine::startupPhase(GameEngine &engineArg)
 
     while (engine->getCurrentState()->getName() != "Assign Reinforcement")
     {
-        std::chrono::seconds sleepDuration(1);
+        std::chrono::seconds sleepDuration(2);
         // Clear screen
         engine->clearScreen();
 
@@ -271,12 +272,26 @@ void GameEngine::startupPhase(GameEngine &engineArg)
         // Get command
         Command cmd = commandProcessor->getCommand();
 
-        if (cmd.command == "loadmap")
+        std::vector<std::string> commandWords;
+        std::istringstream iss(cmd.command);
+        for (std::string s; iss >> s;)
+            commandWords.push_back(s);
+
+        if (commandWords[0] == "loadmap")
         {
             // intialize map
             map = new Map();
             MapLoader *mapLoader = new MapLoader(); // loader
-            map = mapLoader->loadMap();
+
+            if (commandWords.size() > 1)
+            {
+                map = mapLoader->loadMap_withName(commandWords[1]);
+            }
+            else
+            {
+                map = mapLoader->loadMap();
+            }
+
             delete mapLoader;
             mapLoader = NULL;
 
@@ -306,20 +321,22 @@ void GameEngine::startupPhase(GameEngine &engineArg)
             }
         }
 
-        else if (cmd.command == "addplayer")
+        else if (commandWords[0] == "addplayer")
         {
 
             // Add players command - getCommand() from CommandProcessor object - prob a if satement here + call validate
-            if (*sizeofPlayerArray > 6)
+            if (*sizeofPlayerArray > 5 && cmd.command == "addplayer")
             {
                 cout << "Too many players. Please use the gamestart command to start the game" << endl;
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
             else
             {
                 Player *player = new Player(map, deck);
                 engine->addPlayer(player);
                 commandProcessor->saveEffect("Player added");
-                engine->processCommand("addPlayer");
+                engine->processCommand("addplayer");
                 std::cout << "******************************\n";
                 std::this_thread::sleep_for(sleepDuration);
             }
@@ -327,92 +344,105 @@ void GameEngine::startupPhase(GameEngine &engineArg)
 
         else if (cmd.command == "gamestart")
         {
-
-            //========================================= Assign territories to players======================================================//
-
-            // Vector of player IDs/Number
-            vector<int> players;
-            for (int i = 1; i < *sizeofPlayerArray + 1; i++)
+            if (*sizeofPlayerArray < 2)
             {
-                players.push_back(i);
+                cout << "Not enough players. Please add more players using the addplayer command" << endl;
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
-
-            // Set Randomization function
-            int minLimit = 0;
-            int maxLimit = 0;
-            maxLimit = map->getTerritories().size() - 1;
-            std::random_device rd;  // Seed the random number generator
-            std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
-            std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
-
-            // Get territories
-            vector<Territory *> territories;
-            territories = map->getTerritories();
-
-            // Randomize order of territories in territories vector created above
-            for (int i = 0; i < maxLimit; i++)
+            else
             {
-                int randomIndex1 = distribution(gen);
-                int randomIndex2 = distribution(gen);
-                swap(territories[randomIndex1], territories[randomIndex2]);
+
+                //========================================= Assign territories to players======================================================//
+
+                // Vector of player IDs/Number
+                vector<int> players;
+                for (int i = 1; i < *sizeofPlayerArray + 1; i++)
+                {
+                    players.push_back(i);
+                }
+
+                // Set Randomization function
+                int minLimit = 0;
+                int maxLimit = 0;
+                maxLimit = map->getTerritories().size() - 1;
+                std::random_device rd;  // Seed the random number generator
+                std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
+                std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
+
+                // Get territories
+                vector<Territory *> territories;
+                territories = map->getTerritories();
+
+                // Randomize order of territories in territories vector created above
+                for (int i = 0; i < maxLimit; i++)
+                {
+                    int randomIndex1 = distribution(gen);
+                    int randomIndex2 = distribution(gen);
+                    swap(territories[randomIndex1], territories[randomIndex2]);
+                }
+
+                // Assign territories to players in round robin fashion
+                int playerIndex = 0;
+                int territoryIndex = 0;
+                for (Territory *territory : territories)
+                {
+                    territory->setPlayer(players[playerIndex]);
+                    playerIndex = (playerIndex + 1) % players.size();
+                    territoryIndex = (territoryIndex + 1) % territories.size();
+                }
+
+                //=======================================Order of Play=====================================================//
+                // Determine order of play by rearanging player array in random order
+                minLimit = 0;
+                maxLimit = playerArray.size() - 1;
+                std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
+
+                for (int i = 0; i < playerArray.size(); i++)
+                {
+                    int randomIndex1 = distribution2(gen);
+                    int randomIndex2 = distribution2(gen);
+                    swap(playerArray[randomIndex1], playerArray[randomIndex2]);
+                }
+
+                // Print order of play
+                cout << "Order of play: ";
+                for (Player *player : playerArray)
+                {
+                    cout << "Player " << player->getPlayerID() << " > ";
+                }
+
+                //=======================================Reinforcements=====================================================//
+
+                for (Player *player : playerArray)
+                {
+                    player->setTroopsToDeploy(50);
+                }
+
+                //========================================Draw 2 Cards======================================================//
+                // Each Player draws two cards from the deck
+                for (Player *player : playerArray)
+                {
+                    cout << "\nPlayer : " << player->getPlayerID() << endl;
+                    deck->draw(player->getHand());
+                    deck->draw(player->getHand());
+                    cout << "Troops to deploy: " << *player->getTroopsToDeploy()
+                         << endl; // for demo purpose
+                }
+
+                commandProcessor->saveEffect("Game started");
+                engine->processCommand("gamestart");
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
-
-            // Assign territories to players in round robin fashion
-            int playerIndex = 0;
-            int territoryIndex = 0;
-            for (Territory *territory : territories)
-            {
-                territory->setPlayer(players[playerIndex]);
-                playerIndex = (playerIndex + 1) % players.size();
-                territoryIndex = (territoryIndex + 1) % territories.size();
-            }
-
-            //=======================================Order of Play=====================================================//
-            // Determine order of play by rearanging player array in random order
-            minLimit = 0;
-            maxLimit = playerArray.size() - 1;
-            std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
-
-            for (int i = 0; i < playerArray.size(); i++)
-            {
-                int randomIndex1 = distribution2(gen);
-                int randomIndex2 = distribution2(gen);
-                swap(playerArray[randomIndex1], playerArray[randomIndex2]);
-            }
-
-            // Print order of play
-            cout << "Order of play: ";
-            for (Player *player : playerArray)
-            {
-                cout << "Player " << player->getPlayerID() << " > ";
-            }
-
-            //=======================================Reinforcements=====================================================//
-
-            for (Player *player : playerArray)
-            {
-                player->setTroopsToDeploy(50);
-            }
-
-            //========================================Draw 2 Cards======================================================//
-            // Each Player draws two cards from the deck
-            for (Player *player : playerArray)
-            {
-                cout << "\nPlayer : " << player->getPlayerID() << endl;
-                deck->draw(player->getHand());
-                deck->draw(player->getHand());
-            }
-
-            commandProcessor->saveEffect("Game started");
-            engine->processCommand("assigncountries");
-            std::cout << "******************************\n";
-            std::this_thread::sleep_for(sleepDuration);
         }
 
         else
         {
             // Invalid command
             commandProcessor->saveEffect("Invalid command");
+            std::cout << "******************************\n";
+            std::this_thread::sleep_for(sleepDuration);
         }
     }
 }
@@ -422,16 +452,58 @@ Map *GameEngine::getMap() const
     return map;
 }
 
-int main()
+void testStartUpPhase()
 {
-
     GameEngine engine;
 
     engine.startupPhase(engine);
 
     cout << *engine.getMap() << endl;
 
-    return 0;
+    int cP1 = 0;
+    int cP2 = 0;
+    int Cp3 = 0;
+    // int cP4 = 0;
+    // int cP5 = 0;
+    // int cP6 = 0;
+
+    vector <Territory*> testTerr;
+    testTerr = engine.getMap()->getTerritories();
+
+    for (Territory *territory : testTerr)
+    {
+        if (territory->getPlayer() == 1)
+        {
+            cP1++;
+        }
+        if (territory->getPlayer() == 2)
+        {
+            cP2++;
+        }
+        if (territory->getPlayer() == 3)
+        {
+            Cp3++;
+        }
+        // if (territory->getPlayer() == 4)
+        // {
+        //     cP4++;
+        // }
+        // if (territory->getPlayer() == 5)
+        // {
+        //     cP5++;
+        // }
+        // if (territory->getPlayer() == 6)
+        // {
+        //     cP6++;
+        // }
+    }
+
+    cout << cP1 << endl;
+    cout << cP2 << endl;
+    cout << Cp3 << endl;
+    // cout << cP4 << endl;
+    // cout << cP5 << endl;
+    // cout << cP6 << endl;
 }
 
 void GameEngine::play()

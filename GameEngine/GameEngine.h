@@ -123,6 +123,8 @@ private:
 };
 
 //free functions declaration
+void testStartUpPhase();
+
 void testGameStates();
 
 void testMainGameLoop();
