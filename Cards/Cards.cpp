@@ -141,7 +141,7 @@ void Deck::initializeDeck() {
     //Put cards of all types into deck. NOT SHUFFLED
     //need to know how many cards in the deck(NOT SPECIFIED)
     // or if it's going to be a user defined amount(input)
-    int temp = 2;
+    int temp = 10; //added more cards 
     setDeckSize(temp);
     //emplace_back appends new element to the end
     for(int i =0; i<deckSize; i++){

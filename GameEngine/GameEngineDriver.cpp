@@ -16,7 +16,7 @@ void testGameStates(){
     std::string command;
     while (true) {
         // Clearing terminal screen
-        engine.clearScreen();
+        clearScreen();
 
         //getting available commands for current state
         std::vector<std::string> availableCommands = engine.getAvailableCommands();
@@ -29,7 +29,7 @@ void testGameStates(){
         }
 
         // Displaying status box
-        engine.printBox(engine.getCurrentState()->getName(), commandsStr);
+        printBox(engine.getCurrentState()->getName(), commandsStr);
         std::cout << "Enter command: ";
         std::cin >> command;
         if (command == "end") {
@@ -44,6 +44,62 @@ void testGameStates(){
         std::this_thread::sleep_for(sleepDuration);
         
     }
+}
+
+void testStartUpPhase()
+{
+    GameEngine engine;
+
+    engine.startupPhase(engine);
+
+    cout << *engine.getMap() << endl;
+
+    int cP1 = 0;
+    int cP2 = 0;
+    int Cp3 = 0;
+    // int cP4 = 0;
+    // int cP5 = 0;
+    // int cP6 = 0;
+
+    vector <Territory*> testTerr;
+    testTerr = engine.getMap()->getTerritories();
+
+    for (Territory *territory : testTerr)
+    {
+        if (territory->getPlayer() == 1)
+        {
+            cP1++;
+        }
+        if (territory->getPlayer() == 2)
+        {
+            cP2++;
+        }
+        if (territory->getPlayer() == 3)
+        {
+            Cp3++;
+        }
+        // if (territory->getPlayer() == 4)
+        // {
+        //     cP4++;
+        // }
+        // if (territory->getPlayer() == 5)
+        // {
+        //     cP5++;
+        // }
+        // if (territory->getPlayer() == 6)
+        // {
+        //     cP6++;
+        // }
+    }
+
+    cout << cP1 << endl;
+    cout << cP2 << endl;
+    cout << Cp3 << endl;
+    // cout << cP4 << endl;
+    // cout << cP5 << endl;
+    // cout << cP6 << endl;
+
+    engine.play();
 }
 
 void testMainGameLoop() {

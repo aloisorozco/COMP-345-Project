@@ -22,6 +22,7 @@ void printMenu() {
     std::cout << "6. Exit\n";
     std::cout << "7. Logs\n";
     std::cout << "8. Command Processing\n";
+    std::cout<< "9. Startup Phase\n";
     std::cout << "10. Main Game Loop\n";
     std::cout << "Enter number > ";
 }
@@ -79,8 +80,13 @@ int main() {
                 testCommandProcessor();
                 break;  // Exit the program
 
+            case 9:
+                testStartUpPhase();
+                break;
+
             case 10:
                 testMainGameLoop();
+                break;
 
             default:
                 std::cout << "Invalid choice. Please enter a number between 1 and 6.\n";

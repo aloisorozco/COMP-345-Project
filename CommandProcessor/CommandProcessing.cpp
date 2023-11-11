@@ -16,16 +16,17 @@ bool CommandProcessor::validate(const std::string& command) {
 
 
     // Split the command into words for easier processing
-    std::vector<std::string> commandWords;
+    std::vector<std::string> commandWords ;
     std::istringstream iss(command);
     for(std::string s; iss >> s; )
         commandWords.push_back(s);
 
     // Get the current state of the game
     GameState* currentState = gameEngine->getCurrentState();
+    cout << "Current State: " << currentState->getName() << endl;
 
     // Check the command based on the current state
-    if (currentState->getName() == "Start" || currentState->getName() == "Map Loaded") {
+    if (currentState->getName() == "Start") {
         if (commandWords[0] == "loadmap") {
             return true;
         }
@@ -34,13 +35,19 @@ bool CommandProcessor::validate(const std::string& command) {
         if (commandWords[0] == "validatemap") {
             return true;
         }
+        if (commandWords[0] == "loadmap") {
+            return true;
+        }
     }
-    else if (currentState->getName() == "Map Validated" || currentState->getName() == "Players Added") {
+    else if (currentState->getName() == "Map Validated") {
         if (commandWords[0] == "addplayer") {
             return true;
         }
     }
     else if (currentState->getName() == "Players Added") {
+        if (commandWords[0] == "addplayer") {
+            return true;
+        }
         if (commandWords[0] == "gamestart") {
             return true;
         }

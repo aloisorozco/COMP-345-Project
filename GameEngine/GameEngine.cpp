@@ -81,7 +81,7 @@ void gameInit(GameEngine& engine)
     mapLoadState->addTransition("validatemap",mapValidationState);
     mapValidationState->addTransition("addplayer",addPlayerState);
     addPlayerState->addTransition("addplayer",addPlayerState);
-    addPlayerState->addTransition("assigncountries",reinforcementState);
+    addPlayerState->addTransition("gamestart",reinforcementState);
     reinforcementState->addTransition("issueorder",orderChoiceState);
     orderChoiceState->addTransition("issueorder",orderChoiceState);
     orderChoiceState->addTransition("endissueorders",orderExecuteState);
@@ -195,67 +195,9 @@ void GameEngine::addPlayer(Player *player)
     *sizeofPlayerArray = playerArray.size();
 }
 
-void GameEngine::gameInit(GameEngine &engineArg)
-{
 
-    // state initialisation
-    GameEngine *engine = &engineArg;
-    GameState *startState = new GameState("Start");
-    GameState *mapLoadState = new GameState("Map Loaded");
-    GameState *mapValidationState = new GameState("Map Validated");
-    GameState *addPlayerState = new GameState("Players Added");
-    GameState *reinforcementState = new GameState("Assign Reinforcement");
-    GameState *orderChoiceState = new GameState("Issue Orders");
-    GameState *orderExecuteState = new GameState("Execute Orders");
-    GameState *winState = new GameState("Win");
-    GameState *endState = new GameState("end");
 
-    // Creating all the appropriate transitions.
-    startState->addTransition("loadmap", mapLoadState);
-    mapLoadState->addTransition("loadmap", mapLoadState);
-    mapLoadState->addTransition("validatemap", mapValidationState);
-    mapValidationState->addTransition("addplayer", addPlayerState);
-    addPlayerState->addTransition("addplayer", addPlayerState);
-    addPlayerState->addTransition("gamestart", reinforcementState);
-    reinforcementState->addTransition("issueorder", orderChoiceState);
-    orderChoiceState->addTransition("issueorder", orderChoiceState);
-    orderChoiceState->addTransition("endissueorders", orderExecuteState);
-    orderExecuteState->addTransition("execorder", orderExecuteState);
-    orderExecuteState->addTransition("endexecorders", reinforcementState);
-    orderExecuteState->addTransition("win", winState);
-    winState->addTransition("play", startState);
-    winState->addTransition("end", endState);
 
-    // Adding all states to the engine
-    engine->addState(startState);
-    engine->addState(mapLoadState);
-    engine->addState(mapValidationState);
-    engine->addState(addPlayerState);
-    engine->addState(reinforcementState);
-    engine->addState(orderChoiceState);
-    engine->addState(orderExecuteState);
-    engine->addState(winState);
-
-    // Setting the initial state
-    engine->setInitialState(startState);
-}
-
-// Fucntion for clearing terminal window using ASCII escape code
-void GameEngine::clearScreen()
-{
-    std::cout << "\x1B[2J\x1B[H";
-}
-
-// Function for printing a helping box
-void GameEngine::printBox(const std::string &state, const std::string &commands)
-{
-    std::cout << "***** WARZONE GAME ENGINE ****\n";
-    std::cout << "******************************\n";
-    std::cout << "* Current state: " << state << "\n";
-    std::cout << "* Available commands: \n"
-              << commands << "\n";
-    std::cout << "******************************\n";
-}
 
 void GameEngine::addMap(Map *map)
 {
@@ -277,7 +219,7 @@ void GameEngine::startupPhase(GameEngine &engineArg)
     // Initialize game
     GameEngine *engine = &engineArg;
     GameEngine *initializer = new GameEngine();
-    engine->gameInit(*engine);
+    gameInit(*engine);
     delete initializer;
     initializer = NULL;
 
@@ -304,7 +246,7 @@ void GameEngine::startupPhase(GameEngine &engineArg)
     {
         std::chrono::seconds sleepDuration(2);
         // Clear screen
-        engine->clearScreen();
+        clearScreen();
 
         // getting available commands for current state
         std::vector<std::string> availableCommands = engine->getAvailableCommands();
@@ -318,7 +260,7 @@ void GameEngine::startupPhase(GameEngine &engineArg)
         }
 
         // Print box
-        engine->printBox(engine->getCurrentState()->getName(), commandsStr);
+        printBox(engine->getCurrentState()->getName(), commandsStr);
 
         // Get command
         Command cmd = commandProcessor->getCommand();
@@ -503,59 +445,7 @@ Map *GameEngine::getMap() const
     return map;
 }
 
-void testStartUpPhase()
-{
-    GameEngine engine;
 
-    engine.startupPhase(engine);
-
-    cout << *engine.getMap() << endl;
-
-    int cP1 = 0;
-    int cP2 = 0;
-    int Cp3 = 0;
-    // int cP4 = 0;
-    // int cP5 = 0;
-    // int cP6 = 0;
-
-    vector <Territory*> testTerr;
-    testTerr = engine.getMap()->getTerritories();
-
-    for (Territory *territory : testTerr)
-    {
-        if (territory->getPlayer() == 1)
-        {
-            cP1++;
-        }
-        if (territory->getPlayer() == 2)
-        {
-            cP2++;
-        }
-        if (territory->getPlayer() == 3)
-        {
-            Cp3++;
-        }
-        // if (territory->getPlayer() == 4)
-        // {
-        //     cP4++;
-        // }
-        // if (territory->getPlayer() == 5)
-        // {
-        //     cP5++;
-        // }
-        // if (territory->getPlayer() == 6)
-        // {
-        //     cP6++;
-        // }
-    }
-
-    cout << cP1 << endl;
-    cout << cP2 << endl;
-    cout << Cp3 << endl;
-    // cout << cP4 << endl;
-    // cout << cP5 << endl;
-    // cout << cP6 << endl;
-}
 
 void GameEngine::play()
 {
@@ -592,9 +482,7 @@ bool GameEngine::reinforcementPhase() {
         playerArray[i]->toDefend();
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
         
-        //checks if owns entire continents if so add continent bonus to troops
-        vector<Continent*> continents = playerArray[i]->getMap()->getContinents();
-
+        
         // checks if owns entire continents if so add continent bonus to troops
         vector<Continent *> continents = playerArray[i]->getMap()->getContinents();
 
