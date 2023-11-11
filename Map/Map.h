@@ -40,7 +40,12 @@ public:
 	void setArmy(int army);
 	void setContinent(const string& continent);	
 
-	~Territory(); 
+	void addTroops(int army);
+	void removeTroops(int army);
+
+	void transferTroops(Territory* territory, int troops);
+
+	~Territory();
 };
 
 
@@ -49,11 +54,10 @@ private:
 	string* name;
 	vector<Territory*> territories;
 	int* bonus;
-	
 
 public:
 	Continent(); 
-	Continent(const string& continentName);
+	Continent(const string& continentName); 
 	Continent(const string& continentName, int bonus);
 	Continent(const Continent& copyContinent); 
 	~Continent();
@@ -67,13 +71,11 @@ public:
 	const vector<Territory*>& getTerritories() const; 
 
 	void setName(const string& continentName);
-	void setTerritories(const vector<Territory*>& continentTerritories);	
+	void setTerritories(const vector<Territory*>& continentTerritories);
 
 	void setBonus(int bonus);
 
 	int getBonus() const;
-		
-
 };
 
 
@@ -83,13 +85,14 @@ class Map {
 
 	//vector of all territories on the map
 	vector<Territory*> territories;
+
 public:
     Map();
     Map(const Map& m); // Copy constructor
     Map& operator=(const Map& m); // Assignment operator
     friend std::ostream& operator<<(std::ostream& os, const Map& m); // Stream insertion operator
 
-	~Map();
+    ~Map();
 
     void addContinent(Continent* c);
 
@@ -127,6 +130,8 @@ class MapLoader: public Map {
 };
 
 void testLoadMaps();
+
+
 
 
 
