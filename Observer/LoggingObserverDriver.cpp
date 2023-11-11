@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ void testLoggingObserver(){
     //Observer* logObserver = new LogObserver();
     LogObserver* logObserver = new LogObserver();
     Subject* subject = new Subject();
-    Order order = Order();
+    Order *order;
     OrdersList ordersList = OrdersList();
     GameEngine engine = gameInit();
     //Command command;
@@ -54,9 +55,9 @@ void testLoggingObserver(){
 
     //2)the CommandProcessor::saveCommand(), Order::execute(), Command::saveEffect(), OrderList::addOrder(), and GameEngine::transition()
     // methods are effectively using the Observer patterns’ Notify(Subject) method to trigger the writing of an entry in the log file
-    order.Attach(logObserver);
-    order.execute();
-    CheckNotifyStatus(order);
+    order->Attach(logObserver);
+    order->execute();
+    CheckNotifyStatus(*order);
 
     ordersList.Attach(logObserver);
     ordersList.add(order);
@@ -81,7 +82,7 @@ void testLoggingObserver(){
     //5)when an order is executed, the game log observer is notified which results
     // in outputting the effect of the order to the log file
     //6)when the GameEngine changes its state, the new state is output to the log file.
-    bool orderWritten = isInLog(order.stringToLog());
+    bool orderWritten = isInLog(order->stringToLog());
     bool orderListWritten = isInLog(ordersList.stringToLog());
     bool engineWritten = isInLog(engine.stringToLog());
 //    bool commandWritten = isInLog(command.stringToLog());

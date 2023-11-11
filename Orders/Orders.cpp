@@ -49,7 +49,7 @@ bool Negotiate::validate(){
     else{return true;}
 }
 string Order::stringToLog() {
-    string out = "Executed the Order:" + description;
+    string out = "Executed the Order:"+ this->getDescription();
     return out;
 }
 int Order::execute(){
@@ -249,7 +249,7 @@ std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
 
 string OrdersList::stringToLog() {
 //get last order added.
-Order o = orders.back();
-string out = "Issued the Order:" + o.getDescription();
+Order *o = orders.back();
+string out = "Issued the Order:" + o->getDescription();
 return out;
 }

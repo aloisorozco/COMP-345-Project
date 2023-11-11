@@ -10,8 +10,6 @@
 using namespace std;
 
 class Order : public Subject, public ILoggable{
-    private:
-        list<Observer *> *_observers;
     protected:
         //ID of the player Issuing the order
         int* playerIssuerID;
@@ -51,7 +49,12 @@ class Order : public Subject, public ILoggable{
         }
 
         virtual string getDescription() const {
-            return *this->description;
+            if(this->description != nullptr){
+                return *this->description;
+            }
+            else{
+                return "Error, null pointer";
+            }
         }
 
         virtual int getPlayerIssuerID() const {
