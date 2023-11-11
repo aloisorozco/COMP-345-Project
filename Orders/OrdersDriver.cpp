@@ -37,19 +37,19 @@ int testOrdersLists(){
     t5->setPlayer(p4.getPlayerID());
     t6->setPlayer(p4.getPlayerID());
 
-    p1.getOrdersList().add(new Order());
-    p1.getOrdersList().add(new Deploy(p1.getPlayerID(), "p1 deploy", 4, t1));
-    p1.getOrdersList().add(new Advance(p1.getPlayerID(), "p1 advance", 3, t1, t2));
-    p1.getOrdersList().add(new Bomb(p1.getPlayerID(), "p1 bomb", t3));
-    p4.getOrdersList().add(new Blockade(p4.getPlayerID(), "p4 blockade", t5));
-    p2.getOrdersList().add(new Airlift(p1.getPlayerID(), "p2 airlift invalid", 4, t5, t6));
-    p2.getOrdersList().add(new Negotiate(p2.getPlayerID(), "p2 negotiates p1", p1.getPlayerID()));
-    p2.getOrdersList().add(new Bomb(p2.getPlayerID(), "p2 bomb", t1));
+    p1.getOrdersList()->add(new Order());
+    p1.getOrdersList()->add(new Deploy(p1.getPlayerID(), "p1 deploy", 4, t1));
+    p1.getOrdersList()->add(new Advance(p1.getPlayerID(), "p1 advance", 3, t1, t2));
+    p1.getOrdersList()->add(new Bomb(p1.getPlayerID(), "p1 bomb", t3));
+    p4.getOrdersList()->add(new Blockade(p4.getPlayerID(), "p4 blockade", t5));
+    p2.getOrdersList()->add(new Airlift(p1.getPlayerID(), "p2 airlift invalid", 4, t5, t6));
+    p2.getOrdersList()->add(new Negotiate(p2.getPlayerID(), "p2 negotiates p1", p1.getPlayerID()));
+    p2.getOrdersList()->add(new Bomb(p2.getPlayerID(), "p2 bomb", t1));
 
-    p1.getOrdersList().executeAll();
-    p2.getOrdersList().executeAll();
-    p3.getOrdersList().executeAll();
-    p4.getOrdersList().executeAll();
+    p1.getOrdersList()->executeAll();
+    p2.getOrdersList()->executeAll();
+    p3.getOrdersList()->executeAll();
+    p4.getOrdersList()->executeAll();
 
     cout << "Enter any character to end : ";
     cin >> any;

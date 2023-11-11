@@ -33,7 +33,7 @@ bool Bomb::validate(){
 }
 
 bool Blockade::validate(){
-    if(this->getTarget()->getPlayer() != 0){return false;}
+    if(this->getTarget()->getPlayer() != this->getPlayerIssuerID()){return false;}
     else{return true;}
 }
 
@@ -59,7 +59,7 @@ int Order::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -75,7 +75,7 @@ int Deploy::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -89,7 +89,7 @@ int Advance::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -99,17 +99,17 @@ int Bomb::execute(){
     if(validate()){
         if(target->getArmy() > 0){
             target->removeTroops((target->getArmy() / 2) + (target->getArmy() % 2));
-            cout << this;
+            cout << "Valid order: " << *this << endl;
         }
 
         else{
-            cout << this->target->getName() << " has been bombed, but no one was there";
+            cout << "Valid order: " << this->target->getName() << " has been bombed, but no one was there";
         }
         Notify(this);
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -124,7 +124,7 @@ int Blockade::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -139,7 +139,7 @@ int Airlift::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
@@ -154,20 +154,14 @@ int Negotiate::execute(){
         return 0;
     }
 
-    cout << "Invalid order: " << description << "\n";
+    cout << "Invalid order: " << *this << "\n";
 
     return -1;
 }
 
 int OrdersList::add(Order* order){
-    if(order != nullptr){
-        this->orders.push_back(order);
-        cout << orders.size();
-        Notify(this);
-    }
-    else{
-        cout<<"EMPTY ORDER"<<endl;
-    }
+    this->orders.push_back(order);
+    Notify(this);
     return 0;
 }
 
@@ -241,6 +235,10 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
         }
     }
     return *this;
+}
+
+void OrdersList::clear() {
+    orders.clear();
 }
 
 std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {

@@ -67,7 +67,7 @@ public:
     Card& operator =(const Card&); //Assignment operator of value of Card
     friend ostream& operator<<(ostream&, const Card&);//stream insertion operator for output
 
-    Order* play(Deck *deck, Hand *hand); // The play function we need
+    string play(Deck *deck, Hand *hand); // The play function we need
     CardType getType() const;
     string cardTypeToString() const;
     ~Card(); //Deconstructor for destroying the card if ever needed later

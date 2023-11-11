@@ -128,7 +128,7 @@ void GameEngine::play() {
     this->mainGameLoop();
 }
 
-void GameEngine::reinforcementPhase() {
+bool GameEngine::reinforcementPhase() {
 
     std::cout << "Reinforcement Phase\n" << endl;
 
@@ -141,13 +141,18 @@ void GameEngine::reinforcementPhase() {
         }
     }
 
+    if (playerArray.size() == 1) {
+        std::cout << "Player " << playerArray[0]->getPlayerID() << " wins" << endl;
+        return true;
+    }
+
     //calculating troops for each player
     for (int i = 0; i < playerArray.size(); i++) {
         playerArray[i]->toDefend();
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
         
         //checks if owns entire continents if so add continent bonus to troops
-        vector<Continent*> continents = playerArray[i]->getMap().getContinents();
+        vector<Continent*> continents = playerArray[i]->getMap()->getContinents();
 
         for (Continent* continent : continents) {
             vector<Territory*> territories = continent->getTerritories();
@@ -166,13 +171,17 @@ void GameEngine::reinforcementPhase() {
         playerArray[i]->setTroopsToDeploy(troops);
     }
     std::cout << "--------------------\n" << endl;
+    return false;
 }
 
 void GameEngine::issueOrdersPhase() {
     std::cout << "Issuing Orders Phase\n" << endl;
     bool* playersDoneArray = new bool[*sizeofPlayerArray];
+
     for (int i = 0; i < playerArray.size(); i++) {
         playersDoneArray[i] = false;
+        playerArray[i]->setOrderListIndex(0);
+        playerArray[i]->getOrdersList()->clear();
     }
     while (true) {
         for (int i = 0; i < playerArray.size(); i++) {
@@ -216,18 +225,18 @@ void GameEngine::mainGameLoop() {
     while (true) {
 
         //getting & setting troops
-        reinforcementPhase();
+        bool gameWon = reinforcementPhase();
+
+        if (gameWon) {
+            break;
+        }
 
         //issuing orders phase
         issueOrdersPhase();
 
         //executing orders phase
         executeOrdersPhase();
-      
-        if (*sizeofPlayerArray == 1) {
-            std::cout << playerArray[0] << " wins" << endl;
-            break;
-        }
+
     }
 }
 string GameEngine::stringToLog() {
