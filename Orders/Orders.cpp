@@ -161,7 +161,6 @@ int Negotiate::execute(){
 
 int OrdersList::add(Order* order){
     this->orders.push_back(order);
-    cout << orders.size();
     Notify(this);
     return 0;
 }
