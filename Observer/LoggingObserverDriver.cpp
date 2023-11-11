@@ -2,7 +2,7 @@
 #include "../Orders/Orders.h"
 #include "../GameEngine/GameEngine.h"
 //using the testGameStates function.
-//#include "../CommandProcessing/CommandProcessing.h"
+//#include "../CommandProcessor/CommandProcessing.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -26,7 +26,7 @@ bool isInLog(string s){
     return log.find(s) != string::npos;
 }
 void testLoggingObserver(){
-    
+    /*
 
     //Observer* logObserver = new LogObserver();
     LogObserver* logObserver = new LogObserver();
@@ -88,6 +88,8 @@ void testLoggingObserver(){
 
     delete subject;
     delete logObserver;
-    
+
+*/  
 }
-*/
+
+

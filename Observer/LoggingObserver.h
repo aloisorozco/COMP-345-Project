@@ -1,7 +1,7 @@
 #ifndef LOGGINGOBSERVER_H
 #define LOGGINGOBSERVER_H
 
-#include "../CommandProcessor/CommandProcessing.h"
+// #include "../CommandProcessor/CommandProcessing.h"
 //#include "../Orders/Orders.h"
 //#include "../GameEngine/GameEngine.h"
 #include <string>
