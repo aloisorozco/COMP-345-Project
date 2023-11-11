@@ -46,7 +46,7 @@ private:
 public:
 
 	Player();
-  
+	
 	Player(Map* map, Deck* deck);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
@@ -60,6 +60,8 @@ public:
 	Territory* toAttack();
 
 	bool issueOrder();
+
+	//void orderOrdersList();
 
 	bool hasTerritory(string territoryName);
 

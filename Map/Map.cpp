@@ -8,7 +8,7 @@
 #include <random>
 #include "Map.h"
 using namespace std;
-namespace fs = std::filesystem;
+namespace fs = std::filesystem; // Namespace alias for filesystem
 
 // Default constructor (Territory)
 Territory::Territory() : name(new string("")), player(new int(0)), army(new int(0)), continent(new string("")) {}
@@ -29,8 +29,10 @@ Territory::Territory(const Territory &copyTerritory)
     this->continent = new string(*copyTerritory.continent);
 }
 
-//Destructor (Territory)
-Territory::~Territory() {
+
+// Destructor (Territory)
+Territory::~Territory()
+{
     delete this->name;
     name = NULL;
 
@@ -44,102 +46,62 @@ Territory::~Territory() {
     continent = NULL;
 }
 
-//stream insertion operator
-ostream& operator << (ostream& out, const Territory& territory)
+// stream insertion operator
+ostream &operator<<(ostream &out, const Territory &territory)
 {
-	out << "Territory " << territory.getName() << endl;
+    out << "Territory " << territory.getName() << endl;
     out << "Player " << territory.getPlayer() << endl;
     out << "Army " << territory.getArmy() << endl;
     out << "Continent " << territory.getContinent() << endl;
-    for (Territory* neighbor : territory.getNeighbors()) {
+    for (Territory *neighbor : territory.getNeighbors())
+    {
         out << "Neighbor: " << neighbor->getName() << endl;
     }
-	return out;
+    return out;
 }
 
-//assignment operator
-Territory& Territory::operator=(const Territory& territory) {
-	this->setName(*territory.name);
-	this->setPlayer(*territory.player);
-	this->setArmy(*territory.army);
+// assignment operator
+Territory &Territory::operator=(const Territory &territory)
+{
+    this->setName(*territory.name);
+    this->setPlayer(*territory.player);
+    this->setArmy(*territory.army);
     this->setContinent(*territory.continent);
 
-	return *this;
+    return *this;
 }
 
-void Territory::addNeighbor(Territory* neighbor) {
+void Territory::addNeighbor(Territory *neighbor)
+{
     adjacentTerritories.push_back(neighbor);
 }
 
-bool Territory::isNeighbor(Territory* territory) {
-    for (Territory* neighbor : adjacentTerritories) {
-        if (neighbor == territory) {
+bool Territory::isNeighbor(Territory *territory)
+{
+    for (Territory *neighbor : adjacentTerritories)
+    {
+        if (neighbor == territory)
+        {
             return true;
         }
     }
     return false;
 }
 
-
-//Getters (Territory)
+// Getters (Territory)
 string Territory::getName() const { return *name; }
 int Territory::getPlayer() const { return *player; }
 int Territory::getArmy() const { return *army; }
 string Territory::getContinent() const { return *continent; }
-vector<Territory*> Territory::getNeighbors() const { return adjacentTerritories; }
+vector<Territory *> Territory::getNeighbors() const { return adjacentTerritories; }
 
-//Setters (Territory)
-void Territory::setName(const string& territoryName) {*name = territoryName;}
-void Territory::setPlayer(int territoryPlayer) {*player = territoryPlayer;}
-void Territory::setArmy(int territoryArmy) {*army = territoryArmy;}
-void Territory::setContinent(const string& territoryContinent) {*continent = territoryContinent;}
-
-void Territory::addTroops(int troops) {*army = *army + troops;}
-void Territory::removeTroops(int troops) {if(troops >= *army){*army = *army - troops;}}
-
-void Territory::transferTroops(Territory* territory, int troops){
-
-    if(this->getPlayer() == territory->getPlayer()){
-        if(*this->army >= troops){
-            this->removeTroops(troops);
-            territory->addTroops(troops);
-        }
-
-        else{
-            territory->addTroops(*this->army);
-            this->setArmy(0);
-        }
-    }
-
-    else{
-
-        int chance;
-        int remaining = *this->army >= troops ? troops : *this->army;
-
-        this->removeTroops(remaining);
-
-        while(remaining > 0 && *territory->army > 0){
-            chance = rand() % 100;
-            if(chance >= 40){
-                territory->removeTroops(1);
-            }
-
-            chance = rand() % 100;
-            if(chance >= 30){
-                remaining--;
-            }
-        }
-
-        if(*territory->army <= 0){
-            territory->setPlayer(this->getPlayer());
-            territory->setArmy(remaining);
-        }
-    }
-    
-}
+// Setters (Territory)
+void Territory::setName(const string &territoryName) { *name = territoryName; }
+void Territory::setPlayer(int territoryPlayer) { *player = territoryPlayer; }
+void Territory::setArmy(int territoryArmy) { *army = territoryArmy; }
+void Territory::setContinent(const string &territoryContinent) { *continent = territoryContinent; }
 
 //=============================================================================================================================================================================================================//
-
 
 // Default Constructor (Continent)
 Continent::Continent() : name(new string("")), bonus(new int(0)) {}
@@ -230,11 +192,11 @@ void Continent::setTerritories(const vector<Territory *> &continentTerritories)
     }
 }
 
-
 //=============================================================================================================================================================================================================//
 
-
-Map::Map() {}
+Map::Map()
+{
+}
 
 Map::Map(const Map &m)
 {
@@ -266,7 +228,8 @@ void Map::addContinent(Continent *continent)
     }
 }
 
-vector<Continent*> Map::getContinents() const {
+vector<Continent *> Map::getContinents() const
+{
     return continents;
 }
 
@@ -298,11 +261,14 @@ vector<Territory *> Map::getTerritories()
 
     continents = this->getContinents();
 
+
     for (Continent *continent: continents){
         for (Territory *territory: continent->getTerritories()){
             territories.push_back(territory);
         }
     }
+
+
 
     return territories;
 }
@@ -329,7 +295,8 @@ ostream &operator<<(std::ostream &os, const Map &m)
     return os;
 }
 
-Map& Map::operator=(const Map& m){
+Map &Map::operator=(const Map &m)
+{
     this->setContinents(m.getContinents());
     return *this;
 }
@@ -831,8 +798,8 @@ Map *MapLoader::loadMap_withName(string mapName)
     return map;
 };
 
-/* Test for map functionality
-int main(){
+// int main()
+// {
 
 //     MapLoader* loader = new MapLoader();
 //     string mapName = "Aden.map";
@@ -932,9 +899,8 @@ int main(){
 //         cout << "Map is not valid" << endl;
 //     }
 
-   
+//     delete testMap;
 
-    return 0;
-};
+//     return 0;
+// }
 
-*/

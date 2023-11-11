@@ -23,8 +23,6 @@ void printMenu() {
 }
 
 int main() {
-
-    
     std::chrono::seconds sleepDuration(1);
 
     while (true) {
