@@ -2,6 +2,7 @@
 #include "CommandProcessing.h"
 #include <iostream>
 #include <sstream>
+#include <limits>
 
 //Saving command to the command Vector
 void CommandProcessor::saveCommand(const std::string& command) {
