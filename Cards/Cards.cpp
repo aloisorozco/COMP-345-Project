@@ -76,9 +76,10 @@ Order* Card::play(Deck *deck, Hand *hand){
         (*hand).getOrdersList().add(order);
     }
     //print the card played
-    (*deck).returnCard(this);
-    (*hand).removeCard(this);
-    return order;
+    deck->returnCard(this);
+    hand->removeCard(this);
+
+    return orderString;
 }
 //Deconstructor, but Deck and Hand already clear the cards
 Card::~Card() = default;

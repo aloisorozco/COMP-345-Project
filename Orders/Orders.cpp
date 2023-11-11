@@ -55,7 +55,7 @@ string Order::stringToLog() {
 int Order::execute(){
     if(validate()){
         cout << this;
-        Notify(this);      
+        Notify(this);
         return 0;
     }
 
@@ -70,7 +70,7 @@ int Deploy::execute(){
 
     if(validate()){
         target->addTroops(*troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         Notify(this);
         return 0;
     }
@@ -84,7 +84,7 @@ int Advance::execute(){
     
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         Notify(this);
         return 0;
     }
@@ -119,8 +119,7 @@ int Blockade::execute(){
     if(validate()){
         target->setPlayer(0);
         target->setArmy(target->getArmy() * 2);
-
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         Notify(this);
         return 0;
     }
@@ -135,7 +134,7 @@ int Airlift::execute(){
     if(validate()){
 
         this->source->transferTroops(this->target, *this->troops);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         Notify(this);
         return 0;
     }
@@ -150,7 +149,7 @@ int Negotiate::execute(){
     if(validate()){
 
         addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
-        cout << this;
+        cout << "Valid order: " << *this << endl;
         Notify(this);
         return 0;
     }
