@@ -7,7 +7,6 @@
 
 using namespace std;
 namespace fs = std::filesystem; // Namespace alias for filesystem
-
 void testLoadMaps()
 {
     

@@ -1,13 +1,15 @@
+
 #ifndef ORDERS_H
 #define ORDERS_H
 
+#include "../Observer/LoggingObserver.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include "../Map/Map.h"
+using namespace std;
 
-class Order {
-
+class Order : public Subject, public ILoggable{
     protected:
         //ID of the player Issuing the order
         int* playerIssuerID;
@@ -48,12 +50,19 @@ class Order {
         }
 
         virtual string getDescription() const {
-            return *this->description;
+            if(this->description != nullptr){
+                return *this->description;
+            }
+            else{
+                return "Error, null pointer";
+            }
         }
 
         virtual int getPlayerIssuerID() const {
             return *this->playerIssuerID;
         }
+
+        string stringToLog() override;
 };
 
 class Deploy : public Order{
@@ -388,12 +397,11 @@ class Negotiate : public Order{
 
 };
 
-class OrdersList {
+class OrdersList : public ILoggable, public Subject{
 
     private:
-        
+      
         std::vector<Order*> orders;
-
         void copyOrders(const OrdersList& other);
 
     public:
@@ -430,6 +438,11 @@ class OrdersList {
         }
 
         friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
+
+
+        string stringToLog() override;
+
+        void addOrders(const Order& o);
 };
 
 // free function declaration

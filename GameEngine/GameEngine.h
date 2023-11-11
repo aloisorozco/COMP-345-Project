@@ -3,16 +3,19 @@
 #define GAME_ENGINE_H
 
 #include "../Player/Player.h"
-
+#include "../Observer/LoggingObserver.h"
 #include <string>
 #include <map>
 #include <vector>
-using namespace std;
 
+using namespace std;
+class ILoggable;
+class Subject;
 // copy constructor, assignment operator, and stream insertion operator.
 
 // The GameState class represents a single state in a game.
 // Each state has a name and a set of transitions that lead to other states.
+
 class GameState {
 public:
     // Constructor that initializes the state with a name.
@@ -45,7 +48,7 @@ private:
 };
 
 // The GameEngine class manages the game states and processes commands.
-class GameEngine {
+class GameEngine : public ILoggable, public Subject{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
@@ -109,6 +112,7 @@ public:
         gamePlayerArray = playerArray;
         sizeOfPlayersArray = sizeOfPlayersArray;
     }*/
+    string stringToLog() override;
 
 private:
     // A map from state names to states. Contains all the states in the game.
@@ -125,5 +129,5 @@ private:
 void testGameStates();
 
 void testMainGameLoop();
-
+GameEngine gameInit();
 #endif // GAME_ENGINE_H

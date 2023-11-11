@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Orders.h"
-
+#include "../Observer/LoggingObserver.h"
 using namespace std;
 
 std::vector<std::pair<int, int>> Negotiate::negotiations;
@@ -48,11 +48,14 @@ bool Negotiate::validate(){
     else if(Negotiate::isNegotiation(this->getPlayerIssuerID(), this->getPlayerTargetID())){return false;}
     else{return true;}
 }
-
+string Order::stringToLog() {
+    string out = "Executed the Order:"+ this->getDescription();
+    return out;
+}
 int Order::execute(){
-
     if(validate()){
         cout << this;
+        Notify(this);
         return 0;
     }
 
@@ -61,11 +64,14 @@ int Order::execute(){
     return -1;
 }
 
+
+
 int Deploy::execute(){
 
     if(validate()){
         target->addTroops(*troops);
         cout << "Valid order: " << *this << endl;
+        Notify(this);
         return 0;
     }
 
@@ -79,6 +85,7 @@ int Advance::execute(){
     if(validate()){
         this->source->transferTroops(this->target, *this->troops);
         cout << "Valid order: " << *this << endl;
+        Notify(this);
         return 0;
     }
 
@@ -98,7 +105,7 @@ int Bomb::execute(){
         else{
             cout << "Valid order: " << this->target->getName() << " has been bombed, but no one was there";
         }
-            
+        Notify(this);
         return 0;
     }
 
@@ -110,12 +117,10 @@ int Bomb::execute(){
 int Blockade::execute(){
     
     if(validate()){
-
         target->setPlayer(0);
         target->setArmy(target->getArmy() * 2);
-
         cout << "Valid order: " << *this << endl;
-
+        Notify(this);
         return 0;
     }
 
@@ -127,8 +132,10 @@ int Blockade::execute(){
 int Airlift::execute(){
     
     if(validate()){
+
         this->source->transferTroops(this->target, *this->troops);
         cout << "Valid order: " << *this << endl;
+        Notify(this);
         return 0;
     }
 
@@ -140,8 +147,10 @@ int Airlift::execute(){
 int Negotiate::execute(){
     
     if(validate()){
+
         addNegotiation(*this->playerIssuerID, *this->targetPlayerID);
         cout << "Valid order: " << *this << endl;
+        Notify(this);
         return 0;
     }
 
@@ -153,6 +162,7 @@ int Negotiate::execute(){
 int OrdersList::add(Order* order){
     this->orders.push_back(order);
     cout << orders.size();
+    Notify(this);
     return 0;
 }
 
@@ -238,4 +248,11 @@ std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList) {
         os << order->getDescription() << "\n";
     }
     return os;
+}
+
+string OrdersList::stringToLog() {
+//get last order added.
+Order *o = orders.back();
+string out = "Issued the Order:" + o->getDescription();
+return out;
 }
