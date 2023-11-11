@@ -8,6 +8,7 @@
 #include "Orders/Orders.h"
 #include "Player/Player.h"
 #include "Map/Map.h"
+#include "CommandProcessor/CommandProcessing.h"
 
 
 void printMenu() {
@@ -18,6 +19,7 @@ void printMenu() {
     std::cout << "4. Card deck/hand\n";
     std::cout << "5. Game Engine\n";
     std::cout << "6. Exit\n";
+    std:cout << "7. Command Proccessing exemple\n";
     std::cout << "10. Main Game Loop\n";
     std::cout << "Enter number > ";
 }
@@ -66,6 +68,10 @@ int main() {
 
             case 6:
                 return 0;  // Exit the program
+
+            case 7:
+                // call function to test Command Processing
+                testCommandProcessor();
 
             case 10:
                 testMainGameLoop();

@@ -1,4 +1,7 @@
 // CommandProcessing.h
+#ifndef COMMANDPROCESSING_H
+#define COMMANDPROCESSING_H
+
 #include <string>
 #include <vector>
 #include <fstream>
@@ -41,3 +44,9 @@ public:
 private:
     void readCommand() override;  // Override base class method
 };
+
+
+// Free function
+
+void testCommandProcessor();
+#endif 

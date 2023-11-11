@@ -10,7 +10,7 @@ void testCommandProcessor() {
     GameEngine* initializer = new GameEngine();
     GameEngine engine = initializer->gameInit();
     delete initializer;
-    
+
     std::cout << "Pick between the two options:" << std::endl;
     std::cout << "Console Commands (1)" << std::endl;
     std::cout << "File Commands (2)" << std::endl;
@@ -41,7 +41,3 @@ void testCommandProcessor() {
     }
 }
 
-int main() {
-    testCommandProcessor();
-    return 0;
-}
