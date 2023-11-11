@@ -7,6 +7,7 @@
 #include "Cards/Cards.h"
 #include "Orders/Orders.h"
 #include "Player/Player.h"
+#include "CommandProcessor/CommandProcessing.h"
 #include "Observer/LoggingObserver.h"
 #include "Map/Map.h"
 
@@ -20,6 +21,7 @@ void printMenu() {
     std::cout << "5. Game Engine\n";
     std::cout << "6. Exit\n";
     std::cout << "7. Logs\n";
+    std::cout << "8. Command Processing\n";
     std::cout << "10. Main Game Loop\n";
     std::cout << "Enter number > ";
 }
@@ -73,6 +75,10 @@ int main() {
 
             case 7:
                 testLoggingObserver();
+                break;  // Exit the program
+
+            case 8:
+                testCommandProcessor();
                 break;  // Exit the program
 
             case 10:
