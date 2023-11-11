@@ -12,10 +12,7 @@
 void testGameStates(){
     std::chrono::seconds sleepDuration(1);
     GameEngine engine;
-    engine.gameInit(engine);
-    
-    
-
+    gameInit(engine);
     std::string command;
     while (true) {
         // Clearing terminal screen

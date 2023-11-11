@@ -3,22 +3,26 @@
 #define GAME_ENGINE_H
 
 #include "../Player/Player.h"
-
-
-
+#include "../Observer/LoggingObserver.h"
 #include <string>
 #include <map>
 #include <vector>
+
+
 using namespace std;
 
 class CommandProcessor;
 class ConsoleCommandProcessor;
 class FileCommandProcessorAdapter;
 
+
+class ILoggable;
+class Subject;
 // copy constructor, assignment operator, and stream insertion operator.
 
 // The GameState class represents a single state in a game.
 // Each state has a name and a set of transitions that lead to other states.
+
 class GameState {
 public:
     // Constructor that initializes the state with a name.
@@ -42,6 +46,11 @@ public:
     // Returns the available transitions from this state.
     const std::map<std::string, GameState*>& getTransitions() const;
 
+
+    
+
+
+
 private:
     // The name of this state.
     std::string name;
@@ -51,15 +60,19 @@ private:
 };
 
 // The GameEngine class manages the game states and processes commands.
-class GameEngine{
+class GameEngine : public ILoggable, public Subject{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
+
+
     GameEngine(const GameEngine&); // 1.copy constructor
     GameEngine& operator =(const GameEngine&); // 2.copy operator
     friend ostream& operator<<(ostream&,const GameEngine&); // 3.stream insertion
     // Destructor that cleans up the game engine.
     ~GameEngine();
+
+
 
     // Returns the current state of the game.
     GameState* getCurrentState();
@@ -95,7 +108,7 @@ public:
 
     void startupPhase(GameEngine &engineArg);
 
-    void reinforcementPhase();
+    bool reinforcementPhase();
 
     void issueOrdersPhase();
 
@@ -106,6 +119,21 @@ public:
     }
 
     void addPlayer(Player* player);
+    
+
+    /*static Player* gamePlayerArray;
+    static int* sizeOfPlayersArray;
+    static void setGamePlayerArray(Player* playerArray, int sizeOfPlayersArray) {
+        if(&gamePlayerArray != &playerArray) {delete gamePlayerArray;} 
+        gamePlayerArray = playerArray;
+        sizeOfPlayersArray = sizeOfPlayersArray;
+    }*/
+    string stringToLog() override;
+
+
+    
+
+
 
 private:
     // A map from state names to states. Contains all the states in the game.
@@ -126,7 +154,13 @@ private:
 void testStartUpPhase();
 
 void testGameStates();
-
 void testMainGameLoop();
+
+//Initialization
+void gameInit(GameEngine&);
+
+//Display Methods
+    void clearScreen();
+    void printBox(const std::string& state, const std::string& commands) ;
 
 #endif // GAME_ENGINE_H

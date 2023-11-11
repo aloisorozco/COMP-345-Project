@@ -73,7 +73,7 @@ public:
 
 	Territory getTerritoryArray();
 
-	OrdersList getOrdersList();
+	OrdersList* getOrdersList();
 
 	Hand* getHand();
 

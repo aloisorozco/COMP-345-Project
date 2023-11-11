@@ -6,3 +6,6 @@
 *.filters
 driver
 *.json
+*.json
+.vscode
+.idea

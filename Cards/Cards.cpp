@@ -42,44 +42,50 @@ string Card::cardTypeToString() const {
     }
 }
 //check hand size, to make sure a card can be played
-Order* Card::play(Deck *deck, Hand *hand){
-    if((*hand).getHandSize() == 0){
+string Card::play(Deck *deck, Hand *hand){
+    if(hand->getHandSize() == 0){
         cout <<"No cards to play."<<endl;
         return NULL;
     }
     cout <<"Playing a " << this->cardTypeToString() << " card." << endl;
     Order* order; // play() creates an order outside not to get deleted
+    string orderString;
     if(type == CardType::BombCT){
         order = new Bomb(); //havent fetched/merged Order
         cout<<"Creating new Bomb Order to Order List\n";
-        (*hand).getOrdersList().add(*order);
+        //hand->getOrdersList().add(order);
+        orderString = "Bomb";
     }
     else if(type == CardType::ReinforcementCT){
         //This adds +5 units to your pool of deployable units.
         order = new Deploy();
         cout<<"Creating new Reinforcement Order to Order List\n";
-        (*hand).getOrdersList().add(*order);
+        //hand->getOrdersList().add(order);
+        orderString = "Deploy";
     }
     else if(type == CardType::BlockadeCT){
         order = new Blockade();
         cout<<"Creating new Blockade Order to Order List\n";
-        (*hand).getOrdersList().add(*order);
+        //hand->getOrdersList().add(order);
+        orderString = "Blockade";
     }
     else if(type == CardType::AirliftCT){
         order = new Airlift();
         cout<<"Creating new Airlift Order to Order List\n";
-        (*hand).getOrdersList().add(*order);
+        //hand->getOrdersList().add(order);
+        orderString = "Airlift";
     }
     else if(type == CardType::DiplomacyCT){
         order = new Negotiate();
         cout<<"Creating new Diplomacy Order to Order List\n";
-        (*hand).getOrdersList().add(*order);
+        //hand->getOrdersList().add(order);
+        orderString = "Negotiate";
     }
     //print the card played
-    (*deck).returnCard(this);
-    (*hand).removeCard(this);
+    deck->returnCard(this);
+    hand->removeCard(this);
 
-    return order;
+    return orderString;
 }
 //Deconstructor, but Deck and Hand already clear the cards
 Card::~Card() = default;
@@ -112,7 +118,8 @@ ostream &operator<<(ostream& out, const Deck& deck) {
 void Deck::draw(Hand *hand){
     //first we shuffle, then we draw.
    if(!cards.empty()) {
-        int randIndex = rand() % cards.size(); // rand() generates same numbers, fine for now
+        //int randIndex = rand() % cards.size(); // rand() generates same numbers, fine for now
+        int randIndex = 0;
         auto card = cards.begin() + randIndex;
         Card* drawncard = *card;
         cout<<"You drew the card: "<< drawncard->cardTypeToString() << " card." << endl;
@@ -134,7 +141,7 @@ void Deck::initializeDeck() {
     //Put cards of all types into deck. NOT SHUFFLED
     //need to know how many cards in the deck(NOT SPECIFIED)
     // or if it's going to be a user defined amount(input)
-    int temp = 10;
+    int temp = 2;
     setDeckSize(temp);
     //emplace_back appends new element to the end
     for(int i =0; i<deckSize; i++){
@@ -225,7 +232,3 @@ void Hand::removeCard(Card* card) {
 OrdersList Hand::getOrdersList()const {
     return *this->ordersList;
 }
-
-
-
-

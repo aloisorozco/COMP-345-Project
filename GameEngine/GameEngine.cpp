@@ -56,8 +56,54 @@ ostream &operator<<(ostream &out, const GameState &)
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("Start")), playerArray{}, sizeofPlayerArray(new int(0))
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(0), sizeofPlayerArray(new int(0)){
+
+}
+
+// Initialisation of the engine, creation of all states and transition.
+void gameInit(GameEngine& engine)
 {
+    //state initialisation
+    GameState* startState = new GameState("Start");
+    GameState* mapLoadState = new GameState("Map Loaded");
+    GameState* mapValidationState = new GameState("Map Validated");
+    GameState* addPlayerState = new GameState("Players Added");
+    GameState* reinforcementState = new GameState("Assign Reinforcement");
+    GameState* orderChoiceState = new GameState("Issue Orders");
+    GameState* orderExecuteState = new GameState("Execute Orders");
+    GameState* winState = new GameState("Win");
+    GameState* endState = new GameState("end");
+
+
+    // Creating all the appropriate transitions.
+    startState->addTransition("loadmap", mapLoadState);
+    mapLoadState->addTransition("loadmap",mapLoadState);
+    mapLoadState->addTransition("validatemap",mapValidationState);
+    mapValidationState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("assigncountries",reinforcementState);
+    reinforcementState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("endissueorders",orderExecuteState);
+    orderExecuteState->addTransition("execorder",orderExecuteState);
+    orderExecuteState->addTransition("endexecorders",reinforcementState);
+    orderExecuteState->addTransition("win",winState);
+    winState->addTransition("play",startState);
+    winState->addTransition("end",endState);
+
+    //Adding all states to the engine
+    engine.addState(startState);
+    engine.addState(mapLoadState);
+    engine.addState(mapValidationState);
+    engine.addState(addPlayerState);
+    engine.addState(reinforcementState);
+    engine.addState(orderChoiceState);
+    engine.addState(orderExecuteState);
+    engine.addState(winState);
+
+    //Setting the initial state
+    engine.setInitialState(startState);
+
 }
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
@@ -108,6 +154,9 @@ void GameEngine::setInitialState(GameState *state)
     currentState = state;
 }
 
+
+
+
 // Processes a command from the user. It checks if a current state exists and gets the next state based on the provided command.
 void GameEngine::processCommand(const std::string &command)
 {
@@ -124,6 +173,8 @@ void GameEngine::processCommand(const std::string &command)
     else
     {
         currentState = nextState;
+        //the equivalent to GameEngine::transition()
+        Notify(this);
         std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
     }
 }
@@ -515,8 +566,7 @@ void GameEngine::play()
     this->mainGameLoop();
 }
 
-void GameEngine::reinforcementPhase()
-{
+bool GameEngine::reinforcementPhase() {
 
     std::cout << "Reinforcement Phase\n"
               << endl;
@@ -532,11 +582,18 @@ void GameEngine::reinforcementPhase()
         }
     }
 
-    // calculating troops for each player
-    for (int i = 0; i < playerArray.size(); i++)
-    {
+    if (playerArray.size() == 1) {
+        std::cout << "Player " << playerArray[0]->getPlayerID() << " wins" << endl;
+        return true;
+    }
+
+    //calculating troops for each player
+    for (int i = 0; i < playerArray.size(); i++) {
         playerArray[i]->toDefend();
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
+        
+        //checks if owns entire continents if so add continent bonus to troops
+        vector<Continent*> continents = playerArray[i]->getMap()->getContinents();
 
         // checks if owns entire continents if so add continent bonus to troops
         vector<Continent *> continents = playerArray[i]->getMap()->getContinents();
@@ -561,18 +618,18 @@ void GameEngine::reinforcementPhase()
 
         playerArray[i]->setTroopsToDeploy(troops);
     }
-    std::cout << "--------------------\n"
-              << endl;
+    std::cout << "--------------------\n" << endl;
+    return false;
 }
 
-void GameEngine::issueOrdersPhase()
-{
-    std::cout << "Issuing Orders Phase\n"
-              << endl;
-    bool *playersDoneArray = new bool[*sizeofPlayerArray];
-    for (int i = 0; i < playerArray.size(); i++)
-    {
+void GameEngine::issueOrdersPhase() {
+    std::cout << "Issuing Orders Phase\n" << endl;
+    bool* playersDoneArray = new bool[*sizeofPlayerArray];
+
+    for (int i = 0; i < playerArray.size(); i++) {
         playersDoneArray[i] = false;
+        playerArray[i]->setOrderListIndex(0);
+        playerArray[i]->getOrdersList()->clear();
     }
     while (true)
     {
@@ -630,8 +687,12 @@ void GameEngine::mainGameLoop()
     while (true)
     {
 
-        // getting & setting troops
-        reinforcementPhase();
+        //getting & setting troops
+        bool gameWon = reinforcementPhase();
+
+        if (gameWon) {
+            break;
+        }
 
         // issuing orders phase
         issueOrdersPhase();
@@ -639,10 +700,22 @@ void GameEngine::mainGameLoop()
         // executing orders phase
         executeOrdersPhase();
 
-        if (*sizeofPlayerArray == 1)
-        {
-            std::cout << playerArray[0] << " wins" << endl;
-            break;
-        }
     }
+}
+string GameEngine::stringToLog() {
+    return "Game Engine state: " + getCurrentState()->getName();
+}
+
+// Fucntion for clearing terminal window using ASCII escape code
+void clearScreen() {
+    std::cout << "\x1B[2J\x1B[H";
+}
+
+// Function for printing a helping box
+void printBox(const std::string& state, const std::string& commands) {
+    std::cout << "***** WARZONE GAME ENGINE ****\n";
+    std::cout << "******************************\n";
+    std::cout << "* Current state: " << state << "\n";
+    std::cout << "* Available commands: \n" << commands << "\n";
+    std::cout << "******************************\n";
 }

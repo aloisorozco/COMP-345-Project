@@ -8,6 +8,7 @@ void testCommandProcessor() {
 
     // Initialisation of the engine
     GameEngine engine;
+    gameInit(engine);
 
 
     std::cout << "Pick between the two options:" << std::endl;
@@ -38,9 +39,4 @@ void testCommandProcessor() {
     } else {
         std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
     }
-}
-
-int main() {
-    testCommandProcessor();
-    return 0;
 }

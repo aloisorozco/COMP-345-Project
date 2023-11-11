@@ -95,11 +95,55 @@ int Territory::getArmy() const { return *army; }
 string Territory::getContinent() const { return *continent; }
 vector<Territory *> Territory::getNeighbors() const { return adjacentTerritories; }
 
-// Setters (Territory)
-void Territory::setName(const string &territoryName) { *name = territoryName; }
-void Territory::setPlayer(int territoryPlayer) { *player = territoryPlayer; }
-void Territory::setArmy(int territoryArmy) { *army = territoryArmy; }
-void Territory::setContinent(const string &territoryContinent) { *continent = territoryContinent; }
+//Setters (Territory)
+void Territory::setName(const string& territoryName) {*name = territoryName;}
+void Territory::setPlayer(int territoryPlayer) {*player = territoryPlayer;}
+void Territory::setArmy(int territoryArmy) {*army = territoryArmy;}
+void Territory::setContinent(const string& territoryContinent) {*continent = territoryContinent;}
+
+void Territory::addTroops(int troops) {*army = *army + troops;}
+void Territory::removeTroops(int troops) {if(troops <= *army){*army = *army - troops;}}
+
+void Territory::transferTroops(Territory* territory, int troops){
+
+    if(this->getPlayer() == territory->getPlayer()){
+        if(*this->army >= troops){
+            this->removeTroops(troops);
+            territory->addTroops(troops);
+        }
+
+        else{
+            territory->addTroops(*this->army);
+            this->setArmy(0);
+        }
+    }
+
+    else{
+
+        int chance;
+        int remaining = *this->army >= troops ? troops : *this->army;
+
+        this->removeTroops(remaining);
+
+        while(remaining > 0 && *territory->army > 0){
+            chance = rand() % 100;
+            if(chance >= 40){
+                territory->removeTroops(1);
+            }
+
+            chance = rand() % 100;
+            if(chance >= 30){
+                remaining--;
+            }
+        }
+
+        if(*territory->army <= 0){
+            territory->setPlayer(this->getPlayer());
+            territory->setArmy(remaining);
+        }
+    }
+    
+}
 
 //=============================================================================================================================================================================================================//
 
