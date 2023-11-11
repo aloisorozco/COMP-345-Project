@@ -1,5 +1,5 @@
-command1
-testLoadMap()
-addplayer Bobo
+loadmap Aden.map
+loadmap
+addplayer Bob
 hiefiz
 win

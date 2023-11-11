@@ -7,9 +7,10 @@ void testCommandProcessor() {
     std::string filename;
 
     // Initialisation of the engine
-    GameEngine engine;
-
-
+    GameEngine* initializer = new GameEngine();
+    GameEngine engine = initializer->gameInit();
+    delete initializer;
+    
     std::cout << "Pick between the two options:" << std::endl;
     std::cout << "Console Commands (1)" << std::endl;
     std::cout << "File Commands (2)" << std::endl;

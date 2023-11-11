@@ -8,6 +8,7 @@
 
 #include "../Player/Player.h"
 #include "../Map/Map.h"
+#include "../CommandProcessor/CommandProcessing.h"
 
 // Constructor for GameState. Initializes the state with a name.
 GameState::GameState(std::string name) : name(name) {}
@@ -210,6 +211,7 @@ void GameEngine::addMap(Map *map)
 {
     this->map = map;
 }
+/*
 
 void GameEngine::startupPhase(GameEngine &engineArg)
 { // will input a command object
@@ -370,21 +372,13 @@ void GameEngine::startupPhase(GameEngine &engineArg)
         }
     }
 }
-
+*/
 Map *GameEngine::getMap() const
 {
     return map;
 }
 
-int main()
-{
 
-    GameEngine engine;
-    engine.startupPhase(engine);
-    cout << *engine.getMap() << endl;
-
-    return 0;
-}
 
 void GameEngine::play()
 {
