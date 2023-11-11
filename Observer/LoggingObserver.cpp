@@ -3,18 +3,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-
-
 using namespace std;
-//ILoggable PURE VIRTUAL CLASS
+/////////ILoggable PURE VIRTUAL CLASS/////////////
 ILoggable::ILoggable()=default;
 ILoggable::~ILoggable()= default;
 ILoggable::ILoggable(const ILoggable &) {}
 ILoggable &ILoggable::operator=(const ILoggable &) {return *this;}
 ostream &operator<<(ostream& out, const ILoggable &) {return out ;}
-
-
-//SUBJECT
+/////////////////SUBJECT/////////////////////////
 Subject::Subject() {
     _observers = new list<Observer*>;}
 Subject::~Subject() {
@@ -40,14 +36,14 @@ ostream &operator<<(ostream& out, const Subject &) {return out ;}
 
 
 
-//OBSERVER
+////////////////OBSERVER///////////////////////
 Observer::Observer() {};
 Observer::~Observer() {};
 Observer::Observer(const Observer &) {}
 Observer &Observer::operator=(const Observer &) {return *this;}
 ostream &operator<<(ostream &os, const Observer &observer) {return os;}
 
-//LOG OBSERVER
+///////////////////LOG OBSERVER//////////////////
 
 LogObserver::LogObserver() = default;
 void LogObserver::AddSubject(Subject* s) {

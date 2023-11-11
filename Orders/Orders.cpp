@@ -49,12 +49,12 @@ bool Negotiate::validate(){
     else{return true;}
 }
 string Order::stringToLog() {
-    string out = "Executed the Order:"+ this->getDescription();
+    string out = "\nExecuted the Order:"+ this->getDescription();
     return out;
 }
 int Order::execute(){
     if(validate()){
-        cout << this;
+        cout << this->getDescription();
         Notify(this);
         return 0;
     }
@@ -160,9 +160,14 @@ int Negotiate::execute(){
 }
 
 int OrdersList::add(Order* order){
-    this->orders.push_back(order);
-    cout << orders.size();
-    Notify(this);
+    if(order != nullptr){
+        this->orders.push_back(order);
+        cout << orders.size();
+        Notify(this);
+    }
+    else{
+        cout<<"EMPTY ORDER"<<endl;
+    }
     return 0;
 }
 
