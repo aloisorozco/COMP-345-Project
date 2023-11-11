@@ -14,11 +14,7 @@ class Observer;
 class Subject;
 class OrdersList;
 class GameEngine;
-
 class LogObserver;
-
-
-
 //abstract class, with method stringToLog(). all classes inherit this to log data.
 class ILoggable{
     public:
@@ -30,9 +26,7 @@ class ILoggable{
         // pure virtual, create and return string for output into log file gamelog.txt
         virtual string stringToLog()=0;
     private:
-
 };
-
 //Observer class in the Observer Pattern
 class Observer{
     public:
@@ -41,6 +35,7 @@ class Observer{
         Observer(const Observer&); // copy constructor
         Observer& operator = (const Observer&);
         friend ostream &operator<<(ostream &os, const Observer &observer);
+        //Pure virtual update used by our concreteObserver LogObserver
         virtual void Update(ILoggable* iLoggable)=0;
 };
 /*
@@ -48,7 +43,7 @@ class Observer{
 game log observer should be notified by the CommandProcessor::saveCommand(), as well as the and Command::saveEffect()
  This should result in all the current game’s commands and their effects to be logged into a “gamelog.txt”
 file.
- */
+ *///our ConcreteObserver (View class)
 class LogObserver : public Observer{
     public:
         //A constructor for every subject we wish to observee
@@ -60,16 +55,10 @@ class LogObserver : public Observer{
         void AddSubject(Subject* subject);
         //explicit LogObserver(OrdersList* ordersList);
         //explicit LogObserver(GameEngine* gameEngine);
-        //Missing classes from part 1.
         //LogObserver(CommandProcessor *commandProcessor);
         //LogObserver(FileCommandProcessorAdapter *fileCommandProcessorAdapter);
-
-        //notified by CommandProcessor::saveCommand() ,  Command::saveEffect()
-
         void Update(ILoggable* iLoggable) override;
-
         const vector<Subject *> &getSubject() const;
-
 private:
         vector<Subject*> _subject;
         //OrdersList *_ordersList_subject;
@@ -87,7 +76,7 @@ public:
     ~Subject();
 
     Subject(const Subject&); // copy constructor
-    Subject& operator = (const Subject&);
+    Subject& operator = (const Subject&); // unused
     friend ostream& operator<<(ostream&,const Subject&);//3.stream insertion operator for output
 
     //used to check if Notify was called.
@@ -98,8 +87,8 @@ private:
     list<Observer*> *_observers;
     bool notified = false;
 };
-
+void CheckNotifyStatus(Subject& subject);
+bool isInLog(string s);
 void testLoggingObserver();
-//our ConcreteObserver (View class)
 
 #endif //LOGGINGOBSERVER_H

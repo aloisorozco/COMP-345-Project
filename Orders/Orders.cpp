@@ -49,12 +49,12 @@ bool Negotiate::validate(){
     else{return true;}
 }
 string Order::stringToLog() {
-    string out = "Executed the Order:"+ this->getDescription();
+    string out = "\nExecuted the Order:"+ this->getDescription();
     return out;
 }
 int Order::execute(){
     if(validate()){
-        cout << this;
+        cout << this->getDescription();
         Notify(this);
         return 0;
     }
