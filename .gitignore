@@ -5,3 +5,5 @@
 *.sln
 *.filters
 driver
+*.json
+.vscode
