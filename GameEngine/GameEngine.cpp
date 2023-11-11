@@ -8,6 +8,7 @@
 
 #include "../Player/Player.h"
 #include "../Map/Map.h"
+#include "../CommandProcessor/CommandProcessing.h"
 
 // Constructor for GameState. Initializes the state with a name.
 GameState::GameState(std::string name) : name(name) {}
@@ -214,18 +215,47 @@ void GameEngine::addMap(Map *map)
 void GameEngine::startupPhase(GameEngine &engineArg)
 { // will input a command object
 
+    int choice;
+    string filename;
+
+    std::cout << "Pick between the two options:" << std::endl;
+    std::cout << "Console Commands (1)" << std::endl;
+    std::cout << "File Commands (2)" << std::endl;
+    std::cout << "> ";
+    std::cin >> choice;
+
     // Initialize game
     GameEngine *engine = &engineArg;
     GameEngine *initializer = new GameEngine();
     *engine = initializer->gameInit();
-    map = new Map();
-    Deck *deck = new Deck();
+    delete initializer;
+    initializer = NULL;
+    ConsoleCommandProcessor *consoleProcessor;
+    FileCommandProcessorAdapter *fileProcessor;
+    
 
-    CommandProcessor *commandProcessor = new CommandProcessor();
+    if (choice == 1)
+    {
+        ConsoleCommandProcessor consoleProcessor(engine);
+        ConsoleCommandProcessor *commandProcessor = &consoleProcessor;
+    }
+
+    else if (choice == 2)
+    {
+        std::cout << "Enter filename: ";
+        std::cin >> filename;
+
+        FileCommandProcessorAdapter fileProcessor(filename, engine);
+        commandProcessor = *fileProcessor;
+    }
+
+    // Initialize map and deck
+    map = new Map();
+    Deck *deck = new Deck();    
 
     while (engine->getCurrentState()->getName() != "Assign Reinforcement")
     {
-        Command cmd = commandProcessor->getCommand();
+        Command cmd = commandProcessor->getInputFromConsole();
 
         if (cmd.command == "loadmap")
         {
@@ -343,12 +373,10 @@ void GameEngine::startupPhase(GameEngine &engineArg)
 
                 //=======================================Reinforcements=====================================================//
 
-                // // Add trops to players reinforcment pools
-                // vector<ReinforcementPool *> reinforcements;
-                // for (Player *player : playerArray)
-                // {
-                //     reinforcements.push_back(new ReinforcementPool(50, player->getPlayerID()));
-                // }
+                for (Player *player : playerArray)
+                {
+                    player->setTroopsToDeploy(50);
+                }
 
                 //========================================Draw 2 Cards======================================================//
                 // Each Player draws two cards from the deck
@@ -378,9 +406,37 @@ Map *GameEngine::getMap() const
 
 int main()
 {
-
+    int choice;
+    string filename;
     GameEngine engine;
-    engine.startupPhase(engine);
+
+    std::cout << "Pick between the two options:" << std::endl;
+    std::cout << "Console Commands (1)" << std::endl;
+    std::cout << "File Commands (2)" << std::endl;
+    std::cout << "> ";
+    std::cin >> choice;
+
+    if (choice == 1)
+    {
+        ConsoleCommandProcessor consoleProcessor(&engine);
+        engine.startupPhase(engine, consoleProcessor);
+        consoleProcessor.readCommand();
+
+        while (!consoleProcessor.isCommandsEmpty())
+        {
+            Command cmd = consoleProcessor.getCommand();
+            std::cout << "Command from console: " << cmd.command << ", Effect: " << cmd.effect << std::endl;
+        }
+    }
+    else if (choice == 2)
+    {
+        std::cout << "Enter filename: ";
+        std::cin >> filename;
+
+        FileCommandProcessorAdapter fileProcessor(filename, &engine);
+        engine.startupPhase(engine, fileProcessor);
+    }
+
     cout << *engine.getMap() << endl;
 
     return 0;

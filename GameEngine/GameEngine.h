@@ -5,10 +5,15 @@
 #include "../Player/Player.h"
 
 
+
 #include <string>
 #include <map>
 #include <vector>
 using namespace std;
+
+class CommandProcessor;
+class ConsoleCommandProcessor;
+class FileCommandProcessorAdapter;
 
 // copy constructor, assignment operator, and stream insertion operator.
 
@@ -46,7 +51,7 @@ private:
 };
 
 // The GameEngine class manages the game states and processes commands.
-class GameEngine : public Map{
+class GameEngine{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
@@ -88,7 +93,7 @@ public:
 
     void mainGameLoop();
 
-    void startupPhase(GameEngine &engineArg);
+    void startupPhase(GameEngine &engineArg, CommandProcessor &processorArg);
 
     void reinforcementPhase();
 
@@ -113,6 +118,8 @@ private:
     int* sizeofPlayerArray;
 
     Map* map;
+
+    
 };
 
 //free functions declaration
