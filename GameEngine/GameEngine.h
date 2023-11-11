@@ -79,7 +79,7 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
-    GameEngine gameInit();
+    void gameInit(GameEngine &engineArg);
 
     void clearScreen();
 
@@ -93,7 +93,7 @@ public:
 
     void mainGameLoop();
 
-    void startupPhase(GameEngine &engineArg, CommandProcessor &processorArg);
+    void startupPhase(GameEngine &engineArg);
 
     void reinforcementPhase();
 

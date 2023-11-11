@@ -55,7 +55,7 @@ ostream &operator<<(ostream &out, const GameState &)
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray{}, sizeofPlayerArray(new int(0))
+GameEngine::GameEngine() : currentState(new GameState("Start")), playerArray{}, sizeofPlayerArray(new int(0))
 {
 }
 
@@ -143,11 +143,11 @@ void GameEngine::addPlayer(Player *player)
     *sizeofPlayerArray = playerArray.size();
 }
 
-GameEngine GameEngine::gameInit()
+void GameEngine::gameInit(GameEngine &engineArg)
 {
 
     // state initialisation
-    GameEngine engine;
+    GameEngine *engine = &engineArg;
     GameState *startState = new GameState("Start");
     GameState *mapLoadState = new GameState("Map Loaded");
     GameState *mapValidationState = new GameState("Map Validated");
@@ -175,19 +175,17 @@ GameEngine GameEngine::gameInit()
     winState->addTransition("end", endState);
 
     // Adding all states to the engine
-    engine.addState(startState);
-    engine.addState(mapLoadState);
-    engine.addState(mapValidationState);
-    engine.addState(addPlayerState);
-    engine.addState(reinforcementState);
-    engine.addState(orderChoiceState);
-    engine.addState(orderExecuteState);
-    engine.addState(winState);
+    engine->addState(startState);
+    engine->addState(mapLoadState);
+    engine->addState(mapValidationState);
+    engine->addState(addPlayerState);
+    engine->addState(reinforcementState);
+    engine->addState(orderChoiceState);
+    engine->addState(orderExecuteState);
+    engine->addState(winState);
 
     // Setting the initial state
-    engine.setInitialState(startState);
-
-    return engine;
+    engine->setInitialState(startState);
 }
 
 // Fucntion for clearing terminal window using ASCII escape code
@@ -227,17 +225,15 @@ void GameEngine::startupPhase(GameEngine &engineArg)
     // Initialize game
     GameEngine *engine = &engineArg;
     GameEngine *initializer = new GameEngine();
-    *engine = initializer->gameInit();
+    engine->gameInit(*engine);
     delete initializer;
     initializer = NULL;
-    ConsoleCommandProcessor *consoleProcessor;
-    FileCommandProcessorAdapter *fileProcessor;
-    
+
+    CommandProcessor *commandProcessor;
 
     if (choice == 1)
     {
-        ConsoleCommandProcessor consoleProcessor(engine);
-        ConsoleCommandProcessor *commandProcessor = &consoleProcessor;
+        commandProcessor = new ConsoleCommandProcessor(engine);
     }
 
     else if (choice == 2)
@@ -245,17 +241,35 @@ void GameEngine::startupPhase(GameEngine &engineArg)
         std::cout << "Enter filename: ";
         std::cin >> filename;
 
-        FileCommandProcessorAdapter fileProcessor(filename, engine);
-        commandProcessor = *fileProcessor;
+        commandProcessor = new FileCommandProcessorAdapter(filename, engine);
     }
 
     // Initialize map and deck
     map = new Map();
-    Deck *deck = new Deck();    
+    Deck *deck = new Deck();
 
     while (engine->getCurrentState()->getName() != "Assign Reinforcement")
     {
-        Command cmd = commandProcessor->getInputFromConsole();
+        std::chrono::seconds sleepDuration(1);
+        // Clear screen
+        engine->clearScreen();
+
+        // getting available commands for current state
+        std::vector<std::string> availableCommands = engine->getAvailableCommands();
+
+        // converting vector of strings into a single string separated by a \n
+        std::string commandsStr;
+        for (std::vector<std::string>::iterator it = availableCommands.begin(); it != availableCommands.end(); ++it)
+        {
+            std::string cmd = *it;
+            commandsStr += "* > " + cmd + "\n";
+        }
+
+        // Print box
+        engine->printBox(engine->getCurrentState()->getName(), commandsStr);
+
+        // Get command
+        Command cmd = commandProcessor->getCommand();
 
         if (cmd.command == "loadmap")
         {
@@ -268,6 +282,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
 
             commandProcessor->saveEffect("Map loaded");
             engine->processCommand("loadmap");
+            std::cout << "******************************\n";
+            std::this_thread::sleep_for(sleepDuration);
         }
 
         else if (cmd.command == "validatemap")
@@ -276,6 +292,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
             {
                 commandProcessor->saveEffect("Map validated");
                 engine->processCommand("validatemap");
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
             else
             {
@@ -283,6 +301,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
                 cout << "Map is not valid. Please select another map using the loadmap command" << endl; // still in map loaded state can call loadmap again
                 delete map;
                 map = NULL; // avoid memory leaks - might cause error if so will remove
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
         }
 
@@ -299,98 +319,96 @@ void GameEngine::startupPhase(GameEngine &engineArg)
                 Player *player = new Player(map, deck);
                 engine->addPlayer(player);
                 commandProcessor->saveEffect("Player added");
+                engine->processCommand("addPlayer");
+                std::cout << "******************************\n";
+                std::this_thread::sleep_for(sleepDuration);
             }
         }
 
         else if (cmd.command == "gamestart")
         {
-            if (*sizeofPlayerArray < 2)
+
+            //========================================= Assign territories to players======================================================//
+
+            // Vector of player IDs/Number
+            vector<int> players;
+            for (int i = 1; i < *sizeofPlayerArray + 1; i++)
             {
-                cout << "Not enough players. Please add more players using the addplayer command" << endl;
+                players.push_back(i);
             }
-            else
+
+            // Set Randomization function
+            int minLimit = 0;
+            int maxLimit = 0;
+            maxLimit = map->getTerritories().size() - 1;
+            std::random_device rd;  // Seed the random number generator
+            std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
+            std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
+
+            // Get territories
+            vector<Territory *> territories;
+            territories = map->getTerritories();
+
+            // Randomize order of territories in territories vector created above
+            for (int i = 0; i < maxLimit; i++)
             {
-                engine->processCommand("addPlayer");
-
-                //========================================= Assign territories to players======================================================//
-
-                // Vector of player IDs/Number
-                vector<int> players;
-                for (int i = 1; i < *sizeofPlayerArray + 1; i++)
-                {
-                    players.push_back(i);
-                }
-
-                // Set Randomization function
-                int minLimit = 0;
-                int maxLimit = 0;
-                maxLimit = map->getTerritories().size() - 1;
-                std::random_device rd;  // Seed the random number generator
-                std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
-                std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
-
-                // Get territories
-                vector<Territory *> territories;
-                territories = map->getTerritories();
-
-                // Randomize order of territories in territories vector created above
-                for (int i = 0; i < maxLimit; i++)
-                {
-                    int randomIndex1 = distribution(gen);
-                    int randomIndex2 = distribution(gen);
-                    swap(territories[randomIndex1], territories[randomIndex2]);
-                }
-
-                // Assign territories to players in round robin fashion
-                int playerIndex = 0;
-                int territoryIndex = 0;
-                for (Territory *territory : territories)
-                {
-                    territory->setPlayer(players[playerIndex]);
-                    playerIndex = (playerIndex + 1) % players.size();
-                    territoryIndex = (territoryIndex + 1) % territories.size();
-                }
-
-                //=======================================Order of Play=====================================================//
-                // Determine order of play by rearanging player array in random order
-                minLimit = 0;
-                maxLimit = playerArray.size() - 1;
-                std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
-
-                for (int i = 0; i < playerArray.size(); i++)
-                {
-                    int randomIndex1 = distribution2(gen);
-                    int randomIndex2 = distribution2(gen);
-                    swap(playerArray[randomIndex1], playerArray[randomIndex2]);
-                }
-
-                // Print order of play
-                cout << "Order of play: ";
-                for (Player *player : playerArray)
-                {
-                    cout << "Player " << player->getPlayerID() << " > ";
-                }
-
-                //=======================================Reinforcements=====================================================//
-
-                for (Player *player : playerArray)
-                {
-                    player->setTroopsToDeploy(50);
-                }
-
-                //========================================Draw 2 Cards======================================================//
-                // Each Player draws two cards from the deck
-                for (Player *player : playerArray)
-                {
-                    cout << "\nPlayer : " << player->getPlayerID() << endl;
-                    deck->draw(player->getHand());
-                    deck->draw(player->getHand());
-                }
-
-                commandProcessor->saveEffect("Game started");
-                engine->processCommand("gamestart");
+                int randomIndex1 = distribution(gen);
+                int randomIndex2 = distribution(gen);
+                swap(territories[randomIndex1], territories[randomIndex2]);
             }
+
+            // Assign territories to players in round robin fashion
+            int playerIndex = 0;
+            int territoryIndex = 0;
+            for (Territory *territory : territories)
+            {
+                territory->setPlayer(players[playerIndex]);
+                playerIndex = (playerIndex + 1) % players.size();
+                territoryIndex = (territoryIndex + 1) % territories.size();
+            }
+
+            //=======================================Order of Play=====================================================//
+            // Determine order of play by rearanging player array in random order
+            minLimit = 0;
+            maxLimit = playerArray.size() - 1;
+            std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
+
+            for (int i = 0; i < playerArray.size(); i++)
+            {
+                int randomIndex1 = distribution2(gen);
+                int randomIndex2 = distribution2(gen);
+                swap(playerArray[randomIndex1], playerArray[randomIndex2]);
+            }
+
+            // Print order of play
+            cout << "Order of play: ";
+            for (Player *player : playerArray)
+            {
+                cout << "Player " << player->getPlayerID() << " > ";
+            }
+
+            //=======================================Reinforcements=====================================================//
+
+            for (Player *player : playerArray)
+            {
+                player->setTroopsToDeploy(50);
+            }
+
+            //========================================Draw 2 Cards======================================================//
+            // Each Player draws two cards from the deck
+            for (Player *player : playerArray)
+            {
+                cout << "\nPlayer : " << player->getPlayerID() << endl;
+                deck->draw(player->getHand());
+                deck->draw(player->getHand());
+            }
+
+            commandProcessor->saveEffect("Game started");
+            engine->processCommand("assigncountries");
+            std::cout << "******************************\n";
+            std::this_thread::sleep_for(sleepDuration);
         }
+
         else
         {
             // Invalid command
@@ -406,36 +424,10 @@ Map *GameEngine::getMap() const
 
 int main()
 {
-    int choice;
-    string filename;
+
     GameEngine engine;
 
-    std::cout << "Pick between the two options:" << std::endl;
-    std::cout << "Console Commands (1)" << std::endl;
-    std::cout << "File Commands (2)" << std::endl;
-    std::cout << "> ";
-    std::cin >> choice;
-
-    if (choice == 1)
-    {
-        ConsoleCommandProcessor consoleProcessor(&engine);
-        engine.startupPhase(engine, consoleProcessor);
-        consoleProcessor.readCommand();
-
-        while (!consoleProcessor.isCommandsEmpty())
-        {
-            Command cmd = consoleProcessor.getCommand();
-            std::cout << "Command from console: " << cmd.command << ", Effect: " << cmd.effect << std::endl;
-        }
-    }
-    else if (choice == 2)
-    {
-        std::cout << "Enter filename: ";
-        std::cin >> filename;
-
-        FileCommandProcessorAdapter fileProcessor(filename, &engine);
-        engine.startupPhase(engine, fileProcessor);
-    }
+    engine.startupPhase(engine);
 
     cout << *engine.getMap() << endl;
 

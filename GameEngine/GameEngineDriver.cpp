@@ -11,9 +11,9 @@
 // Console-driven interface that allows the user to navigate through all the states by typing commands
 void testGameStates(){
     std::chrono::seconds sleepDuration(1);
-    GameEngine* initializer = new GameEngine();
-    GameEngine engine = initializer->gameInit();
-    delete initializer;
+    GameEngine engine;
+    engine.gameInit(engine);
+    
     
 
     std::string command;

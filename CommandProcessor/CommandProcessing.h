@@ -21,12 +21,13 @@ public:
     CommandProcessor(GameEngine* gameEngine) : gameEngine(gameEngine) {}
     void saveEffect(const std::string& effect);
     bool isCommandsEmpty();
+    virtual Command getCommand() =0;// Pure virtual method
 };
 
 class ConsoleCommandProcessor : public CommandProcessor {
 public:
     ConsoleCommandProcessor(GameEngine* gameEngine) : CommandProcessor(gameEngine) {}
-    Command getCommand();
+    Command getCommand() override;
 private:
     void readCommand() override;  // Override base class method
     std::string getInputFromConsole();
@@ -37,7 +38,7 @@ public:
     std::string fileName;
     FileCommandProcessorAdapter() : CommandProcessor(nullptr) {}  // Default constructor
     FileCommandProcessorAdapter(const std::string& filename, GameEngine* gameEngine) : CommandProcessor(gameEngine), fileName(filename) {}
-    Command getCommand();
+    Command getCommand() override;
 private:
     void readCommand() override;  // Override base class method
 };
