@@ -47,6 +47,52 @@ GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArra
 
 }
 
+// Initialisation of the engine, creation of all states and transition.
+void gameInit(GameEngine& engine)
+{
+    //state initialisation
+    GameState* startState = new GameState("Start");
+    GameState* mapLoadState = new GameState("Map Loaded");
+    GameState* mapValidationState = new GameState("Map Validated");
+    GameState* addPlayerState = new GameState("Players Added");
+    GameState* reinforcementState = new GameState("Assign Reinforcement");
+    GameState* orderChoiceState = new GameState("Issue Orders");
+    GameState* orderExecuteState = new GameState("Execute Orders");
+    GameState* winState = new GameState("Win");
+    GameState* endState = new GameState("end");
+
+
+    // Creating all the appropriate transitions.
+    startState->addTransition("loadmap", mapLoadState);
+    mapLoadState->addTransition("loadmap",mapLoadState);
+    mapLoadState->addTransition("validatemap",mapValidationState);
+    mapValidationState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("addplayer",addPlayerState);
+    addPlayerState->addTransition("assigncountries",reinforcementState);
+    reinforcementState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("issueorder",orderChoiceState);
+    orderChoiceState->addTransition("endissueorders",orderExecuteState);
+    orderExecuteState->addTransition("execorder",orderExecuteState);
+    orderExecuteState->addTransition("endexecorders",reinforcementState);
+    orderExecuteState->addTransition("win",winState);
+    winState->addTransition("play",startState);
+    winState->addTransition("end",endState);
+
+    //Adding all states to the engine
+    engine.addState(startState);
+    engine.addState(mapLoadState);
+    engine.addState(mapValidationState);
+    engine.addState(addPlayerState);
+    engine.addState(reinforcementState);
+    engine.addState(orderChoiceState);
+    engine.addState(orderExecuteState);
+    engine.addState(winState);
+
+    //Setting the initial state
+    engine.setInitialState(startState);
+
+}
+
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
 GameEngine::~GameEngine() {
     for (std::map<std::string, GameState*>::iterator it = states.begin(); it != states.end(); ++it) {
@@ -86,6 +132,9 @@ void GameEngine::addState(GameState* state) {
 void GameEngine::setInitialState(GameState* state) {
     currentState = state;
 }
+
+
+
 
 // Processes a command from the user. It checks if a current state exists and gets the next state based on the provided command.
 void GameEngine::processCommand(const std::string& command) 
@@ -241,4 +290,18 @@ void GameEngine::mainGameLoop() {
 }
 string GameEngine::stringToLog() {
     return "Game Engine state: " + getCurrentState()->getName();
+}
+
+// Fucntion for clearing terminal window using ASCII escape code
+void clearScreen() {
+    std::cout << "\x1B[2J\x1B[H";
+}
+
+// Function for printing a helping box
+void printBox(const std::string& state, const std::string& commands) {
+    std::cout << "***** WARZONE GAME ENGINE ****\n";
+    std::cout << "******************************\n";
+    std::cout << "* Current state: " << state << "\n";
+    std::cout << "* Available commands: \n" << commands << "\n";
+    std::cout << "******************************\n";
 }

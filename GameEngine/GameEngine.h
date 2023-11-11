@@ -39,6 +39,11 @@ public:
     // Returns the available transitions from this state.
     const std::map<std::string, GameState*>& getTransitions() const;
 
+
+    
+
+
+
 private:
     // The name of this state.
     std::string name;
@@ -52,11 +57,15 @@ class GameEngine : public ILoggable, public Subject{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
+
+
     GameEngine(const GameEngine&); // 1.copy constructor
     GameEngine& operator =(const GameEngine&); // 2.copy operator
     friend ostream& operator<<(ostream&,const GameEngine&); // 3.stream insertion
     // Destructor that cleans up the game engine.
     ~GameEngine();
+
+
 
     // Returns the current state of the game.
     GameState* getCurrentState();
@@ -114,6 +123,11 @@ public:
     }*/
     string stringToLog() override;
 
+
+    
+
+
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;
@@ -127,7 +141,13 @@ private:
 
 //free functions declaration
 void testGameStates();
-
 void testMainGameLoop();
-GameEngine gameInit();
+
+//Initialization
+void gameInit(GameEngine&);
+
+//Display Methods
+    void clearScreen();
+    void printBox(const std::string& state, const std::string& commands) ;
+
 #endif // GAME_ENGINE_H

@@ -1,8 +1,9 @@
 #include "LoggingObserver.h"
 #include "../Orders/Orders.h"
 #include "../GameEngine/GameEngine.h"
+
 //using the testGameStates function.
-//#include "../CommandProcessing/CommandProcessing.h"
+#include "../CommandProcessor/CommandProcessing.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -31,10 +32,12 @@ void testLoggingObserver(){
     Subject* subject = new Subject();
     Order *order = new Order();
     OrdersList *ordersList = new OrdersList();
-    GameEngine engineInit = gameInit();
+    GameEngine engineInit;
+    gameInit(engineInit);
+
     GameEngine *engine = &engineInit;
     Command *command = new Command();
-    CommandProcessor *commandProcessor = new CommandProcessor();
+    CommandProcessor *commandProcessor = new ConsoleCommandProcessor(engine);
 
     //1)The Command, CommandProcessor, Order, OrderList, and GameEngine classes
     // are all a subclass of the Subject and ILoggable classes
