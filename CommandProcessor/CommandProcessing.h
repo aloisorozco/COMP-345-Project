@@ -14,12 +14,11 @@ class CommandProcessor {
 protected:
     std::vector<Command> commands;
     GameEngine* gameEngine;
+    virtual void readCommand() = 0;  // Pure virtual method
     void saveCommand(const std::string& command);
     bool validate(const std::string& command);
 public:
     CommandProcessor(GameEngine* gameEngine) : gameEngine(gameEngine) {}
-    virtual void readCommand() = 0;  // Pure virtual method
-    Command getCommand();
     void saveEffect(const std::string& effect);
     bool isCommandsEmpty();
 };
@@ -27,8 +26,9 @@ public:
 class ConsoleCommandProcessor : public CommandProcessor {
 public:
     ConsoleCommandProcessor(GameEngine* gameEngine) : CommandProcessor(gameEngine) {}
-    void readCommand() override;  // Override base class method
+    Command getCommand();
 private:
+    void readCommand() override;  // Override base class method
     std::string getInputFromConsole();
 };
 
@@ -37,5 +37,7 @@ public:
     std::string fileName;
     FileCommandProcessorAdapter() : CommandProcessor(nullptr) {}  // Default constructor
     FileCommandProcessorAdapter(const std::string& filename, GameEngine* gameEngine) : CommandProcessor(gameEngine), fileName(filename) {}
+    Command getCommand();
+private:
     void readCommand() override;  // Override base class method
 };
