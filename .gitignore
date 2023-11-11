@@ -5,3 +5,4 @@
 *.sln
 *.filters
 driver
+*.json

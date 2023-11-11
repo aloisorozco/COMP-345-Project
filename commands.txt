@@ -1,0 +1,5 @@
+command1
+testLoadMap()
+addplayer Bobo
+hiefiz
+win
