@@ -88,7 +88,7 @@ public:
 
     void mainGameLoop();
 
-    void startupPhase(/*Command& command*/);
+    void startupPhase(GameEngine &engineArg);
 
     void reinforcementPhase();
 
