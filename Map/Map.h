@@ -103,18 +103,27 @@ public:
 	Territory* getTerritory(string name);
 
 	vector<Continent*> getContinents() const;
+	Map* getMap() const;
+	
 
 	void setContinents(const vector<Continent*>& continents);
 
 	vector<Territory*> getTerritories();
 };
 
-class MapLoader {
+class MapLoader: public Map {
+
+	private:
+	Map* map;
 
 	public:
 		Map* loadMap() ;
 		Map* loadMap_withName(string mapName);
 
+		Map* getMap() const;
+
+
+	
 };
 
 void testLoadMaps();

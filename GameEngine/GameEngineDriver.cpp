@@ -4,76 +4,22 @@
 #include <thread>
 #include "GameEngine.h"
 
-// Initialisation of the engine, creation of all states and transition.
-GameEngine gameInit() {
-
-    //state initialisation
-    GameEngine engine;
-    GameState* startState = new GameState("Start");
-    GameState* mapLoadState = new GameState("Map Loaded");
-    GameState* mapValidationState = new GameState("Map Validated");
-    GameState* addPlayerState = new GameState("Players Added");
-    GameState* reinforcementState = new GameState("Assign Reinforcement");
-    GameState* orderChoiceState = new GameState("Issue Orders");
-    GameState* orderExecuteState = new GameState("Execute Orders");
-    GameState* winState = new GameState("Win");
-    GameState* endState = new GameState("end");
 
 
-    // Creating all the appropriate transitions.
-    startState->addTransition("loadmap", mapLoadState);
-    mapLoadState->addTransition("loadmap",mapLoadState);
-    mapLoadState->addTransition("validatemap",mapValidationState);
-    mapValidationState->addTransition("addplayer",addPlayerState);
-    addPlayerState->addTransition("addplayer",addPlayerState);
-    addPlayerState->addTransition("assigncountries",reinforcementState);
-    reinforcementState->addTransition("issueorder",orderChoiceState);
-    orderChoiceState->addTransition("issueorder",orderChoiceState);
-    orderChoiceState->addTransition("endissueorders",orderExecuteState);
-    orderExecuteState->addTransition("execorder",orderExecuteState);
-    orderExecuteState->addTransition("endexecorders",reinforcementState);
-    orderExecuteState->addTransition("win",winState);
-    winState->addTransition("play",startState);
-    winState->addTransition("end",endState);
 
-    //Adding all states to the engine
-    engine.addState(startState);
-    engine.addState(mapLoadState);
-    engine.addState(mapValidationState);
-    engine.addState(addPlayerState);
-    engine.addState(reinforcementState);
-    engine.addState(orderChoiceState);
-    engine.addState(orderExecuteState);
-    engine.addState(winState);
-
-    //Setting the initial state
-    engine.setInitialState(startState);
-
-    return engine;
-}
-
-// Fucntion for clearing terminal window using ASCII escape code
-void clearScreen() {
-    std::cout << "\x1B[2J\x1B[H";
-}
-
-// Function for printing a helping box
-void printBox(const std::string& state, const std::string& commands) {
-    std::cout << "***** WARZONE GAME ENGINE ****\n";
-    std::cout << "******************************\n";
-    std::cout << "* Current state: " << state << "\n";
-    std::cout << "* Available commands: \n" << commands << "\n";
-    std::cout << "******************************\n";
-}
 
 // Console-driven interface that allows the user to navigate through all the states by typing commands
 void testGameStates(){
     std::chrono::seconds sleepDuration(1);
-    GameEngine engine = gameInit();
+    GameEngine* initializer = new GameEngine();
+    GameEngine engine = initializer->gameInit();
+    delete initializer;
+    
+
     std::string command;
     while (true) {
         // Clearing terminal screen
-        clearScreen();
+        engine.clearScreen();
 
         //getting available commands for current state
         std::vector<std::string> availableCommands = engine.getAvailableCommands();
@@ -86,7 +32,7 @@ void testGameStates(){
         }
 
         // Displaying status box
-        printBox(engine.getCurrentState()->getName(), commandsStr);
+        engine.printBox(engine.getCurrentState()->getName(), commandsStr);
         std::cout << "Enter command: ";
         std::cin >> command;
         if (command == "end") {

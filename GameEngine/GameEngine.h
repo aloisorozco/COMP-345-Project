@@ -4,6 +4,7 @@
 
 #include "../Player/Player.h"
 
+
 #include <string>
 #include <map>
 #include <vector>
@@ -45,7 +46,7 @@ private:
 };
 
 // The GameEngine class manages the game states and processes commands.
-class GameEngine {
+class GameEngine : public Map{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
@@ -73,11 +74,21 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
+    GameEngine gameInit();
+
+    void clearScreen();
+
+    void printBox(const std::string& state, const std::string& commands);
+
     void play();
+
+    void addMap(Map* map);
+
+    Map* getMap() const;
 
     void mainGameLoop();
 
-    void startupPhase();
+    void startupPhase(GameEngine &engineArg);
 
     void reinforcementPhase();
 
@@ -89,18 +100,7 @@ public:
         playerArray = players;
     }
 
-    void addPlayer(Player* player) {
-        playerArray.push_back(player);
-        /*Player* temp = new Player[*sizeofPlayerArray];
-        playerArray = new Player[*sizeofPlayerArray + 1];
-
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            playerArray[i] = temp[i];
-        }
-
-        playerArray[*sizeofPlayerArray] = *player;
-        sizeofPlayerArray++;*/
-    }
+    void addPlayer(Player* player);
 
 private:
     // A map from state names to states. Contains all the states in the game.
@@ -111,6 +111,8 @@ private:
 
     vector<Player*> playerArray;
     int* sizeofPlayerArray;
+
+    Map* map;
 };
 
 //free functions declaration
