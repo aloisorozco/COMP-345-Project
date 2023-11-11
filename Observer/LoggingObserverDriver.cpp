@@ -26,17 +26,16 @@ bool isInLog(string s){
     return log.find(s) != string::npos;
 }
 void testLoggingObserver(){
-    /*
+    
 
     //Observer* logObserver = new LogObserver();
     LogObserver* logObserver = new LogObserver();
     Subject* subject = new Subject();
     Order *order = new Order();
     OrdersList *ordersList = new OrdersList();
-    GameEngine engineInit = gameInit();
-    GameEngine *engine = &engineInit;
-    Command *command = new Command();
-    CommandProcessor *commandProcessor = new CommandProcessor();
+    GameEngine *engine = new GameEngine();
+    gameInit(*engine); //new gameInit
+    CommandProcessor *commandProcessor;
 
     //1)The Command, CommandProcessor, Order, OrderList, and GameEngine classes
     // are all a subclass of the Subject and ILoggable classes
@@ -47,7 +46,7 @@ void testLoggingObserver(){
     bool is_gameEngine_child = is_base_of<Subject, GameEngine >::value;
     //True/False instead of 1/0
     cout << std::boolalpha;
-    cout <<"\nIs Command a subclass: "<<+is_command_child <<" .Is CommandProcessor a subclass: "<<+is_commandProcessor_child + endl;
+    cout <<"\nIs Command a subclass: "<<+is_command_child <<" .Is CommandProcessor a subclass: "<<+is_commandProcessor_child <<endl;
     cout <<"\nIs Order a subclass: "<< is_order_child <<" .Is OrderList a subclass: "<< is_orderList_child <<" .Is GameEngine a subclass: "<< is_gameEngine_child << endl;
 
     //2)the CommandProcessor::saveCommand(), Order::execute(), Command::saveEffect(), OrderList::addOrder(), and GameEngine::transition()
@@ -69,6 +68,7 @@ void testLoggingObserver(){
     CheckNotifyStatus(*engine);
 
 //    saveCommand
+/*
     logObserver->AddSubject(command);
     command->saveEffect(order);
     CheckNotifyStatus(command);
@@ -88,5 +88,6 @@ void testLoggingObserver(){
 
     delete subject;
     delete logObserver;
-    */
+    
 }
+*/
