@@ -1,20 +1,60 @@
 // CommandProcessing.cpp
 #include "CommandProcessing.h"
 #include <iostream>
-#include <limits>
+#include <sstream>
 
+//Saving command to the command Vector
 void CommandProcessor::saveCommand(const std::string& command) {
     Command cmd;
     cmd.command = command;
     commands.push_back(cmd);
 }
 
+//Command validation
 bool CommandProcessor::validate(const std::string& command) {
-    // Not implemented yet -> every command is considered valid.
-    return true;
+
+
+    // Split the command into words for easier processing
+    std::vector<std::string> commandWords;
+    std::istringstream iss(command);
+    for(std::string s; iss >> s; )
+        commandWords.push_back(s);
+
+    // Get the current state of the game
+    GameState* currentState = gameEngine->getCurrentState();
+
+    // Check the command based on the current state
+    if (currentState->getName() == "Start" || currentState->getName() == "Map Loaded") {
+        if (commandWords[0] == "loadmap") {
+            return true;
+        }
+    }
+    else if (currentState->getName() == "Map Loaded") {
+        if (commandWords[0] == "validatemap") {
+            return true;
+        }
+    }
+    else if (currentState->getName() == "Map Validated" || currentState->getName() == "Players Added") {
+        if (commandWords[0] == "addplayer") {
+            return true;
+        }
+    }
+    else if (currentState->getName() == "Players Added") {
+        if (commandWords[0] == "gamestart") {
+            return true;
+        }
+    }
+    else if (currentState->getName() == "Win") {
+        if (commandWords[0] == "replay" || commandWords[0] == "quit") {
+            return true;
+        }
+    }
+
+    // If none of the conditions are met, the command is invalid
+    return false;
 }
 
-
+//Saving the effect
 void CommandProcessor::saveEffect(const std::string& effect) {
     if (!commands.empty()) {
         commands.back().effect = effect;
@@ -24,6 +64,7 @@ void CommandProcessor::saveEffect(const std::string& effect) {
 bool CommandProcessor::isCommandsEmpty() {
     return commands.empty();
 }
+
 
 void ConsoleCommandProcessor::readCommand() {
     bool valid=false;
