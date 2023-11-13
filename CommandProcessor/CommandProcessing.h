@@ -30,7 +30,7 @@ public:
 class ConsoleCommandProcessor : public CommandProcessor {
 public:
     ConsoleCommandProcessor(GameEngine* gameEngine) : CommandProcessor(gameEngine) {}
-    Command getCommand() override;
+    Command getCommand() override; // Override base class method
 private:
     void readCommand() override;  // Override base class method
     std::string getInputFromConsole();
@@ -41,7 +41,7 @@ public:
     std::string fileName;
     FileCommandProcessorAdapter() : CommandProcessor(nullptr) {}  // Default constructor
     FileCommandProcessorAdapter(const std::string& filename, GameEngine* gameEngine) : CommandProcessor(gameEngine), fileName(filename) {}
-    Command getCommand() override;
+    Command getCommand() override;// Override base class method
 private:
     void readCommand() override;  // Override base class method
 };
@@ -49,4 +49,6 @@ private:
 // Free function
 
 void testCommandProcessor();
+void printProcessor();
+
 #endif 

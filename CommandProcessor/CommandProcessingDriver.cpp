@@ -4,10 +4,6 @@
 #include <thread>
 #include <chrono>
 
-void printProcessor() {
-    std::cout << "***** WARZONE COMMANDS PROCESSOR****\n";
-    std::cout << "******************************\n";
-}
 
 void testCommandProcessor() {
     int choice;

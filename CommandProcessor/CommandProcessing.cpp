@@ -124,6 +124,8 @@ void FileCommandProcessorAdapter::readCommand() {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << fileName << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for 2 seconds for displaying result
+
         return;
     }
 
@@ -160,4 +162,9 @@ Command FileCommandProcessorAdapter::getCommand() {
         return cmd;
     }
     return Command();  // Return an empty Command object if there are no commands
+}
+
+void printProcessor() {
+    std::cout << "***** WARZONE COMMANDS PROCESSOR****\n";
+    std::cout << "******************************\n";
 }
