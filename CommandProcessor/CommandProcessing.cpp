@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 //Saving command to the command Vector
 void CommandProcessor::saveCommand(const std::string& command) {
@@ -91,6 +94,7 @@ void ConsoleCommandProcessor::readCommand() {
         } else {
             std::cout<<"| Command is invalid and saved |"<< endl;
         }
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for 2 seconds for displaying result
 }
 
 std::string ConsoleCommandProcessor::getInputFromConsole() {
@@ -136,6 +140,7 @@ void FileCommandProcessorAdapter::readCommand() {
         } else {
             std::cout<<"\t| Command is invalid and saved |"<< endl;
         }
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for 2 seconds for displaying result
     }
 
     file.close();
