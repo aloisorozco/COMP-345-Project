@@ -37,9 +37,9 @@ ostream &operator<<(ostream& out, const Subject &) {return out ;}
 
 
 ////////////////OBSERVER///////////////////////
-Observer::Observer() {};
-Observer::~Observer() {};
-Observer::Observer(const Observer &) {}
+Observer::Observer() = default;
+Observer::~Observer() = default;
+Observer::Observer(const Observer &) = default;
 Observer &Observer::operator=(const Observer &) {return *this;}
 ostream &operator<<(ostream &os, const Observer &observer) {return os;}
 
