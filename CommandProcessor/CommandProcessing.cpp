@@ -30,33 +30,33 @@ bool CommandProcessor::validate(const std::string& command) {
     // Check the command based on the current state
     if (currentState->getName() == "Start") {
         if (commandWords[0] == "loadmap") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Map Loaded") {
         if (commandWords[0] == "validatemap") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
         if (commandWords[0] == "loadmap") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Map Validated") {
         if (commandWords[0] == "addplayer") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Players Added") {
         if (commandWords[0] == "addplayer") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
         if (commandWords[0] == "gamestart") {
-            gameEngine->processCommand(commandWords[0]);
+            //gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
