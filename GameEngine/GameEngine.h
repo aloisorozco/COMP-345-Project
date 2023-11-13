@@ -8,7 +8,14 @@
 #include <map>
 #include <vector>
 
+
 using namespace std;
+
+class CommandProcessor;
+class ConsoleCommandProcessor;
+class FileCommandProcessorAdapter;
+
+
 class ILoggable;
 class Subject;
 // copy constructor, assignment operator, and stream insertion operator.
@@ -39,6 +46,11 @@ public:
     // Returns the available transitions from this state.
     const std::map<std::string, GameState*>& getTransitions() const;
 
+
+    
+
+
+
 private:
     // The name of this state.
     std::string name;
@@ -52,11 +64,15 @@ class GameEngine : public ILoggable, public Subject{
 public:
     // Default constructor that initializes the game engine.
     GameEngine();
+
+
     GameEngine(const GameEngine&); // 1.copy constructor
     GameEngine& operator =(const GameEngine&); // 2.copy operator
     friend ostream& operator<<(ostream&,const GameEngine&); // 3.stream insertion
     // Destructor that cleans up the game engine.
     ~GameEngine();
+
+
 
     // Returns the current state of the game.
     GameState* getCurrentState();
@@ -76,11 +92,18 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
+    
+
+    
     void play();
+
+    void addMap(Map* map);
+
+    Map* getMap() const;
 
     void mainGameLoop();
 
-    void startupPhase();
+    void startupPhase(GameEngine &engineArg);
 
     bool reinforcementPhase();
 
@@ -92,18 +115,8 @@ public:
         playerArray = players;
     }
 
-    void addPlayer(Player* player) {
-        playerArray.push_back(player);
-        /*Player* temp = new Player[*sizeofPlayerArray];
-        playerArray = new Player[*sizeofPlayerArray + 1];
-
-        for (int i = 0; i < *sizeofPlayerArray; i++) {
-            playerArray[i] = temp[i];
-        }
-
-        playerArray[*sizeofPlayerArray] = *player;
-        sizeofPlayerArray++;*/
-    }
+    void addPlayer(Player* player);
+    
 
     /*static Player* gamePlayerArray;
     static int* sizeOfPlayersArray;
@@ -114,6 +127,11 @@ public:
     }*/
     string stringToLog() override;
 
+
+    
+
+
+
 private:
     // A map from state names to states. Contains all the states in the game.
     std::map<std::string, GameState*> states;
@@ -123,11 +141,23 @@ private:
 
     vector<Player*> playerArray;
     int* sizeofPlayerArray;
+
+    Map* map;
+
+    
 };
 
 //free functions declaration
-void testGameStates();
+void testStartUpPhase();
 
+void testGameStates();
 void testMainGameLoop();
-GameEngine gameInit();
+
+//Initialization
+void gameInit(GameEngine&);
+
+//Display Methods
+    void clearScreen();
+    void printBox(const std::string& state, const std::string& commands) ;
+
 #endif // GAME_ENGINE_H

@@ -1,7 +1,7 @@
 #ifndef LOGGINGOBSERVER_H
 #define LOGGINGOBSERVER_H
 
-//#include "../CommandProcessing/CommandProcessing.h"
+// #include "../CommandProcessor/CommandProcessing.h"
 //#include "../Orders/Orders.h"
 //#include "../GameEngine/GameEngine.h"
 #include <string>
@@ -15,6 +15,11 @@ class Subject;
 class OrdersList;
 class GameEngine;
 class LogObserver;
+class Command;
+class CommandProcessor;
+class ConsoleCommandProcessor;
+class FileCommandProcessorAdapter;
+
 //abstract class, with method stringToLog(). all classes inherit this to log data.
 class ILoggable{
     public:

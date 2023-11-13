@@ -488,3 +488,4 @@ void Player::setHand(Hand* hand) {
 void Player::setMap(Map* map) {
 	this->map = map;
 }
+

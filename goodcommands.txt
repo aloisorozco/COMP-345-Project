@@ -1,0 +1,6 @@
+loadmap Aden.map
+validatemap
+addplayer Sam
+addplayer Bobo
+addplayer Max
+gamestart

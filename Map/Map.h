@@ -114,9 +114,13 @@ public:
 
 class MapLoader {
 
+	private:
+	Map* map;
+
 	public:
 		Map* loadMap() ;
 		Map* loadMap_withName(string mapName);
+		Map* getMap() const;
 };
 
 void testLoadMaps();

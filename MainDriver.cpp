@@ -7,6 +7,7 @@
 #include "Cards/Cards.h"
 #include "Orders/Orders.h"
 #include "Player/Player.h"
+#include "CommandProcessor/CommandProcessing.h"
 #include "Observer/LoggingObserver.h"
 #include "Map/Map.h"
 
@@ -20,13 +21,13 @@ void printMenu() {
     std::cout << "5. Game Engine\n";
     std::cout << "6. Exit\n";
     std::cout << "7. Logs\n";
+    std::cout << "8. Command Processing\n";
+    std::cout<< "9. Startup Phase\n";
     std::cout << "10. Main Game Loop\n";
     std::cout << "Enter number > ";
 }
 
 int main() {
-
-    
     std::chrono::seconds sleepDuration(1);
 
     while (true) {
@@ -75,8 +76,17 @@ int main() {
                 testLoggingObserver();
                 break;  // Exit the program
 
+            case 8:
+                testCommandProcessor();
+                break;  // Exit the program
+
+            case 9:
+                testStartUpPhase();
+                break;
+
             case 10:
                 testMainGameLoop();
+                break;
 
             default:
                 std::cout << "Invalid choice. Please enter a number between 1 and 6.\n";
