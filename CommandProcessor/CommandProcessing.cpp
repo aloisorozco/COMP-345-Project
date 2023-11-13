@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
-#include <iostream>
 #include <thread>
 #include <chrono>
 
@@ -26,32 +25,38 @@ bool CommandProcessor::validate(const std::string& command) {
 
     // Get the current state of the game
     GameState* currentState = gameEngine->getCurrentState();
-    cout << "Current State: " << currentState->getName() << endl;
+    
 
     // Check the command based on the current state
     if (currentState->getName() == "Start") {
         if (commandWords[0] == "loadmap") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Map Loaded") {
         if (commandWords[0] == "validatemap") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
         if (commandWords[0] == "loadmap") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Map Validated") {
         if (commandWords[0] == "addplayer") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
     else if (currentState->getName() == "Players Added") {
         if (commandWords[0] == "addplayer") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
         if (commandWords[0] == "gamestart") {
+            gameEngine->processCommand(commandWords[0]);
             return true;
         }
     }
@@ -90,17 +95,17 @@ void ConsoleCommandProcessor::readCommand() {
         commands.push_back(cmd);
     }
     if (valid) {
-            std::cout<<"| Command is valid and saved |"<< endl;
+            std::cout<<"|| Command is valid and saved "<< endl;
         } else {
-            std::cout<<"| Command is invalid and saved |"<< endl;
+            std::cout<<"|| Command is invalid and saved "<< endl;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for 2 seconds for displaying result
+        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait for 3 seconds for displaying result
 }
 
 std::string ConsoleCommandProcessor::getInputFromConsole() {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Ignore remaining input    
     std::string command;
-    std::cout << "Enter command: ";
+    std::cout << "---------------------\n" << "|| Enter command: ";
     std::getline(std::cin, command);
     return command;
 }
@@ -125,7 +130,7 @@ void FileCommandProcessorAdapter::readCommand() {
     std::string command;
     while (std::getline(file, command)) {
         bool valid=false;
-        std::cout << "New command catched : " << command ; 
+        std::cout << "|| New command catched : " << command << endl; 
         if (validate(command)) {
             saveCommand(command);
             valid = true;
@@ -136,11 +141,12 @@ void FileCommandProcessorAdapter::readCommand() {
             commands.push_back(cmd);
         }
         if (valid) {
-            std::cout<<"\t| Command is valid and saved |"<< endl;
+            std::cout<<"|| Command is valid and saved "<< endl;
         } else {
-            std::cout<<"\t| Command is invalid and saved |"<< endl;
+            std::cout<<"|| Command is invalid and saved "<< endl;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for 2 seconds for displaying result
+        std::this_thread::sleep_for(std::chrono::seconds(3)); // Wait for 3 seconds for displaying result
+        std::cout << "-----------------------" << std::endl;
     }
 
     file.close();

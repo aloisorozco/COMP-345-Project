@@ -175,7 +175,7 @@ void GameEngine::processCommand(const std::string &command)
         currentState = nextState;
         //the equivalent to GameEngine::transition()
         Notify(this);
-        std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
+        std::cout << "|| Transitioned to state: " << currentState->getName() << std::endl;
     }
 }
 // NOT CALLED
