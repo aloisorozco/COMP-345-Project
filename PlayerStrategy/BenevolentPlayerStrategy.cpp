@@ -1,14 +1,16 @@
 #include "../Map/Map.h"
 #include "BenevolentPlayerStrategy.h"
 
-bool BenevolentPlayerStrategy::issueOrder() {
+#include <string>
 
+bool BenevolentPlayerStrategy::issueOrder() {
+	return false;
 }
 
 Territory* BenevolentPlayerStrategy::toAttack() {
-
+	return NULL;
 }
 
 Territory* BenevolentPlayerStrategy::toDefend() {
-
+	return NULL;
 }

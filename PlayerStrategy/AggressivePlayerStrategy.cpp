@@ -1,14 +1,16 @@
 #include "../Map/Map.h"
 #include "AggressivePlayerStrategy.h"
 
-bool AggressivePlayerStrategy::issueOrder() {
+#include <string>
 
+bool AggressivePlayerStrategy::issueOrder() {
+	return false;
 }
 
 Territory* AggressivePlayerStrategy::toAttack() {
-
+	return NULL;
 }
 
 Territory* AggressivePlayerStrategy::toDefend() {
-
+	return NULL;
 }

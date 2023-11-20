@@ -1,14 +1,16 @@
 #include "../Map/Map.h"
 #include "NeutralPlayerStrategy.h"
 
-bool NeutralPlayerStrategy::issueOrder() {
+#include <string>
 
+bool NeutralPlayerStrategy::issueOrder() {
+	return false;
 }
 
 Territory* NeutralPlayerStrategy::toAttack() {
-
+	return NULL;
 }
 
 Territory* NeutralPlayerStrategy::toDefend() {
-
+	return NULL;
 }
