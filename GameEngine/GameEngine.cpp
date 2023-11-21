@@ -8,6 +8,8 @@
 #include <sstream>
 
 #include "../Player/Player.h"
+#include "../PlayerStrategy/PlayerStrategy.h"
+#include "../PlayerStrategy/HumanPlayerStrategy.h"
 #include "../Map/Map.h"
 #include "../CommandProcessor/CommandProcessing.h"
 
@@ -326,7 +328,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
             }
             else
             {
-                Player *player = new Player(map, deck);
+                PlayerStrategy* strategy = new HumanPlayerStrategy();
+                Player *player = new Player(map, deck, strategy);
                 engine->addPlayer(player);
                 commandProcessor->saveEffect("Player added");
                 engine->processCommand("addplayer");

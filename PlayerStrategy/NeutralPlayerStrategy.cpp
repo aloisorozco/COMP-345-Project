@@ -3,14 +3,14 @@
 
 #include <string>
 
-bool NeutralPlayerStrategy::issueOrder() {
+bool NeutralPlayerStrategy::issueOrder(Player* player) {
 	return false;
 }
 
-Territory* NeutralPlayerStrategy::toAttack() {
+Territory* NeutralPlayerStrategy::toAttack(Player* player) {
 	return NULL;
 }
 
-Territory* NeutralPlayerStrategy::toDefend() {
+Territory* NeutralPlayerStrategy::toDefend(Player* player) {
 	return NULL;
 }

@@ -4,6 +4,7 @@
 #include "../Map/Map.h"
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
+#include "../PlayerStrategy/PlayerStrategy.h"
 
 class Player {
 
@@ -30,16 +31,7 @@ private:
 	//reference of map
 	Map* map;
 
-	//check to make sure we do not add duplicate territories in the toAttack array
-	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
-		for (int i = 0; i < sizeOfCurToAttack; i++) {
-			//assuming each territory has a unique name
-			if (curToAttack[i].getName() == territoryToAdd->getName()) {
-				return true;
-			}
-		}
-		return false;
-	}
+	PlayerStrategy* strategy;
 
 	friend ostream& operator << (ostream& out, const Player& player);
 
@@ -47,7 +39,7 @@ public:
 
 	Player();
 	
-	Player(Map* map, Deck* deck);
+	Player(Map* map, Deck* deck, PlayerStrategy* strategy);
 
 	Player(Territory* territoryArray, int sizeOfTerritoryArray);
 
@@ -121,7 +113,30 @@ public:
 		*this->orderListIndex = index;
 	}
 
+	PlayerStrategy* getPlayerStrategy() {
+		return strategy;
+	}
+
+	void setPlayerStrategy(PlayerStrategy* strategy) {
+		this->strategy = strategy;
+	}
+
 	Player& operator=(const Player& player);
+	
+	Deck* getDeck() {
+		return deck;
+	}
+
+	//check to make sure we do not add duplicate territories in the toAttack array
+	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
+		for (int i = 0; i < sizeOfCurToAttack; i++) {
+			//assuming each territory has a unique name
+			if (curToAttack[i].getName() == territoryToAdd->getName()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 };
 

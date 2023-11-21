@@ -3,10 +3,7 @@
 #include <chrono>
 #include <thread>
 #include "GameEngine.h"
-
-
-
-
+#include "../PlayerStrategy/HumanPlayerStrategy.h"
 
 // Console-driven interface that allows the user to navigate through all the states by typing commands
 void testGameStates(){
@@ -122,9 +119,11 @@ void testMainGameLoop() {
 
     GameEngine* engine = new GameEngine();
 
-    Player* p1 = new Player(testMap, deck);
-    Player* p2 = new Player(testMap, deck);
-    Player* p3 = new Player(testMap, deck);
+    PlayerStrategy* strategy = new HumanPlayerStrategy();
+
+    Player* p1 = new Player(testMap, deck, strategy);
+    Player* p2 = new Player(testMap, deck, strategy);
+    Player* p3 = new Player(testMap, deck, strategy);
 
     for (int i = 0; i < 5; i++) {
         deck->draw(p1->getHand());

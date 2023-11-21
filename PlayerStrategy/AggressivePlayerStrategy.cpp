@@ -3,14 +3,14 @@
 
 #include <string>
 
-bool AggressivePlayerStrategy::issueOrder() {
+bool AggressivePlayerStrategy::issueOrder(Player* player) {
 	return false;
 }
 
-Territory* AggressivePlayerStrategy::toAttack() {
+Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 	return NULL;
 }
 
-Territory* AggressivePlayerStrategy::toDefend() {
+Territory* AggressivePlayerStrategy::toDefend(Player* player) {
 	return NULL;
 }

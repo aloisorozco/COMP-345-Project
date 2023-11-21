@@ -3,16 +3,21 @@
 
 #include "../Map/Map.h"
 #include "PlayerStrategy.h"
+#include "../Player/Player.h"
 
-class BenevolentPlayerStrategy : PlayerStrategy {
+class BenevolentPlayerStrategy : public PlayerStrategy{
 
 public:
 
-	bool issueOrder();
+	bool issueOrder(Player* player);
 
-	Territory* toAttack();
+	Territory* toAttack(Player* player);
 
-	Territory* toDefend();
+	Territory* toDefend(Player* player);
+
+	~BenevolentPlayerStrategy() {
+
+	}
 
 };
 
