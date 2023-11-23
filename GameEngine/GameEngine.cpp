@@ -476,7 +476,7 @@ bool GameEngine::reinforcementPhase() {
     }
 
     if (playerArray.size() == 1) {
-        std::cout << "Player " << playerArray[0]->getPlayerID() << " wins" << endl;
+        std::cout << "\nPlayer " << playerArray[0]->getPlayerID() << " wins!!!\n" << endl;
         return true;
     }
 

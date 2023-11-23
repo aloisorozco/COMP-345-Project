@@ -15,6 +15,8 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 	Territory* toDefendTerritories = toDefend(player);
 	Territory* toAttackTerritories = toAttack(player);
 
+	cout << "\nIssuing order for human player " << player->getPlayerID() << "\n" << endl;
+
 	cout << "\nTerritories to defend for player " << player->getPlayerID() << endl;
 	for (int i = 0; i < player->getSizeOfToDefend(); i++) {
 		cout << toDefendTerritories[i] << endl;
