@@ -3,15 +3,25 @@
 
 #include "../Map/Map.h"
 
+class Player;
+
 class PlayerStrategy {
 
 public:
 
-	virtual bool issueOrder() = 0;
+	inline PlayerStrategy() {
 
-	virtual Territory* toAttack() = 0;
+	}
 
-	virtual Territory* toDefend() = 0;
+	virtual bool issueOrder(Player* player) = 0;
+
+	virtual Territory* toAttack(Player* player) = 0;
+
+	virtual Territory* toDefend(Player* player) = 0;
+
+	virtual ~PlayerStrategy() {
+
+	}
 
 };
 

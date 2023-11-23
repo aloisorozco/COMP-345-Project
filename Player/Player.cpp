@@ -3,7 +3,7 @@
 #include "../Map/Map.h"
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
-
+#include "../PlayerStrategy/PlayerStrategy.h"
 
 #include <iostream>
 #include <string>
@@ -30,10 +30,12 @@ Player::Player() {
 	sizeOfToDefend = new int(0);
 
 	troopsToDeploy = new int(0);
+
+	strategy = NULL;
 }
 
 //main constructor to use other ones i will leave for now but they are not tested to work
-Player::Player(Map* map, Deck* deck) {
+Player::Player(Map* map, Deck* deck, PlayerStrategy* strategy) {
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
@@ -49,6 +51,8 @@ Player::Player(Map* map, Deck* deck) {
 	sizeOfToDefend = new int(0);
 
 	troopsToDeploy = new int(0);
+
+	this->strategy = strategy;
 }
 
 //initializing a player with a collection of territories
@@ -68,6 +72,8 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	sizeOfToDefend = new int(0);
 
 	troopsToDeploy = new int(0);
+
+	strategy = NULL;
 }
 
 //copy constructor
@@ -89,6 +95,8 @@ Player::Player(const Player& copyPlayer) {
 	this->sizeOfToAttack = new int(*copyPlayer.sizeOfToAttack);
 	this->sizeOfToDefend = new int(*copyPlayer.sizeOfToDefend);
 	this->troopsToDeploy = new int(*copyPlayer.troopsToDeploy);
+
+	this->strategy = copyPlayer.strategy;
 }
 
 //destructor to avoid any memory leaks
@@ -122,11 +130,16 @@ Player::~Player() {
 
 	delete this->troopsToDeploy;
 	troopsToDeploy = NULL;
+
+	delete this->strategy;
+	strategy = NULL;
 }
 
 //territories to defend
 Territory* Player::toDefend() {
-	if (map == NULL) {
+	return strategy->toDefend(this);
+
+	/*if (map == NULL) {
 		return 0;
 	}
 
@@ -145,12 +158,14 @@ Territory* Player::toDefend() {
 	}
 
 	*sizeOfToDefend = count;
-	return toDefend;
+	return toDefend;*/
 }
 
 //territories to attack - super inefficient but what can you do
 Territory* Player::toAttack() {
-	if (map == NULL) {
+	return strategy->toAttack(this);
+
+	/*if (map == NULL) {
 		return 0;
 	}
 
@@ -178,14 +193,16 @@ Territory* Player::toAttack() {
 	}
 
 	*sizeOfToAttack = count;
-	return toAttack;
+	return toAttack;*/
 }
 
 //issuing order
 bool Player::issueOrder() {
 
+	return strategy->issueOrder(this);
+
 	//print toDefend & toAttack to show player what he has
-	Territory* toDefendTerritories = toDefend();
+	/*Territory* toDefendTerritories = toDefend();
 	Territory* toAttackTerritories = toAttack();
 
 	cout << "\nTerritories to defend for player " << *playerID << endl;
@@ -388,7 +405,7 @@ bool Player::issueOrder() {
 		//signals to game engine that no more orders will be done
 		cout << "Option 3: End turn\n" << endl;
 		return true;
-	}
+	}*/
 	
 }
 
@@ -443,6 +460,8 @@ Player& Player::operator=(const Player& player) {
 	this->setSizeOfToDefend(*player.sizeOfToDefend);
 
 	this->troopsToDeploy = player.troopsToDeploy;
+
+	this->strategy = player.strategy;
 
 	return *this;
 }

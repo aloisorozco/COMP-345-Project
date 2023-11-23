@@ -8,6 +8,10 @@
 #include <sstream>
 
 #include "../Player/Player.h"
+#include "../PlayerStrategy/PlayerStrategy.h"
+#include "../PlayerStrategy/HumanPlayerStrategy.h"
+#include "../PlayerStrategy/NeutralPlayerStrategy.h"
+#include "../PlayerStrategy/CheaterPlayerStrategy.h"
 #include "../Map/Map.h"
 #include "../CommandProcessor/CommandProcessing.h"
 
@@ -326,7 +330,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
             }
             else
             {
-                Player *player = new Player(map, deck);
+                PlayerStrategy* strategy = new HumanPlayerStrategy();
+                Player *player = new Player(map, deck, strategy);
                 engine->addPlayer(player);
                 commandProcessor->saveEffect("Player added");
                 engine->processCommand("addplayer");
@@ -473,7 +478,7 @@ bool GameEngine::reinforcementPhase() {
     }
 
     if (playerArray.size() == 1) {
-        std::cout << "Player " << playerArray[0]->getPlayerID() << " wins" << endl;
+        std::cout << "\nPlayer " << playerArray[0]->getPlayerID() << " wins!!!\n" << endl;
         return true;
     }
 
@@ -556,7 +561,65 @@ void GameEngine::executeOrdersPhase()
             if (order != NULL)
             {
                 executeOrdersDone = false;
-                order->execute();
+
+                int* playerAttackedID;
+
+                if (dynamic_cast<Bomb*>(order) != NULL) {
+                    Bomb* bomb = dynamic_cast<Bomb*>(order);
+
+                    if (bomb->getTarget() != NULL) {
+                        playerAttackedID = new int(bomb->getTarget()->getPlayer());
+                    }
+                }
+                if (dynamic_cast<Advance*>(order) != NULL) {
+                    Advance* advance = dynamic_cast<Advance*>(order);
+
+                    if (advance->getTarget() != NULL) {
+                        playerAttackedID = new int(advance->getTarget()->getPlayer());
+                    }
+                }
+
+                if (order->execute() == 0) {
+                    if (dynamic_cast<Bomb*>(order) != NULL) {
+                        Bomb* bomb = dynamic_cast<Bomb*>(order);
+
+                        for (int i = 0; i < playerArray.size(); i++) {
+                            if (dynamic_cast<NeutralPlayerStrategy*>(playerArray[i]->getPlayerStrategy()) == NULL) {
+                                continue;
+                            }
+
+                            if (*playerAttackedID == playerArray[i]->getPlayerID()) {
+                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
+                                cout << "Neutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
+
+                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                            }
+                        }
+
+                        delete playerAttackedID;
+                        playerAttackedID = NULL;
+                    }
+                    if (dynamic_cast<Advance*>(order) != NULL) {
+                        Advance* advance = dynamic_cast<Advance*>(order);
+
+                        for (int i = 0; i < playerArray.size(); i++) {
+                            if (dynamic_cast<NeutralPlayerStrategy*>(playerArray[i]->getPlayerStrategy()) == NULL) {
+                                continue;
+                            }
+
+                            if (*playerAttackedID == playerArray[i]->getPlayerID()) {
+                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
+                                cout << "\nNeutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
+
+                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                            }
+                        }
+
+                        delete playerAttackedID;
+                        playerAttackedID = NULL;
+                    }
+                }
+
             }
         }
 

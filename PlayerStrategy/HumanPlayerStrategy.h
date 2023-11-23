@@ -2,17 +2,26 @@
 #define HUMAN_PLAYER_STRATEGY_H
 
 #include "../Map/Map.h"
+#include "../Player/Player.h"
 #include "PlayerStrategy.h"
 
-class HumanPlayerStrategy : PlayerStrategy {
+class HumanPlayerStrategy : public PlayerStrategy {
 
 public:
 
-	bool issueOrder();
+	inline HumanPlayerStrategy() {
 
-	Territory* toAttack();
+	}
 
-	Territory* toDefend();
+	bool issueOrder(Player* player);
+
+	Territory* toAttack(Player* player);
+
+	Territory* toDefend(Player* player);
+
+	~HumanPlayerStrategy() {
+
+	}
 
 };
 
