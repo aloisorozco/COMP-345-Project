@@ -30,6 +30,10 @@ bool CommandProcessor::validate(const std::string& command) {
         if (commandWords[0] == "loadmap") {
             return true;
         }
+
+        if (commandWords[0] == "tournament") {
+            return true;
+        }
     }
     else if (currentState->getName() == "Map Loaded") {
         if (commandWords[0] == "validatemap") {

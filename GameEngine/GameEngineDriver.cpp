@@ -98,7 +98,7 @@ void testStartUpPhase()
     // cout << cP5 << endl;
     // cout << cP6 << endl;
 
-    engine.play();
+    engine.play(engine);
 }
 
 void testMainGameLoop() {

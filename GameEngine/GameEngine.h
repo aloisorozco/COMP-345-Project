@@ -92,10 +92,9 @@ public:
     // This will cause the game engine to transition to a different state, if the command corresponds to a valid transition from the current state.
     void processCommand(const std::string& command);
 
+    void tournamentMode(GameEngine &engineArg, vector<string> commandWords);
     
-
-    
-    void play();
+    void play(GameEngine &engineArg);
 
     void addMap(Map* map);
 
@@ -116,6 +115,10 @@ public:
     }
 
     void addPlayer(Player* player);
+
+    void setMaxTurns(int gameMaxTurns);
+
+    int getMaxTurns() const;
     
 
     /*static Player* gamePlayerArray;
@@ -143,6 +146,8 @@ private:
     int* sizeofPlayerArray;
 
     Map* map;
+
+    int* maxTurns;
 
     
 };

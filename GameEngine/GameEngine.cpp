@@ -60,42 +60,42 @@ ostream &operator<<(ostream &out, const GameState &)
 }
 
 // Constructor for the GameEngine class. It initializes the currentState member variable to nullptr, indicating that there is no current game state when the game engine is first created.
-GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(0), sizeofPlayerArray(new int(0)){
-
+GameEngine::GameEngine() : currentState(new GameState("blankState")), playerArray(0), sizeofPlayerArray(new int(0))
+{
 }
 
 // Initialisation of the engine, creation of all states and transition.
-void gameInit(GameEngine& engine)
+void gameInit(GameEngine &engine)
 {
-    //state initialisation
-    GameState* startState = new GameState("Start");
-    GameState* mapLoadState = new GameState("Map Loaded");
-    GameState* mapValidationState = new GameState("Map Validated");
-    GameState* addPlayerState = new GameState("Players Added");
-    GameState* reinforcementState = new GameState("Assign Reinforcement");
-    GameState* orderChoiceState = new GameState("Issue Orders");
-    GameState* orderExecuteState = new GameState("Execute Orders");
-    GameState* winState = new GameState("Win");
-    GameState* endState = new GameState("end");
-
+    // state initialisation
+    GameState *startState = new GameState("Start");
+    GameState *mapLoadState = new GameState("Map Loaded");
+    GameState *mapValidationState = new GameState("Map Validated");
+    GameState *addPlayerState = new GameState("Players Added");
+    GameState *reinforcementState = new GameState("Assign Reinforcement");
+    GameState *orderChoiceState = new GameState("Issue Orders");
+    GameState *orderExecuteState = new GameState("Execute Orders");
+    GameState *winState = new GameState("Win");
+    GameState *endState = new GameState("end");
 
     // Creating all the appropriate transitions.
+    startState->addTransition("tournament", startState);
     startState->addTransition("loadmap", mapLoadState);
-    mapLoadState->addTransition("loadmap",mapLoadState);
-    mapLoadState->addTransition("validatemap",mapValidationState);
-    mapValidationState->addTransition("addplayer",addPlayerState);
-    addPlayerState->addTransition("addplayer",addPlayerState);
-    addPlayerState->addTransition("gamestart",reinforcementState);
-    reinforcementState->addTransition("issueorder",orderChoiceState);
-    orderChoiceState->addTransition("issueorder",orderChoiceState);
-    orderChoiceState->addTransition("endissueorders",orderExecuteState);
-    orderExecuteState->addTransition("execorder",orderExecuteState);
-    orderExecuteState->addTransition("endexecorders",reinforcementState);
-    orderExecuteState->addTransition("win",winState);
-    winState->addTransition("play",startState);
-    winState->addTransition("end",endState);
+    mapLoadState->addTransition("loadmap", mapLoadState);
+    mapLoadState->addTransition("validatemap", mapValidationState);
+    mapValidationState->addTransition("addplayer", addPlayerState);
+    addPlayerState->addTransition("addplayer", addPlayerState);
+    addPlayerState->addTransition("gamestart", reinforcementState);
+    reinforcementState->addTransition("issueorder", orderChoiceState);
+    orderChoiceState->addTransition("issueorder", orderChoiceState);
+    orderChoiceState->addTransition("endissueorders", orderExecuteState);
+    orderExecuteState->addTransition("execorder", orderExecuteState);
+    orderExecuteState->addTransition("endexecorders", reinforcementState);
+    orderExecuteState->addTransition("win", winState);
+    winState->addTransition("play", startState);
+    winState->addTransition("end", endState);
 
-    //Adding all states to the engine
+    // Adding all states to the engine
     engine.addState(startState);
     engine.addState(mapLoadState);
     engine.addState(mapValidationState);
@@ -105,9 +105,8 @@ void gameInit(GameEngine& engine)
     engine.addState(orderExecuteState);
     engine.addState(winState);
 
-    //Setting the initial state
+    // Setting the initial state
     engine.setInitialState(startState);
-
 }
 
 // Destructor for the GameEngine class. It is responsible for cleaning up memory to prevent leaks. It iterates over the states map and deletes each GameState object that it contains.
@@ -158,9 +157,6 @@ void GameEngine::setInitialState(GameState *state)
     currentState = state;
 }
 
-
-
-
 // Processes a command from the user. It checks if a current state exists and gets the next state based on the provided command.
 void GameEngine::processCommand(const std::string &command)
 {
@@ -177,7 +173,7 @@ void GameEngine::processCommand(const std::string &command)
     else
     {
         currentState = nextState;
-        //the equivalent to GameEngine::transition()
+        // the equivalent to GameEngine::transition()
         Notify(this);
         std::cout << "Transitioned to state: " << currentState->getName() << std::endl;
     }
@@ -199,10 +195,6 @@ void GameEngine::addPlayer(Player *player)
     *sizeofPlayerArray = playerArray.size();
 }
 
-
-
-
-
 void GameEngine::addMap(Map *map)
 {
     this->map = map;
@@ -222,10 +214,8 @@ void GameEngine::startupPhase(GameEngine &engineArg)
 
     // Initialize game
     GameEngine *engine = &engineArg;
-    GameEngine *initializer = new GameEngine();
+
     gameInit(*engine);
-    delete initializer;
-    initializer = NULL;
 
     CommandProcessor *commandProcessor;
 
@@ -274,10 +264,15 @@ void GameEngine::startupPhase(GameEngine &engineArg)
         for (std::string s; iss >> s;)
             commandWords.push_back(s);
 
-        if (commandWords[0] == "loadmap")
+        if (commandWords[0] == "tournament")
+        {
+            tournamentMode(*engine, commandWords);
+            break;
+        }
+
+        else if (commandWords[0] == "loadmap")
         {
             // intialize map
-            map = new Map();
             MapLoader *mapLoader = new MapLoader(); // loader
 
             if (commandWords.size() > 1)
@@ -330,7 +325,7 @@ void GameEngine::startupPhase(GameEngine &engineArg)
             }
             else
             {
-                PlayerStrategy* strategy = new HumanPlayerStrategy();
+                PlayerStrategy *strategy = new HumanPlayerStrategy();
                 Player *player = new Player(map, deck, strategy);
                 engine->addPlayer(player);
                 commandProcessor->saveEffect("Player added");
@@ -450,18 +445,392 @@ Map *GameEngine::getMap() const
     return map;
 }
 
-
-
-void GameEngine::play()
+//======================================================================== TOURNAMENT ===============================================================================//
+void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWords)
 {
+    vector<string> mapFiles;         // vector to store map files names
+    vector<string> playerStrategies; // vector to store player strategies names
+    int numberOfGames = 0;           // number of games to play
+    int maxTurns = 0;                // max number of turns per game
+    int j = 1;                       // index for parsing through commandWords vector
+
+    //====================================================== Get Tournament Options ==================================================//
+
+    // Parse through commandWords vector to get all the tournament options
+    for (int i = 1; i < commandWords.size(); i++)
+    {
+        if (commandWords[i] == "-M") // if current index is "-M" -> next input should be a map file name
+        {
+            // Check wether next input is empty or a command string for other options
+            while (!((j + 1) > (commandWords.size() - 1)) && commandWords[j + 1] != "-P" && commandWords[j + 1] != "-G" && commandWords[j + 1] != "-D")
+            {
+                if (mapFiles.size() > 4) // if more than 5 maps were entered -> stop storing maps, tournament will start with the first 5 maps entered
+                {
+                    cout << "Too many maps. Only the first 5 will be loaded\n"
+                         << endl;
+                    break;
+                }
+                mapFiles.push_back(commandWords[j + 1]); // stores map file name
+                j++;
+            }
+        }
+
+        if (commandWords[i] == "-P") // if current index is "-P" -> next input should be a player strategy
+        {
+            // Increments index of parser 'j' until it finds the next option
+            while (commandWords[j] != "-P" && commandWords[j] != "-G" && commandWords[j] != "-D")
+            {
+                j++;
+            }
+
+            // Check wether next input is empty or a command string for other options
+            while (!((j + 1) > (commandWords.size() - 1)) && commandWords[j + 1] != "-G" && commandWords[j + 1] != "-D")
+            {
+                if (playerStrategies.size() > 3) // if more than 4 players were entered -> stop storing players, tournament will start with the first 4 players entered
+                {
+                    cout << "Too many players. Only the first 4 will be added\n"
+                         << endl;
+                    break;
+                }
+
+                playerStrategies.push_back(commandWords[j + 1]); // stores player strategy name
+                j++;
+            }
+        }
+
+        if (commandWords[i] == "-G") // if current index is "-G" -> next input should be a number of games
+        {
+            // Increments index of parser 'j' until it finds the next option
+            while (commandWords[j] != "-G" && commandWords[j] != "-D")
+            {
+                j++;
+            }
+
+            // Check wether next input is empty or a command string for other options
+            while (!((j + 1) > (commandWords.size() - 1)) && commandWords[j + 1] != "-D")
+            {
+                numberOfGames = stoi(commandWords[j + 1]); // stores number of games
+
+                // Check if the number of games exceeds the limits if it does set to default values
+                if (numberOfGames > 5)
+                {
+                    cout << "Too many games. Number of games is set to 5\n"
+                         << endl;
+                    numberOfGames = 5; // set games to 5 if number too high
+                }
+
+                else if (numberOfGames < 1)
+                {
+                    cout << "Too few games. Number of games is set to 1\n"
+                         << endl;
+                    numberOfGames = 1; // set games to 1 if number too low
+                }
+
+                j++;
+            }
+        }
+
+        if (commandWords[i] == "-D") // if current index is "-D" -> next input should be a number of turns
+        {
+            // Increments index of parser 'j' until it finds the next option
+            while (commandWords[j] != "-D")
+            {
+                j++;
+            }
+
+            // Check wether next input is empty
+            while (!((j + 1) > (commandWords.size() - 1)))
+            {
+                maxTurns = stoi(commandWords[j + 1]); // stores number of turns
+                j++;
+            }
+
+            // Check if the number of turns exceeds the limits, if it does set to default values
+            if (maxTurns > 50)
+            {
+                cout << "Too many turns. Number of turns is set to 50\n"
+                     << endl;
+                maxTurns = 50; // set turns to 50 if number too high
+            }
+
+            else if (maxTurns < 10)
+            {
+                cout << "Too few turns. Number of turns is set to 10\n"
+                     << endl;
+                maxTurns = 10; // set turns to 10 if number too low
+
+            }
+        }
+    }
+
+    //==================================================== Check for Missing Options =======================================================//
+
+    // Check if all tournament options were entered
+    if (mapFiles.size() == 0 || playerStrategies.size() == 0 || numberOfGames == 0 || maxTurns == 0)
+    {
+        if (mapFiles.size() == 0) // if no maps were entered
+        {
+            cout << "No maps entered. Please restart the game with proper tournament commands (-M to add maps).\n"
+                 << endl;
+        }
+
+        if (playerStrategies.size() == 0) // if no players were entered
+        {
+            cout << "No players entered. Please restart the game with proper tournament commands (-P to add players).\n"
+                 << endl;
+        }
+
+        if (numberOfGames == 0) // if no number of games were entered
+        {
+            cout << "No number of games entered. Please restart the game with proper tournament commands (-G to add number of games).\n"
+                 << endl;
+        }
+
+        if (maxTurns == 0) // if no number of turns were entered
+        {
+            cout << "No number of turns entered. Please restart the game with proper tournament commands (-D to add number of turns).\n"
+                 << endl;
+        }
+
+        return;
+    }
+
+    //======================================================= Validate Maps ============================================================//
+
+    // Check whether maps entered for the tournament are valid
+    for (int i = 0; i < mapFiles.size(); i++)
+    {
+        map = new Map();
+        MapLoader *mapLoader = new MapLoader();              // initalize map loader
+        Map *map = mapLoader->loadMap_withName(mapFiles[i]); // load map
+
+        // Vaidate the map
+        if (map->validate())
+        {
+            delete map;
+            map = NULL; // avoid memory leaks
+        }
+        else
+        {
+            cout << "Map " << mapFiles[i] << " is not valid. Skipping Map... \n " << endl;
+            mapFiles.erase(mapFiles.begin() + i); // remove map from list
+            delete map;
+            map = NULL; // avoid memory leaks
+        }
+    }
+
+    // If no valid maps were entered -> quit game
+    if (mapFiles.size() == 0)
+    {
+        cout << "No valid maps entered. Please restart the game with proper tournament commands (-M to add maps).\n"
+             << endl;
+        return;
+    }
+
+    //======================================================= Validate Players =========================================================//
+
+    // Check whether players are valid
+    for (int i = 0; i < playerStrategies.size(); i++)
+    {
+        if (playerStrategies[i] == "aggressive" || playerStrategies[i] == "benevolent" || playerStrategies[i] != "cheater" || playerStrategies[i] != "neutral")
+        {
+            // do nothing - player strategies are valid
+        }
+        else
+        {
+            cout << "Player " << playerStrategies[i] << " is not valid. Removing Player... \n " << endl;
+            playerStrategies.erase(playerStrategies.begin() + i); // remove player strategies from list
+        }
+    }
+
+    // check if there's enough players - if no valid players were entered quit game
+    if (playerStrategies.size() == 0)
+    {
+        cout << "No valid players entered. Please restart the game with proper tournament commands (-P to add players).\n"
+             << endl;
+        return;
+    }
+
+    // if missing 1 payer, add a neutral player by default so tournament can start
+    if (playerStrategies.size() < 2)
+    {
+        cout << "Not enough players in instructions. Added a neutral player.\n"
+             << endl;
+        playerStrategies.push_back("neutral");
+    }
+
+    //========================================================== Start Tournament =========================================================//
+
+    ////////////////// Print Tournament Options //////////////////////
+    cout << "\nTournament will start with the following options: " << endl;
+    cout << "Maps: ";
+    for (string map : mapFiles)
+    {
+        cout << map << " ";
+    }
+
+    cout << "\nPlayers: ";
+    for (string player : playerStrategies)
+    {
+        cout << player << " ";
+    }
+    cout << "\nNumber of Games: " << numberOfGames << endl;
+    cout << "Max Turns: " << maxTurns << endl;
+
+    
+    /////////////////// Games Start /////////////////////////
+    for (int i = 0; i < numberOfGames; i++)
+    {
+
+        // intialize game
+        cout << "Game " << i + 1 << endl;
+        GameEngine *engine = &engineArg;
+        gameInit(*engine);
+        engine->setMaxTurns(maxTurns);
+
+        for (int i = 0; i < mapFiles.size(); i++)
+        {
+            //=============================================== Initialize map and deck =====================================//
+            map = new Map();
+            Deck *deck = new Deck();
+
+            // Load first map
+            MapLoader *mapLoader = new MapLoader();         // loader
+            map = mapLoader->loadMap_withName(mapFiles[i]); // load map
+            engine->processCommand("loadmap");              // transition state
+            engine->processCommand("validatemap");          // transition state (maps are already valid, no need to validate again)
+            delete mapLoader;                               // delete loader
+            mapLoader = NULL;
+
+            //================================================ Add players =============================================//
+            for (int i = 0; i < playerStrategies.size(); i++)
+            {
+                PlayerStrategy *strategy;
+                // if (playerStrategies[i] == "aggressive")
+                // {
+                //     strategy = new AggressivePlayerStrategy();
+                // }
+                // else if (playerStrategies[i] == "benevolent")
+                // {
+                //     strategy = new BenevolentPlayerStrategy();
+                // }
+                if (playerStrategies[i] == "cheater")
+                {
+                    strategy = new CheaterPlayerStrategy();
+                }
+                else if (playerStrategies[i] == "neutral")
+                {
+                    strategy = new NeutralPlayerStrategy();
+                }
+
+                Player *player = new Player(map, deck, strategy);
+                engine->addPlayer(player);
+                engine->processCommand("addplayer");
+            }
+
+            //========================================= Assign territories to players ========================================//
+
+            // Vector of player IDs/Number
+            vector<int> players;
+            for (int i = 1; i < *sizeofPlayerArray + 1; i++)
+            {
+                players.push_back(i);
+            }
+
+            // Set Randomization function
+            int minLimit = 0;
+            int maxLimit = 0;
+            maxLimit = map->getTerritories().size() - 1;
+            std::random_device rd;  // Seed the random number generator
+            std::mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator
+            std::uniform_int_distribution<int> distribution(minLimit, maxLimit);
+
+            // Get territories
+            vector<Territory *> territories;
+            territories = map->getTerritories();
+
+            // Randomize order of territories in territories vector created above
+            for (int i = 0; i < maxLimit; i++)
+            {
+                int randomIndex1 = distribution(gen);
+                int randomIndex2 = distribution(gen);
+                swap(territories[randomIndex1], territories[randomIndex2]);
+            }
+
+            // Assign territories to players in round robin fashion
+            int playerIndex = 0;
+            int territoryIndex = 0;
+            for (Territory *territory : territories)
+            {
+                territory->setPlayer(players[playerIndex]);
+                playerIndex = (playerIndex + 1) % players.size();
+                territoryIndex = (territoryIndex + 1) % territories.size();
+            }
+
+            //=======================================Order of Play=========================================================//
+            // Determine order of play by rearanging player array in random order
+            minLimit = 0;
+            maxLimit = playerArray.size() - 1;
+            std::uniform_int_distribution<int> distribution2(minLimit, maxLimit);
+
+            for (int i = 0; i < playerArray.size(); i++)
+            {
+                int randomIndex1 = distribution2(gen);
+                int randomIndex2 = distribution2(gen);
+                swap(playerArray[randomIndex1], playerArray[randomIndex2]);
+            }
+
+            // Print order of play
+            cout << "Order of play: ";
+            for (Player *player : playerArray)
+            {
+                cout << "Player " << player->getPlayerID() << " > ";
+            }
+
+            //=======================================Reinforcements=====================================================//
+
+            for (Player *player : playerArray)
+            {
+                player->setTroopsToDeploy(50);
+            }
+
+            //========================================Draw 2 Cards======================================================//
+            // Each Player draws two cards from the deck
+            for (Player *player : playerArray)
+            {
+                cout << "\nPlayer : " << player->getPlayerID() << endl;
+                deck->draw(player->getHand());
+                deck->draw(player->getHand());
+            }
+
+            engine->processCommand("gamestart");
+            engine->play(*engine);
+        }
+    }
+}
+
+void GameEngine::setMaxTurns(int gameMaxTurns) {*maxTurns = gameMaxTurns;}
+int GameEngine::getMaxTurns() const {return *maxTurns;}
+
+int main()
+{
+    GameEngine engine;
+
+    engine.startupPhase(engine);
+
+    return 0;
+}
+
+void GameEngine::play(GameEngine &engineArg){
 
     // part 2
 
     // part 3
-    this->mainGameLoop();
+    engineArg.mainGameLoop();
 }
 
-bool GameEngine::reinforcementPhase() {
+bool GameEngine::reinforcementPhase()
+{
 
     std::cout << "Reinforcement Phase\n"
               << endl;
@@ -477,17 +846,19 @@ bool GameEngine::reinforcementPhase() {
         }
     }
 
-    if (playerArray.size() == 1) {
-        std::cout << "\nPlayer " << playerArray[0]->getPlayerID() << " wins!!!\n" << endl;
+    if (playerArray.size() == 1)
+    {
+        std::cout << "\nPlayer " << playerArray[0]->getPlayerID() << " wins!!!\n"
+                  << endl;
         return true;
     }
 
-    //calculating troops for each player
-    for (int i = 0; i < playerArray.size(); i++) {
+    // calculating troops for each player
+    for (int i = 0; i < playerArray.size(); i++)
+    {
         playerArray[i]->toDefend();
         int troops = (playerArray[i]->getSizeOfToDefend() / 3) + 3;
-        
-        
+
         // checks if owns entire continents if so add continent bonus to troops
         vector<Continent *> continents = playerArray[i]->getMap()->getContinents();
 
@@ -511,15 +882,19 @@ bool GameEngine::reinforcementPhase() {
 
         playerArray[i]->setTroopsToDeploy(troops);
     }
-    std::cout << "--------------------\n" << endl;
+    std::cout << "--------------------\n"
+              << endl;
     return false;
 }
 
-void GameEngine::issueOrdersPhase() {
-    std::cout << "Issuing Orders Phase\n" << endl;
-    bool* playersDoneArray = new bool[*sizeofPlayerArray];
+void GameEngine::issueOrdersPhase()
+{
+    std::cout << "Issuing Orders Phase\n"
+              << endl;
+    bool *playersDoneArray = new bool[*sizeofPlayerArray];
 
-    for (int i = 0; i < playerArray.size(); i++) {
+    for (int i = 0; i < playerArray.size(); i++)
+    {
         playersDoneArray[i] = false;
         playerArray[i]->setOrderListIndex(0);
         playerArray[i]->getOrdersList()->clear();
@@ -562,34 +937,43 @@ void GameEngine::executeOrdersPhase()
             {
                 executeOrdersDone = false;
 
-                int* playerAttackedID;
+                int *playerAttackedID;
 
-                if (dynamic_cast<Bomb*>(order) != NULL) {
-                    Bomb* bomb = dynamic_cast<Bomb*>(order);
+                if (dynamic_cast<Bomb *>(order) != NULL)
+                {
+                    Bomb *bomb = dynamic_cast<Bomb *>(order);
 
-                    if (bomb->getTarget() != NULL) {
+                    if (bomb->getTarget() != NULL)
+                    {
                         playerAttackedID = new int(bomb->getTarget()->getPlayer());
                     }
                 }
-                if (dynamic_cast<Advance*>(order) != NULL) {
-                    Advance* advance = dynamic_cast<Advance*>(order);
+                if (dynamic_cast<Advance *>(order) != NULL)
+                {
+                    Advance *advance = dynamic_cast<Advance *>(order);
 
-                    if (advance->getTarget() != NULL) {
+                    if (advance->getTarget() != NULL)
+                    {
                         playerAttackedID = new int(advance->getTarget()->getPlayer());
                     }
                 }
 
-                if (order->execute() == 0) {
-                    if (dynamic_cast<Bomb*>(order) != NULL) {
-                        Bomb* bomb = dynamic_cast<Bomb*>(order);
+                if (order->execute() == 0)
+                {
+                    if (dynamic_cast<Bomb *>(order) != NULL)
+                    {
+                        Bomb *bomb = dynamic_cast<Bomb *>(order);
 
-                        for (int i = 0; i < playerArray.size(); i++) {
-                            if (dynamic_cast<NeutralPlayerStrategy*>(playerArray[i]->getPlayerStrategy()) == NULL) {
+                        for (int i = 0; i < playerArray.size(); i++)
+                        {
+                            if (dynamic_cast<NeutralPlayerStrategy *>(playerArray[i]->getPlayerStrategy()) == NULL)
+                            {
                                 continue;
                             }
 
-                            if (*playerAttackedID == playerArray[i]->getPlayerID()) {
-                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
+                            if (*playerAttackedID == playerArray[i]->getPlayerID())
+                            {
+                                // TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "Neutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
                                 playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
@@ -599,16 +983,20 @@ void GameEngine::executeOrdersPhase()
                         delete playerAttackedID;
                         playerAttackedID = NULL;
                     }
-                    if (dynamic_cast<Advance*>(order) != NULL) {
-                        Advance* advance = dynamic_cast<Advance*>(order);
+                    if (dynamic_cast<Advance *>(order) != NULL)
+                    {
+                        Advance *advance = dynamic_cast<Advance *>(order);
 
-                        for (int i = 0; i < playerArray.size(); i++) {
-                            if (dynamic_cast<NeutralPlayerStrategy*>(playerArray[i]->getPlayerStrategy()) == NULL) {
+                        for (int i = 0; i < playerArray.size(); i++)
+                        {
+                            if (dynamic_cast<NeutralPlayerStrategy *>(playerArray[i]->getPlayerStrategy()) == NULL)
+                            {
                                 continue;
                             }
 
-                            if (*playerAttackedID == playerArray[i]->getPlayerID()) {
-                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
+                            if (*playerAttackedID == playerArray[i]->getPlayerID())
+                            {
+                                // TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "\nNeutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
                                 playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
@@ -619,7 +1007,6 @@ void GameEngine::executeOrdersPhase()
                         playerAttackedID = NULL;
                     }
                 }
-
             }
         }
 
@@ -634,14 +1021,22 @@ void GameEngine::executeOrdersPhase()
 
 void GameEngine::mainGameLoop()
 {
+    int currentTurn = 0; 
     // part 3 here - players already have to be set
     while (true)
     {
 
-        //getting & setting troops
+        // getting & setting troops
         bool gameWon = reinforcementPhase();
 
-        if (gameWon) {
+        if (gameWon)
+        {
+            break;
+        }
+
+        if (this->getMaxTurns() == currentTurn)
+        {
+            cout << "Draw" << endl;
             break;
         }
 
@@ -651,22 +1046,28 @@ void GameEngine::mainGameLoop()
         // executing orders phase
         executeOrdersPhase();
 
+        // count turns and check if max turns reached
+        currentTurn++;
     }
 }
-string GameEngine::stringToLog() {
+string GameEngine::stringToLog()
+{
     return "Game Engine state: " + getCurrentState()->getName();
 }
 
 // Fucntion for clearing terminal window using ASCII escape code
-void clearScreen() {
+void clearScreen()
+{
     std::cout << "\x1B[2J\x1B[H";
 }
 
 // Function for printing a helping box
-void printBox(const std::string& state, const std::string& commands) {
+void printBox(const std::string &state, const std::string &commands)
+{
     std::cout << "***** WARZONE GAME ENGINE ****\n";
     std::cout << "******************************\n";
     std::cout << "* Current state: " << state << "\n";
-    std::cout << "* Available commands: \n" << commands << "\n";
+    std::cout << "* Available commands: \n"
+              << commands << "\n";
     std::cout << "******************************\n";
 }
