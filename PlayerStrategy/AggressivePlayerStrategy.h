@@ -23,8 +23,6 @@ public:
 
 	}
 
-private:
-
 	Territory* getStrongestTerritory(Player* player);
 	Territory* getSecondStrongestTerritory(Player* player);
 

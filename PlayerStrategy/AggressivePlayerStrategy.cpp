@@ -3,6 +3,7 @@
 
 #include <string>
 #include <thread>
+#include <limits>
 
 bool AggressivePlayerStrategy::issueOrder(Player* player) {
 	Map* map = player->getMap();
@@ -35,27 +36,28 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 
 		this_thread::sleep_for(chrono::milliseconds(1000));
 
+		cout << "\nEnding turn\n" << endl;
 		return false;
 	}
 	
 	else {
 		
-		if(hand->getCards().size() > 0){
+		if(hand->getHandSize() > 0){
 
 			Card* card = hand->getCards().back();
-
 			Territory* target = map->getTerritory(toAttackTerritories[rand() % toAttackTerritoriesSize].getName());
 
 			if(card->getType() == Card::ReinforcementCT){
 
 				player->setTroopsToDeploy(*player->getTroopsToDeploy() + 5);
-				deck->returnCard(card);
+				cout << "\nAdding 5 troops to deploy";
 			}
 
 			else if(card->getType() == Card::BombCT){
 
+				
 				ordersList->add(new Bomb(player->getPlayerID(), "", target));
-				deck->returnCard(card);
+				cout << "\nBombing " << target->getName();
 			}
 
 			else if(card->getType() == Card::AirliftCT){
@@ -63,33 +65,51 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 				Territory* secondStrongest = getSecondStrongestTerritory(player);
 
 				ordersList->add(new Airlift(player->getPlayerID(), "", secondStrongest->getArmy(), secondStrongest, strongestTerritory));
-				deck->returnCard(card);
+				cout << "\nAirlifting " << secondStrongest->getArmy() << " troops from " << secondStrongest->getName() << " to " << strongestTerritory->getName();
 			}
 
 			else{
-
-				deck->returnCard(card);
+				cout << "\nNot issuing orders";
 			}
 
+			deck->returnCard(card);
+			hand->removeCard(card);
+
+			cout << "\nEnding turn\n" << endl;
 			return false;
 		}
 
 		else{
 
+			bool alreadyAdvancing = false;
 			for(Territory* neighbor : strongestTerritory->getNeighbors()){
 
-				if(neighbor->getPlayer() == player->getPlayerID()){
+				for(Order* order : player->getOrdersList()->getOrders()){
+
+					if(dynamic_cast<Advance*>(order) != nullptr && dynamic_cast<Advance*>(order)->getSource() == neighbor){
+						alreadyAdvancing = true;
+					}
+				}
+
+				if(neighbor->getPlayer() == player->getPlayerID() && neighbor->getArmy() > 0 && !alreadyAdvancing){
 
 					ordersList->add(new Advance(player->getPlayerID(), "", neighbor->getArmy(), neighbor, strongestTerritory));
+					cout << "\nAdvancing " << neighbor->getArmy() << " troops from " << neighbor->getName() << " to " << strongestTerritory->getName();
+					cout << "\nEnding turn\n" << endl;
 					return false;
 				}
 			}
+
+			Territory* target = map->getTerritory(toAttackTerritories[rand() % toAttackTerritoriesSize].getName());
 			
-			ordersList->add(new Advance(player->getPlayerID(), "", strongestTerritory->getArmy(), strongestTerritory, map->getTerritory(toAttackTerritories[rand() % toAttackTerritoriesSize].getName())));
+			ordersList->add(new Advance(player->getPlayerID(), "", std::numeric_limits<int>::max(), strongestTerritory, target));
+			cout << "\nAdvancing all troops from " << strongestTerritory->getName() << " to " << target->getName();
+			cout << "\nEnding turn\n" << endl;
 			return true;
 		}
 
 		cout << "\nEnding turn\n" << endl;
+		return true;
 	}
 }
 
@@ -114,8 +134,8 @@ Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 
 		if(territory->getPlayer() != player->getPlayerID()){
 			enemies[i] = *territory;
+			i++;
 		}
-		i++;
 	}
 
 	return enemies;
@@ -172,7 +192,7 @@ Territory* AggressivePlayerStrategy::getStrongestTerritory(Player* player){
 				}
 			}
 
-			if(territory->getArmy() > max && isNextToEnemy){
+			if(territory->getArmy() >= max && isNextToEnemy){
 
 				strongestTerritory = territory;
 				max = territory->getArmy();
@@ -191,7 +211,7 @@ Territory* AggressivePlayerStrategy::getSecondStrongestTerritory(Player* player)
 		return 0;
 	}
 
-	Territory* strongestTerritory = nullptr;
+	Territory* strongestTerritory = getStrongestTerritory(player);
 	Territory* secondStrongestTerritory = nullptr;
 	int max = 0;
 	//loop through all territories on the map
@@ -208,9 +228,8 @@ Territory* AggressivePlayerStrategy::getSecondStrongestTerritory(Player* player)
 				}
 			}
 
-			if(territory->getArmy() > max && isNextToEnemy){
-				
-				secondStrongestTerritory = strongestTerritory;
+			if(territory->getArmy() >= max && isNextToEnemy && strongestTerritory != territory){
+
 				strongestTerritory = territory;
 				max = territory->getArmy();
 			}
