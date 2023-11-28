@@ -10,18 +10,19 @@
 
 using namespace std;
 
-//used for playerID and incremented so each player has a unique id
-int* playerCount = new int(1);
+// used for playerID and incremented so each player has a unique id
+int *playerCount = new int(1);
 
-Player::Player() {
-	//assign playerCount to playerID and increment playerCount
+Player::Player()
+{
+	// assign playerCount to playerID and increment playerCount
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
 	territoryArray = new Territory[0];
 	sizeOfTerritoryArray = new int(0);
 	ordersList = new OrdersList();
-	orderListIndex = new int(-1);//setting this one to -1 since we have an empty orderList
+	orderListIndex = new int(-1); // setting this one to -1 since we have an empty orderList
 	hand = NULL;
 	map = NULL;
 	deck = NULL;
@@ -34,8 +35,9 @@ Player::Player() {
 	strategy = NULL;
 }
 
-//main constructor to use other ones i will leave for now but they are not tested to work
-Player::Player(Map* map, Deck* deck, PlayerStrategy* strategy) {
+// main constructor to use other ones i will leave for now but they are not tested to work
+Player::Player(Map *map, Deck *deck, PlayerStrategy *strategy)
+{
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
@@ -55,8 +57,9 @@ Player::Player(Map* map, Deck* deck, PlayerStrategy* strategy) {
 	this->strategy = strategy;
 }
 
-//initializing a player with a collection of territories
-Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
+// initializing a player with a collection of territories
+Player::Player(Territory *territoryArray, int sizeOfTerritoryArray)
+{
 	playerID = new int(*playerCount);
 	(*playerCount)++;
 
@@ -76,14 +79,15 @@ Player::Player(Territory* territoryArray, int sizeOfTerritoryArray) {
 	strategy = NULL;
 }
 
-//copy constructor
-Player::Player(const Player& copyPlayer) {
+// copy constructor
+Player::Player(const Player &copyPlayer)
+{
 	Player();
 
-	this->playerID = new int (*copyPlayer.playerID);
-	this->territoryArray = copyPlayer.territoryArray;
+	this->playerID = new int(*copyPlayer.playerID);
 	this->territoryArray = new Territory[*copyPlayer.sizeOfTerritoryArray];
-	for (int i = 0; i < *copyPlayer.sizeOfTerritoryArray; i++) {
+	for (int i = 0; i < *copyPlayer.sizeOfTerritoryArray; i++)
+	{
 		this->territoryArray[i] = copyPlayer.territoryArray[i];
 	}
 	this->sizeOfTerritoryArray = new int(*copyPlayer.sizeOfTerritoryArray);
@@ -99,44 +103,46 @@ Player::Player(const Player& copyPlayer) {
 	this->strategy = copyPlayer.strategy;
 }
 
-//destructor to avoid any memory leaks
-Player::~Player() {
-	delete this->territoryArray;
+// destructor to avoid any memory leaks
+Player::~Player()
+{
+	delete[] territoryArray;
 	territoryArray = NULL;
 
-	delete this->sizeOfTerritoryArray;
+	delete sizeOfTerritoryArray;
 	sizeOfTerritoryArray = NULL;
 
-	delete this->ordersList;
+	delete ordersList;
 	ordersList = NULL;
 
-	delete this->orderListIndex;
+	delete orderListIndex;
 	orderListIndex = NULL;
 
-	delete this->hand;
+	delete hand;
 	hand = NULL;
 
-	delete this->deck;
+	delete deck;
 	deck = NULL;
 
-	delete this->map;
+	delete map;
 	map = NULL;
 
-	delete this->sizeOfToAttack;
+	delete sizeOfToAttack;
 	sizeOfToAttack = NULL;
 
-	delete this->sizeOfToDefend;
+	delete sizeOfToDefend;
 	sizeOfToDefend = NULL;
 
-	delete this->troopsToDeploy;
+	delete troopsToDeploy;
 	troopsToDeploy = NULL;
 
-	delete this->strategy;
+	delete strategy;
 	strategy = NULL;
 }
 
-//territories to defend
-Territory* Player::toDefend() {
+// territories to defend
+Territory *Player::toDefend()
+{
 	return strategy->toDefend(this);
 
 	/*if (map == NULL) {
@@ -161,8 +167,9 @@ Territory* Player::toDefend() {
 	return toDefend;*/
 }
 
-//territories to attack - super inefficient but what can you do
-Territory* Player::toAttack() {
+// territories to attack - super inefficient but what can you do
+Territory *Player::toAttack()
+{
 	return strategy->toAttack(this);
 
 	/*if (map == NULL) {
@@ -196,12 +203,14 @@ Territory* Player::toAttack() {
 	return toAttack;*/
 }
 
-//issuing order
-bool Player::issueOrder() {
+
+// issuing order
+bool Player::issueOrder()
+{
 
 	return strategy->issueOrder(this);
 
-	//print toDefend & toAttack to show player what he has
+	// print toDefend & toAttack to show player what he has
 	/*Territory* toDefendTerritories = toDefend();
 	Territory* toAttackTerritories = toAttack();
 
@@ -244,13 +253,13 @@ bool Player::issueOrder() {
 		//Deploy* deploy = new Deploy(tempString, tempInt);
 		ordersList->add(deploy);
 		troopsToDeploy = new int(*troopsToDeploy - tempInt);
-		
+
 		return false;
 	}
 
 	//choose advance troops or play a card if have one or end turn
 	int actionInput;
-	
+
 	while (true) {
 		cout << "Choose an action: " << endl;
 
@@ -275,7 +284,7 @@ bool Player::issueOrder() {
 		string dstInput;
 		int tempInt;
 		while (true) {
-			
+
 			cout << "Option 1: Advance troops\n" << endl;
 
 			cout << "Enter source territory name: ";
@@ -294,7 +303,7 @@ bool Player::issueOrder() {
 				cout << "Invalid number of troops to advance please try again" << endl;
 			}
 		}
-		
+
 		Advance* advance = new Advance(*playerID, "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
 		//Advance* advance = new Advance(srcInput, dstInput, tempInt);
 		ordersList->add(advance);
@@ -322,7 +331,7 @@ bool Player::issueOrder() {
 				cout << "Invalid card choice please try again" << endl;
 			}
 		}
-		
+
 		cout << "\nCard chosen:" << endl;
 		cout << *tempCards[cardChoice] << endl;
 
@@ -396,7 +405,7 @@ bool Player::issueOrder() {
 		}
 
 		else {
-			cout << "Invalid input, please try again" << endl; 
+			cout << "Invalid input, please try again" << endl;
 		}
 
 		return false;
@@ -406,47 +415,55 @@ bool Player::issueOrder() {
 		cout << "Option 3: End turn\n" << endl;
 		return true;
 	}*/
-	
 }
 
-bool Player::hasTerritory(string territoryName) {
-	Territory* toDefendArray = toDefend();
-	for (int i = 0; i < *sizeOfToDefend; i++) {
-		if (toDefendArray[i].getName() == territoryName) {
+bool Player::hasTerritory(string territoryName)
+{
+	Territory *toDefendArray = toDefend();
+	for (int i = 0; i < *sizeOfToDefend; i++)
+	{
+		if (toDefendArray[i].getName() == territoryName)
+		{
 			return true;
 		}
 	}
 	return false;
 }
 
-bool Player::hasTerritory(Territory territory) {
-	Territory* toDefendArray = toDefend();
-	for (int i = 0; i < *sizeOfToDefend; i++) {
-		if (toDefendArray[i].getName() == territory.getName()) {
+bool Player::hasTerritory(Territory territory)
+{
+	Territory *toDefendArray = toDefend();
+	for (int i = 0; i < *sizeOfToDefend; i++)
+	{
+		if (toDefendArray[i].getName() == territory.getName())
+		{
 			return true;
 		}
 	}
 	return false;
 }
 
-Order* Player::getNextInOrdersList() {
-	if (*orderListIndex >= ordersList->getOrders().size()) {
+Order *Player::getNextInOrdersList()
+{
+	if (*orderListIndex >= ordersList->getOrders().size())
+	{
 		return NULL;
 	}
-	Order* order = ordersList->get(*orderListIndex);
+	Order *order = ordersList->get(*orderListIndex);
 	*orderListIndex += 1;
 	return order;
 }
 
-//stream insertion operator
-ostream& operator << (ostream& out, const Player& player)
+// stream insertion operator
+ostream &operator<<(ostream &out, const Player &player)
 {
 	out << "Player " << *player.playerID << endl;
 	return out;
 }
 
-//assignment operator
-Player& Player::operator=(const Player& player) {
+// assignment operator
+Player &Player::operator=(const Player &player)
+{
 	this->setPlayerID(*player.playerID);
 
 	this->setTerritoryArray(player.territoryArray);
@@ -466,45 +483,59 @@ Player& Player::operator=(const Player& player) {
 	return *this;
 }
 
-//Getters and Setters
-int Player::getPlayerID() {
+// Getters and Setters
+
+string Player::getPlayerStrategyName() const
+{
+	return strategy->getStrategyName();
+}
+
+int Player::getPlayerID()
+{
 	return *this->playerID;
 }
 
-Territory Player::getTerritoryArray() {
+Territory Player::getTerritoryArray()
+{
 	return *this->territoryArray;
 }
 
-OrdersList* Player::getOrdersList() {
+OrdersList *Player::getOrdersList()
+{
 	return this->ordersList;
 }
 
-Hand* Player::getHand() {
+Hand *Player::getHand()
+{
 	return this->hand;
 }
 
-Map* Player::getMap() {
+Map *Player::getMap()
+{
 	return this->map;
 }
 
-void Player::setPlayerID(int playerID) {
+void Player::setPlayerID(int playerID)
+{
 	this->playerID = new int(playerID);
 }
 
-
-void Player::setTerritoryArray(Territory* territoryArray) {
+void Player::setTerritoryArray(Territory *territoryArray)
+{
 	this->territoryArray = territoryArray;
 }
 
-void Player::setOrdersList(OrdersList ordersList) {
+void Player::setOrdersList(OrdersList ordersList)
+{
 	*this->ordersList = ordersList;
 }
 
-void Player::setHand(Hand* hand) {
+void Player::setHand(Hand *hand)
+{
 	this->hand = hand;
 }
 
-void Player::setMap(Map* map) {
+void Player::setMap(Map *map)
+{
 	this->map = map;
 }
-

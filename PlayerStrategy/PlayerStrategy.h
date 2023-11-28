@@ -23,6 +23,8 @@ public:
 
 	}
 
+	virtual string getStrategyName() = 0;
+
 };
 
 #endif

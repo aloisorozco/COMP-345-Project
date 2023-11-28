@@ -127,6 +127,9 @@ public:
 		return deck;
 	}
 
+	string getPlayerStrategyName() const;
+
+
 	//check to make sure we do not add duplicate territories in the toAttack array
 	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
 		for (int i = 0; i < sizeOfCurToAttack; i++) {

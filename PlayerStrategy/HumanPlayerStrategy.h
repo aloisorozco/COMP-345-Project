@@ -23,6 +23,8 @@ public:
 
 	}
 
+	string getStrategyName(); 
+
 };
 
 #endif

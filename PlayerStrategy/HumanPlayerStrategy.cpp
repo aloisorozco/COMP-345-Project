@@ -278,3 +278,7 @@ Territory* HumanPlayerStrategy::toDefend(Player* player) {
 	player->setSizeOfToDefend(count);
 	return toDefend;
 }
+
+string HumanPlayerStrategy::getStrategyName() {
+	return "Human";
+}

@@ -19,6 +19,7 @@ public:
 
 	}
 
+	string getStrategyName(); 
 };
 
 #endif

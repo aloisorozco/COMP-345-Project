@@ -14,3 +14,7 @@ Territory* BenevolentPlayerStrategy::toAttack(Player* player) {
 Territory* BenevolentPlayerStrategy::toDefend(Player* player) {
 	return NULL;
 }
+
+string BenevolentPlayerStrategy::getStrategyName() {
+	return "Benevolent";
+}

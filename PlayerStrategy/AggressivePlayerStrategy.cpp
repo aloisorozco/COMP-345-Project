@@ -14,3 +14,7 @@ Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 Territory* AggressivePlayerStrategy::toDefend(Player* player) {
 	return NULL;
 }
+
+string AggressivePlayerStrategy::getStrategyName() {
+	return "Aggressive";
+}

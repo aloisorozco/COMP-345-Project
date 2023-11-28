@@ -9,16 +9,21 @@ class NeutralPlayerStrategy : public PlayerStrategy {
 
 public:
 
+
 	bool issueOrder(Player* player);
 
 	Territory* toAttack(Player* player);
 
 	Territory* toDefend(Player* player);
 
-	~NeutralPlayerStrategy() {
+	~NeutralPlayerStrategy() {};
+	
+	string getStrategyName();
 
-	}
+	
 
 };
+
+
 
 #endif

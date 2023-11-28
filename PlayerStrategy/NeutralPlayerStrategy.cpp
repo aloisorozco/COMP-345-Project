@@ -86,3 +86,7 @@ Territory* NeutralPlayerStrategy::toDefend(Player* player) {
 	player->setSizeOfToDefend(count);
 	return toDefend;
 }
+
+string NeutralPlayerStrategy::getStrategyName() {
+	return "Neutral";
+}

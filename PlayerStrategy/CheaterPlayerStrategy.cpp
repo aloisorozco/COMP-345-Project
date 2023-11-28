@@ -127,3 +127,7 @@ Territory* CheaterPlayerStrategy::toDefend(Player* player) {
 	player->setSizeOfToDefend(count);
 	return toDefend;
 }
+
+string CheaterPlayerStrategy::getStrategyName() {
+	return "Cheater";
+}
