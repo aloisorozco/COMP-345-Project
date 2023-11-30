@@ -456,9 +456,6 @@ Player& Player::operator=(const Player& player) {
 	this->deck = new Deck(*player.deck);
 	this->setMap(player.map);
 
-	this->setSizeOfToAttack(*player.sizeOfToAttack);
-	this->setSizeOfToDefend(*player.sizeOfToDefend);
-
 	this->troopsToDeploy = player.troopsToDeploy;
 
 	this->strategy = player.strategy;

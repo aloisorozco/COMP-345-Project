@@ -104,7 +104,7 @@ void testPlayers() {
 	deck->draw(player1->getHand());
 	deck->draw(player2->getHand());
 
-	////Issue order
+	////Issue all orders from both players
 
 	while(!player1->issueOrder());
 	while(!player2->issueOrder());
@@ -116,18 +116,20 @@ void testPlayers() {
 
 	Territory* toDefendTerritories = player2->toDefend();
 
-	int sizeOfToAttackP2 = aps2->toAttackSize(player2);
-	int sizeOfToDefendP2 = aps2->toDefendSize(player2);
+	int sizeOfToAttackP2 = player2->getSizeOfToAttack();
+	int sizeOfToDefendP2 = player2->getSizeOfToDefend();
 
 	cout << "toAttackSizeP2: " << sizeOfToAttackP2 << endl;
 	cout << "toDefendSizeP2: " << sizeOfToDefendP2 << endl;
 
+	//Testing toAttack()
 	cout << "Territories to attack for " << *player2 << endl;
 	for (int i = 0; i < sizeOfToAttackP2; i++) {
 		cout << toAttackTerritories[i] << endl;
 	}
 	cout << "---" << endl;
 	
+	//Testing toDefend()
 	cout << "Territories to defend for " << *player2 << endl;
 	for (int i = 0; i < sizeOfToDefendP2; i++) {
 		cout << toDefendTerritories[i] << endl;
@@ -144,8 +146,8 @@ void testPlayers() {
 
 	Territory* toDefendTerritories1 = player1->toDefend();
 
-	int sizeOfToAttackP1 = aps1->toAttackSize(player1);
-	int sizeOfToDefendP1 = aps1->toDefendSize(player1);
+	int sizeOfToAttackP1 = player1->getSizeOfToAttack();
+	int sizeOfToDefendP1 = player1->getSizeOfToDefend();
 
 	cout << "toAttackSizeP1: " << sizeOfToAttackP1 << endl;
 	cout << "toDefendSizeP1: " << sizeOfToDefendP1 << endl;

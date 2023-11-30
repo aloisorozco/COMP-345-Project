@@ -15,14 +15,11 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 	Territory* toDefendTerritories = toDefend(player);
 	Territory* toAttackTerritories = toAttack(player);
 
-	int toDefendTerritoriesSize = toDefendSize(player);
-	int toAttackTerritoriesSize = toAttackSize(player);
-
 	Territory* strongestTerritory = getStrongestTerritory(player);
 
 	cout << "\nAggressive Player " << player->getPlayerID() << "'s issue order\n" << endl;
 
-	//if player has troops to deploy, player is forced to deploy them can't issue another order
+	//if player has troops to deploy, player is forced to deploy them can't issue another order. Aggressive player will deploy to the strongest territory
 	if (*player->getTroopsToDeploy() > 0) {
 
 		cout << "Deploy troops: " << endl;
@@ -42,10 +39,11 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 	
 	else {
 		
+		//Will first check if there are cards yet
 		if(hand->getHandSize() > 0){
 
 			Card* card = hand->getCards().back();
-			Territory* target = map->getTerritory(toAttackTerritories[rand() % toAttackTerritoriesSize].getName());
+			Territory* target = map->getTerritory(toAttackTerritories[rand() % player->getSizeOfToAttack()].getName());
 
 			if(card->getType() == Card::ReinforcementCT){
 
@@ -68,6 +66,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 				cout << "\nAirlifting " << secondStrongest->getArmy() << " troops from " << secondStrongest->getName() << " to " << strongestTerritory->getName();
 			}
 
+			//Aggressive Player will ignore cards with no offencive nature
 			else{
 				cout << "\nNot issuing orders";
 			}
@@ -81,6 +80,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 
 		else{
 
+			//If there are no cards left, Aggressive player will first advance troops from adjacent territories to the strongest one
 			bool alreadyAdvancing = false;
 			for(Territory* neighbor : strongestTerritory->getNeighbors()){
 
@@ -100,7 +100,8 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 				}
 			}
 
-			Territory* target = map->getTerritory(toAttackTerritories[rand() % toAttackTerritoriesSize].getName());
+			//Once adjacent territories' troops are all 0, the strongest territory will attack a random enemy territory
+			Territory* target = map->getTerritory(toAttackTerritories[rand() % player->getSizeOfToAttack()].getName());
 			
 			ordersList->add(new Advance(player->getPlayerID(), "", std::numeric_limits<int>::max(), strongestTerritory, target));
 			cout << "\nAdvancing all troops from " << strongestTerritory->getName() << " to " << target->getName();
@@ -113,6 +114,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 	}
 }
 
+//Returns an array of enemy territories adjacent to strongest territory
 Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 
 	Territory* strongestTerritory = getStrongestTerritory(player);
@@ -126,6 +128,7 @@ Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 		}
 	}
 
+	player->setSizeOfToAttack(count);
 	Territory* enemies = new Territory[count];
 
 	int i = 0;
@@ -142,32 +145,14 @@ Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 
 }
 
+//Returns empty array because aggressive player won't take defensive approaches
 Territory* AggressivePlayerStrategy::toDefend(Player* player) {
 	
 	player->setSizeOfToDefend(0);
 	return new Territory[0];
 }
 
-int AggressivePlayerStrategy::toAttackSize(Player* player){
-
-	Territory* strongestTerritory = getStrongestTerritory(player);
-
-	int count = 0;
-
-	for(Territory* territory : strongestTerritory->getNeighbors()){
-
-		if(territory->getPlayer() != player->getPlayerID()){
-			count++;
-		}
-	}
-
-	return count;
-}
-
-int AggressivePlayerStrategy::toDefendSize(Player* player){
-	return 0;
-}
-
+//Returns the territory with the most troops, which is going to attack
 Territory* AggressivePlayerStrategy::getStrongestTerritory(Player* player){
 
 	Map* map = player->getMap();
@@ -203,6 +188,7 @@ Territory* AggressivePlayerStrategy::getStrongestTerritory(Player* player){
 	return strongestTerritory;
 }
 
+//Returns the second territory with most troops. Used exclusively with airlift orders to decide the source territory.
 Territory* AggressivePlayerStrategy::getSecondStrongestTerritory(Player* player){
 
 	Map* map = player->getMap();

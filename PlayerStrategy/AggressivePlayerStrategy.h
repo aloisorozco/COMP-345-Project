@@ -15,10 +15,6 @@ public:
 
 	Territory* toDefend(Player* player);
 
-	int toAttackSize(Player* player);
-
-	int toDefendSize(Player* player);
-
 	~AggressivePlayerStrategy() {
 
 	}
