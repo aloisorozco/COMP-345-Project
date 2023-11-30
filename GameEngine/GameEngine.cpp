@@ -7,6 +7,7 @@
 #include <random>
 #include <sstream>
 #include <stdexcept>
+#include <iomanip>
 
 #include "../Player/Player.h"
 #include "../PlayerStrategy/PlayerStrategy.h"
@@ -452,6 +453,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
     vector<string> mapFiles;         // vector to store map files names
     vector<string> playerStrategies; // vector to store player strategies names
     int numberOfGames = 0;           // number of games to play
+    int numberOfMaps = 0;            // number of maps to play
     int maxTurns = 0;                // max number of turns per game
     int j = 1;                       // index for parsing through commandWords vector
 
@@ -558,7 +560,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             {
                 cout << "Too few turns. Number of turns is set to 10\n"
                      << endl;
-                maxTurns = 10; // set turns to 10 if number too low
+                maxTurns = 2; // set turns to 10 if number too low
             }
         }
     }
@@ -663,19 +665,27 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
 
     ////////////////// Print Tournament Options //////////////////////
     cout << "\nTournament will start with the following options: " << endl;
-    cout << "Maps: ";
+    cout << "Ms: ";
     for (string map : mapFiles)
     {
         cout << map << " ";
     }
 
-    cout << "\nPlayers: ";
+    cout << "\nP: ";
     for (string player : playerStrategies)
     {
         cout << player << " ";
     }
-    cout << "\nNumber of Games: " << numberOfGames << endl;
-    cout << "Max Turns: " << maxTurns << endl;
+    cout << "\nG: " << numberOfGames << endl;
+    cout << "D: " << maxTurns << endl;
+
+    // Get num maps and num games
+    numberOfMaps = mapFiles.size();
+
+    //Create 2D array for results
+    string results[numberOfMaps][numberOfMaps] = {};
+    
+
 
     /////////////////// Games Start /////////////////////////
     for (int i = 0; i < numberOfGames; i++)
@@ -693,47 +703,61 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
 
             GameEngine *engine = &engineArg;
             gameInit(*engine);
+            engine->setMaxTurns(maxTurns);
+            cout<<"Game loaded  -  "<< engine->getMaxTurns()<<endl; 
 
             map = new Map();
             Deck *deck = new Deck();
 
             // Load first map
             MapLoader *mapLoader = new MapLoader();         // loader
-            map = mapLoader->loadMap_withName(mapFiles[i]); // load map
+            map = mapLoader->loadMap_withName(mapFiles[l]); // load map
             engine->processCommand("loadmap");              // transition state
             engine->processCommand("validatemap");          // transition state (maps are already valid, no need to validate again)
             delete mapLoader;                               // delete loader
             mapLoader = NULL;
 
             //================================================ Add players =============================================//
-            for (int j = 0; j < playerStrategies.size(); j++)
+            if (playerArray.size() == 0) // If there are no existing players - create new ones
             {
-                PlayerStrategy *strategy;
-                // if (playerStrategies[i] == "aggressive")
-                // {
-                //     strategy = new AggressivePlayerStrategy();
-                // }
-                // else if (playerStrategies[i] == "benevolent")
-                // {
-                //     strategy = new BenevolentPlayerStrategy();
-                // }
-                if (playerStrategies[j] == "cheater")
+                for (int j = 0; j < playerStrategies.size(); j++)
                 {
-                    strategy = new CheaterPlayerStrategy();
-                }
-                else if (playerStrategies[j] == "neutral")
-                {
-                    strategy = new NeutralPlayerStrategy();
-                }
+                    PlayerStrategy *strategy;
+                    // if (playerStrategies[i] == "aggressive")
+                    // {
+                    //     strategy = new AggressivePlayerStrategy();
+                    // }
+                    // else if (playerStrategies[i] == "benevolent")
+                    // {
+                    //     strategy = new BenevolentPlayerStrategy();
+                    // }
+                    if (playerStrategies[j] == "cheater")
+                    {
+                        strategy = new CheaterPlayerStrategy();
+                    }
+                    else if (playerStrategies[j] == "neutral")
+                    {
+                        strategy = new NeutralPlayerStrategy();
+                    }
 
-                cout<<strategy->getStrategyName()<<endl;
+                    Player *player = new Player(map, deck, strategy);
+                    engine->addPlayer(player);
+                    engine->processCommand("addplayer");
+                }
+            }
+            else{ // If players are already created - reset their hand, deck and map
 
-                Player *player = new Player(map, deck, strategy);
-                cout<<player->getPlayerStrategyName()<<endl;
-                engine->addPlayer(player);
-                engine->processCommand("addplayer");
+                for (Player* player : playerArray)
+                {                      
+                    delete player->getHand();
+                    Hand *hand = new Hand(deck);
+                    player->setHand(hand);
+                    player->setMap(map);
+                    player->setDeck(deck);
+                }
             }
 
+                
             //========================================= Assign territories to players ========================================//
 
             // Vector of player IDs/Number
@@ -790,7 +814,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             cout << "Order of play: ";
             for (Player *player : playerArray)
             {
-                cout << "Player " << player->getPlayerStrategyName() << " > ";
+                cout << "Player " << player->getPlayerStrategyName() << player->getPlayerID() << " > ";
             }
 
             //=======================================Reinforcements=====================================================//
@@ -804,7 +828,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             // Each Player draws two cards from the deck
             for (Player *player : playerArray)
             {
-                cout << "\nPlayer : " << player->getPlayerStrategyName()<< endl;
+                cout << "\nPlayer : " << player->getPlayerStrategyName() << endl;
                 deck->draw(player->getHand());
                 deck->draw(player->getHand());
             }
@@ -812,50 +836,68 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             //========================================Game Start======================================================//
             // cout<<*engine->getMap()<<endl;
 
-            engine->play(*engine);
+            engine->processCommand("gamestart");
+
+            results[l][i] = engine->mainGameLoop();
 
             //========================================Game End======================================================//
-            
-            for (auto it = playerArray.begin(); it != playerArray.end();)
+
+            // Empty Player Hand
             {
-                it = playerArray.erase(it); // Erase the element from the vector
+                
             }
 
             // delete deck
             delete deck;
-            cout << "deck deleted" << endl;
+            deck = NULL;
 
             // delete map
             delete map;
-            cout << "map deleted" << endl;
-
-            // cout << "hello" << endl;
-
-            // engine->processCommand("gamestart");
-
-            //TODO: fix Play fucntion
-            
+            map = NULL;
         }
     }
+
+
+    //========================================Print Results======================================================//
+    cout<<std::setw(10)<<" ";
+
+    //Print Column Headers
+    for (int i =0; i< numberOfGames; i++){
+        cout<< std::setw(10)<< "Game " << i+1;
+    }
+
+    cout<<endl;
+
+    //Prints Rows (results)
+    for (int i = 0; i < numberOfMaps; ++i) {
+        std::cout << std::setw(10) << "Map " << i + 1;
+        for (int j = 0; j < numberOfGames; ++j) {
+            std::cout << std::setw(10) << results[i][j];
+        }
+        std::cout << std::endl;
+    }
+
 }
 
-void GameEngine::setMaxTurns(int gameMaxTurns) { *maxTurns = gameMaxTurns; }
+void GameEngine::setMaxTurns(int gameMaxTurns) { maxTurns = new int(gameMaxTurns); }
 int GameEngine::getMaxTurns() const { return *maxTurns; }
 
 int main()
 {
-    GameEngine *engine = new GameEngine();
+    // GameEngine *engine = new GameEngine();
 
-    engine->startupPhase(*engine);
+    // engine->startupPhase(*engine);
 
-    delete engine;
+    // delete engine;
+
+    testMainGameLoop();
 
     // Map *map = new Map();
     // cout<<"map created"<<endl;
 
     // Deck *deck = new Deck();
-    // cout<<"deck created"<<endl;  
-   
+    // cout<<"deck created"<<endl;
+
     // PlayerStrategy *strategy2 = new NeutralPlayerStrategy();
     // cout<<"strategy created"<<endl;
 
@@ -864,8 +906,51 @@ int main()
     // delete player2;
     // cout<<"player deleted"<<endl;
 
-    
     // cout << "success" << endl;
+
+    //    MapLoader loader;
+    // Map* testMap = loader.loadMap();
+
+    // cout << *testMap << endl;
+
+    // if (testMap->validate())
+    // {
+    //     cout << "\n\nMap is valid" << endl;
+    // }
+    // else
+    // {
+    //     cout << "Map is not valid" << endl;
+    // }
+
+    // Deck* deck = new Deck();
+
+    // GameEngine* engine = new GameEngine();
+
+    // PlayerStrategy* strategy = new CheaterPlayerStrategy();
+    // PlayerStrategy* cheaterStrategy = new NeutralPlayerStrategy();
+
+    // Player* p1 = new Player(testMap, deck, strategy);
+    // Player* p2 = new Player(testMap, deck, cheaterStrategy);
+    // Player* p3 = new Player(testMap, deck, strategy);
+
+    // for (int i = 0; i < 5; i++) {
+    //     deck->draw(p1->getHand());
+    // }
+
+    // engine->addPlayer(p1);
+    // engine->addPlayer(p2);
+    // engine->addPlayer(p3);
+
+    // testMap->setContinents(testMap->getContinents());
+
+    // for (Territory* territory : testMap->getTerritories()) {
+    //     territory->setPlayer(1);
+    // }
+    // testMap->getTerritories()[0]->setPlayer(2);
+
+    // cout << "Main Game Loop start: " << endl;
+
+    // engine->play(*engine);
 
     return 0;
 }
@@ -895,6 +980,8 @@ bool GameEngine::reinforcementPhase()
             playerArray.erase(playerArray.begin() + i);
         }
     }
+
+
 
     if (playerArray.size() == 1)
     {
@@ -1069,8 +1156,11 @@ void GameEngine::executeOrdersPhase()
               << endl;
 }
 
-void GameEngine::mainGameLoop()
+string GameEngine::mainGameLoop()
+
+
 {
+    
     int currentTurn = 0;
     // part 3 here - players already have to be set
     while (true)
@@ -1081,14 +1171,14 @@ void GameEngine::mainGameLoop()
 
         if (gameWon)
         {
-            break;
+            return "winner";//
+            // this->Player->getStrategyName() + " wins!!!";
         }
 
-        // if (this->getMaxTurns() == currentTurn)
-        // {
-        //     cout << "Draw" << endl;
-        //     break;
-        // }
+        if (this->getMaxTurns() == currentTurn)
+        {
+            return "draw";
+        }
 
         // issuing orders phase
         issueOrdersPhase();

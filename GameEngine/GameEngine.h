@@ -100,7 +100,7 @@ public:
 
     Map* getMap() const;
 
-    void mainGameLoop();
+    string mainGameLoop();
 
     void startupPhase(GameEngine &engineArg);
 

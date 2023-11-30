@@ -122,10 +122,10 @@ void testMainGameLoop() {
     GameEngine* engine = new GameEngine();
 
     PlayerStrategy* strategy = new NeutralPlayerStrategy();
-    PlayerStrategy* cheaterStrategy = new HumanPlayerStrategy();
+    PlayerStrategy* cheaterStrategy = new CheaterPlayerStrategy();
 
-    Player* p1 = new Player(testMap, deck, strategy);
-    Player* p2 = new Player(testMap, deck, cheaterStrategy);
+    Player* p1 = new Player(testMap, deck, cheaterStrategy);
+    Player* p2 = new Player(testMap, deck, strategy);
     Player* p3 = new Player(testMap, deck, strategy);
 
     for (int i = 0; i < 5; i++) {

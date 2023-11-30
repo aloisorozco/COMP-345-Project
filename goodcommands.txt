@@ -1,3 +1,4 @@
+tournament -M Aden.map Afric Africa.map Z.map -P cheater neutral -G 1 -D 30
 loadmap Aden.map
 validatemap
 addplayer Sam

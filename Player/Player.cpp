@@ -136,8 +136,7 @@ Player::~Player()
 	delete troopsToDeploy;
 	troopsToDeploy = NULL;
 
-	delete strategy;
-	strategy = NULL;
+	delete this->strategy;
 }
 
 // territories to defend
@@ -538,4 +537,9 @@ void Player::setHand(Hand *hand)
 void Player::setMap(Map *map)
 {
 	this->map = map;
+}
+
+void Player::setDeck(Deck *deck)
+{
+	this->deck = deck;
 }

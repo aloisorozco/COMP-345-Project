@@ -81,6 +81,8 @@ public:
 
 	void setMap(Map* map);
 
+	void setDeck(Deck* deck);
+
 	int getSizeOfToDefend() {
 		return *sizeOfToDefend;
 	}
