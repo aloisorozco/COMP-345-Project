@@ -24,5 +24,6 @@ public:
 	}
 
 };
-
+// free function declaration
+int testPlayerStrategies();
 #endif

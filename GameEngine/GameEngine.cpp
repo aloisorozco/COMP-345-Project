@@ -12,6 +12,8 @@
 #include "../PlayerStrategy/HumanPlayerStrategy.h"
 #include "../PlayerStrategy/NeutralPlayerStrategy.h"
 #include "../PlayerStrategy/CheaterPlayerStrategy.h"
+#include "../PlayerStrategy/AggressivePlayerStrategy.h"
+#include "../PlayerStrategy/BenevolentPlayerStrategy.h"
 #include "../Map/Map.h"
 #include "../CommandProcessor/CommandProcessing.h"
 
@@ -589,10 +591,9 @@ void GameEngine::executeOrdersPhase()
                             }
 
                             if (*playerAttackedID == playerArray[i]->getPlayerID()) {
-                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "Neutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
-                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                                playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
                             }
                         }
 
@@ -608,10 +609,9 @@ void GameEngine::executeOrdersPhase()
                             }
 
                             if (*playerAttackedID == playerArray[i]->getPlayerID()) {
-                                //TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "\nNeutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
-                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                                playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
                             }
                         }
 

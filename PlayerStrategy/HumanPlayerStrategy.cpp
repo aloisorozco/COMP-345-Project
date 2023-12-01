@@ -49,7 +49,13 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 				break;
 			}
 			else {
+                //Okay invalid, what should user input to make it valid.
 				cout << "Invalid input please try again" << endl;
+                cout<<"You can deploy this many troops: " << *player->getTroopsToDeploy() <<endl;
+                cout<<"You own the following territories: " << endl;
+                for (int i = 0; i < player->getSizeOfToDefend(); i++) {
+                    cout << toDefendTerritories[i] << endl;
+                }
 			}
 		}
 		Deploy* deploy = new Deploy(player->getPlayerID(), "", tempInt, map->getTerritory(tempString));

@@ -57,15 +57,17 @@ bool CheaterPlayerStrategy::issueOrder(Player* player) {
 	*/
 	else {
 		//conquering territories like this instead of by orders since player is cheating
-		for (int i = 0; i < player->getSizeOfToAttack(); i++) {
+        for (int i = 0; i < player->getSizeOfToAttack(); i++) {
 
-			cout << "\nConquering territory " << toAttackTerritories[i].getName() << endl;
+            cout << "\nConquering territory " << toAttackTerritories[i].getName() << endl;
+            cout<< map->getTerritory(toAttackTerritories[i].getName())->getName()<< endl;
+            cout << player->getPlayerID() << endl;
+            map->getTerritory(toAttackTerritories[i].getName())->setPlayer(player->getPlayerID());
 
-			map->getTerritory(toAttackTerritories[i].getName())->setPlayer(player->getPlayerID());
-
-		}
+        }
 
 		cout << "\nEnding turn\n" << endl;
+        return true;
 	}
 }
 
