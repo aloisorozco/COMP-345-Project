@@ -55,6 +55,8 @@ Player::Player(Map *map, Deck *deck, PlayerStrategy *strategy)
 	troopsToDeploy = new int(0);
 
 	this->strategy = strategy;
+
+	this->initStrategyName = new string(strategy->getStrategyName());
 }
 
 // initializing a player with a collection of territories
@@ -101,6 +103,7 @@ Player::Player(const Player &copyPlayer)
 	this->troopsToDeploy = new int(*copyPlayer.troopsToDeploy);
 
 	this->strategy = copyPlayer.strategy;
+	this->initStrategyName = new string(*copyPlayer.initStrategyName);
 }
 
 // destructor to avoid any memory leaks
@@ -165,6 +168,16 @@ Territory *Player::toDefend()
 	*sizeOfToDefend = count;
 	return toDefend;*/
 }
+
+bool Player::isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
+		for (int i = 0; i < sizeOfCurToAttack; i++) {
+			//assuming each territory has a unique name
+			if (curToAttack[i].getName() == territoryToAdd->getName()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 // territories to attack - super inefficient but what can you do
 Territory *Player::toAttack()
@@ -478,11 +491,22 @@ Player &Player::operator=(const Player &player)
 	this->troopsToDeploy = player.troopsToDeploy;
 
 	this->strategy = player.strategy;
+	this->initStrategyName = new string(*player.initStrategyName);
 
 	return *this;
 }
 
 // Getters and Setters
+
+void Player::setInitStrategyName(string strategyName)
+{
+	this->initStrategyName = new string(strategyName);
+}
+
+string Player::getInitStrategyName() const
+{
+	return *this->initStrategyName;
+}
 
 string Player::getPlayerStrategyName() const
 {

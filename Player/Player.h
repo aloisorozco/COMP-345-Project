@@ -35,6 +35,8 @@ private:
 
 	friend ostream& operator << (ostream& out, const Player& player);
 
+	string* initStrategyName; //to ouput winner of tournament
+
 public:
 
 	Player();
@@ -131,17 +133,13 @@ public:
 
 	string getPlayerStrategyName() const;
 
+	void setInitStrategyName(string strategyName);
+
+	string getInitStrategyName() const;
+
 
 	//check to make sure we do not add duplicate territories in the toAttack array
-	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd) {
-		for (int i = 0; i < sizeOfCurToAttack; i++) {
-			//assuming each territory has a unique name
-			if (curToAttack[i].getName() == territoryToAdd->getName()) {
-				return true;
-			}
-		}
-		return false;
-	}
+	bool isAlreadyInToAttack(Territory* curToAttack, int sizeOfCurToAttack, Territory* territoryToAdd);
 
 };
 

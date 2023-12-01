@@ -685,7 +685,8 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
     //Create 2D array for results
     string results[numberOfMaps][numberOfMaps] = {};
     
-
+    // Array to keep track of players in game and add them back into the playerArray after each game
+    vector<Player*> players;
 
     /////////////////// Games Start /////////////////////////
     for (int i = 0; i < numberOfGames; i++)
@@ -742,11 +743,16 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
 
                     Player *player = new Player(map, deck, strategy);
                     engine->addPlayer(player);
+                    players.push_back(player);
                     engine->processCommand("addplayer");
                 }
             }
             else{ // If players are already created - reset their hand, deck and map
 
+                // Reset Player array so all players are in game
+                engine->setPlayers(players);
+
+                // Reset players hand, deck and map
                 for (Player* player : playerArray)
                 {                      
                     delete player->getHand();
@@ -814,7 +820,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             cout << "Order of play: ";
             for (Player *player : playerArray)
             {
-                cout << "Player " << player->getPlayerStrategyName() << player->getPlayerID() << " > ";
+                cout << "Player "<< player->getPlayerID()<<" - " << player->getPlayerStrategyName()  << " > ";
             }
 
             //=======================================Reinforcements=====================================================//
@@ -828,7 +834,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             // Each Player draws two cards from the deck
             for (Player *player : playerArray)
             {
-                cout << "\nPlayer : " << player->getPlayerStrategyName() << endl;
+                cout << "\nPlayer : " << player->getPlayerID()<<" - " << player->getPlayerStrategyName() << endl;
                 deck->draw(player->getHand());
                 deck->draw(player->getHand());
             }
@@ -884,13 +890,13 @@ int GameEngine::getMaxTurns() const { return *maxTurns; }
 
 int main()
 {
-    // GameEngine *engine = new GameEngine();
+    GameEngine *engine = new GameEngine();
 
-    // engine->startupPhase(*engine);
+    engine->startupPhase(*engine);
 
-    // delete engine;
+    delete engine;
 
-    testMainGameLoop();
+    // testMainGameLoop();
 
     // Map *map = new Map();
     // cout<<"map created"<<endl;
@@ -950,7 +956,7 @@ int main()
 
     // cout << "Main Game Loop start: " << endl;
 
-    // engine->play(*engine);
+    // engine->mainGameLoop();
 
     return 0;
 }
@@ -1156,6 +1162,11 @@ void GameEngine::executeOrdersPhase()
               << endl;
 }
 
+vector<Player*> GameEngine::getPlayers() const 
+{
+    return playerArray;
+}
+
 string GameEngine::mainGameLoop()
 
 
@@ -1171,7 +1182,7 @@ string GameEngine::mainGameLoop()
 
         if (gameWon)
         {
-            return "winner";//
+            return this->getPlayers()[0]->getInitStrategyName();
             // this->Player->getStrategyName() + " wins!!!";
         }
 

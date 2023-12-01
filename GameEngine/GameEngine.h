@@ -119,6 +119,8 @@ public:
     void setMaxTurns(int gameMaxTurns);
 
     int getMaxTurns() const;
+
+    vector<Player*> getPlayers() const;
     
 
     /*static Player* gamePlayerArray;
