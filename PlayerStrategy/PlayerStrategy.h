@@ -29,5 +29,6 @@ public:
 	virtual Territory* getSecondStrongestTerritory(Player* player) {return NULL;};
 
 };
-
+// free function declaration
+int testPlayerStrategies();
 #endif

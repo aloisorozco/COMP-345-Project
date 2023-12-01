@@ -21,6 +21,8 @@ public:
 
 	string getStrategyName();
 
+    Territory* getWeakestTerritory(Player* player);
+    Territory* getStrongestTerritory(Player* player);
 };
 
 #endif

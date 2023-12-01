@@ -49,7 +49,13 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 				break;
 			}
 			else {
+                //Okay invalid, what should user input to make it valid.
 				cout << "Invalid input please try again" << endl;
+                cout<<"You can deploy this many troops: " << *player->getTroopsToDeploy() <<endl;
+                cout<<"You own the following territories: " << endl;
+                for (int i = 0; i < player->getSizeOfToDefend(); i++) {
+                    cout << toDefendTerritories[i] << endl;
+                }
 			}
 		}
 		Deploy* deploy = new Deploy(player->getPlayerID(), "", tempInt, map->getTerritory(tempString));
@@ -99,14 +105,18 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 			cout << "Enter troops to advance: ";
 			cin >> tempInt;
 
-			if (tempInt > 0) {
+            //make sure the territory belongs to the player and that the units to move dont exceed the amount in the territory
+			if (tempInt <= map->getTerritory(srcInput)->getArmy() && player->hasTerritory(srcInput) && map->getTerritory(srcInput)->isNeighbor(map->getTerritory(dstInput)) ) {
 				break;
 			}
 			else {
-				cout << "Invalid number of troops to advance please try again" << endl;
+				cout << "Invalid input, your source territories are: " <<endl;
+                for (int i = 0; i < player->getSizeOfToDefend(); i++) {
+                    cout << toDefendTerritories[i]<< "has this many troops:" <<toDefendTerritories[i].getArmy() << endl;
+                }
+
 			}
 		}
-
 		Advance* advance = new Advance(player->getPlayerID(), "", tempInt, map->getTerritory(srcInput), map->getTerritory(dstInput));
 		//Advance* advance = new Advance(srcInput, dstInput, tempInt);
 		ordersList->add(advance);
@@ -127,7 +137,7 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 			cout << "Choose a card to play:\n" << endl;
 			cin >> cardChoice;
 
-			if (cardChoice >= 0 || cardChoice < tempCards.size()) {
+			if (cardChoice >= 0 && cardChoice < tempCards.size()) {
 				break;
 			}
 			else {
@@ -177,12 +187,15 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 				;
 				cout << "Enter troops to advance: ";
 				cin >> tempInt;
-
-				if (tempInt > 0) {
-					break;
-				}
+                //cant exceed amount of troops in the territory, you must own both territories.
+                if (tempInt <= map->getTerritory(srcInput)->getArmy() && player->hasTerritory(srcInput) && player->hasTerritory(dstInput) ) {
+                    break;
+                }
 				else {
-					cout << "Invalid number of troops to advance please try again" << endl;
+                    cout << "Invalid input, you own the following territories: " <<endl;
+                    for (int i = 0; i < player->getSizeOfToDefend(); i++) {
+                        cout << toDefendTerritories[i]<< "has this many troops:" <<toDefendTerritories[i].getArmy() << endl;
+                    }
 				}
 			}
 
