@@ -19,6 +19,9 @@ public:
 
 	}
 
+	Territory* getStrongestTerritory(Player* player);
+	Territory* getSecondStrongestTerritory(Player* player);
+
 };
 
 #endif
