@@ -5,6 +5,7 @@
 #include "../Orders/Orders.h"
 #include "../Cards/Cards.h"
 #include "../PlayerStrategy/PlayerStrategy.h"
+#include "../PlayerStrategy/AggressivePlayerStrategy.h"
 
 class Player {
 
