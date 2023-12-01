@@ -682,11 +682,11 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
     // Get num maps and num games
     numberOfMaps = mapFiles.size();
 
-    //Create 2D array for results
+    // Create 2D array for results
     string results[numberOfMaps][numberOfMaps] = {};
-    
+
     // Array to keep track of players in game and add them back into the playerArray after each game
-    vector<Player*> players;
+    vector<Player *> players;
 
     /////////////////// Games Start /////////////////////////
     for (int i = 0; i < numberOfGames; i++)
@@ -705,7 +705,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             GameEngine *engine = &engineArg;
             gameInit(*engine);
             engine->setMaxTurns(maxTurns);
-            cout<<"Game loaded  -  "<< engine->getMaxTurns()<<endl; 
+            cout << "Game loaded  -  " << engine->getMaxTurns() << endl;
 
             map = new Map();
             Deck *deck = new Deck();
@@ -724,15 +724,16 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                 for (int j = 0; j < playerStrategies.size(); j++)
                 {
                     PlayerStrategy *strategy;
-                    // if (playerStrategies[i] == "aggressive")
-                    // {
-                    //     strategy = new AggressivePlayerStrategy();
-                    // }
-                    // else if (playerStrategies[i] == "benevolent")
+                    if (playerStrategies[j] == "aggressive")
+                    {
+                        cout << "=============TEST===============" << endl;
+                        strategy = new AggressivePlayerStrategy();
+                    }
+                    // else if (playerStrategies[j] == "benevolent")
                     // {
                     //     strategy = new BenevolentPlayerStrategy();
                     // }
-                    if (playerStrategies[j] == "cheater")
+                    else if (playerStrategies[j] == "cheater")
                     {
                         strategy = new CheaterPlayerStrategy();
                     }
@@ -747,23 +748,39 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                     engine->processCommand("addplayer");
                 }
             }
-            else{ // If players are already created - reset their hand, deck and map
+            else
+            { // If players are already created - reset their hand, deck and map
 
                 // Reset Player array so all players are in game
                 engine->setPlayers(players);
 
+                for (Player *player : players)
+                {
+                    cout << *player << endl;
+                }
+
+                for (Player* player: playerArray){
+                    cout<<*player<<endl;
+                }
                 // Reset players hand, deck and map
-                for (Player* player : playerArray)
-                {                      
-                    delete player->getHand();
-                    Hand *hand = new Hand(deck);
-                    player->setHand(hand);
+                for (Player *player : playerArray)
+                {
+                    
+                    if (player->getInitStrategyName() != "Cheater") // cheater has no hand
+                    {
+                        Hand *hand = new Hand(deck);
+                        player->setHand(hand);
+                        cout<<"not hand"<<endl;
+                    }
                     player->setMap(map);
                     player->setDeck(deck);
+
+                    cout << "player init" << endl;
                 }
+
+                engine->processCommand("addplayer");
             }
 
-                
             //========================================= Assign territories to players ========================================//
 
             // Vector of player IDs/Number
@@ -820,7 +837,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             cout << "Order of play: ";
             for (Player *player : playerArray)
             {
-                cout << "Player "<< player->getPlayerID()<<" - " << player->getPlayerStrategyName()  << " > ";
+                cout << "Player " << player->getPlayerID() << " - " << player->getPlayerStrategyName() << " > ";
             }
 
             //=======================================Reinforcements=====================================================//
@@ -834,7 +851,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             // Each Player draws two cards from the deck
             for (Player *player : playerArray)
             {
-                cout << "\nPlayer : " << player->getPlayerID()<<" - " << player->getPlayerStrategyName() << endl;
+                cout << "\nPlayer : " << player->getPlayerID() << " - " << player->getInitStrategyName() << endl;
                 deck->draw(player->getHand());
                 deck->draw(player->getHand());
             }
@@ -848,11 +865,6 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
 
             //========================================Game End======================================================//
 
-            // Empty Player Hand
-            {
-                
-            }
-
             // delete deck
             delete deck;
             deck = NULL;
@@ -863,38 +875,42 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
         }
     }
 
-
     //========================================Print Results======================================================//
-    cout<<std::setw(10)<<" ";
+    cout << std::setw(10) << " ";
 
-    //Print Column Headers
-    for (int i =0; i< numberOfGames; i++){
-        cout<< std::setw(10)<< "Game " << i+1;
+    // Print Column Headers
+    for (int i = 0; i < numberOfGames; i++)
+    {
+        cout << std::setw(10) << "Game " << i + 1;
     }
 
-    cout<<endl;
+    cout << endl;
 
-    //Prints Rows (results)
-    for (int i = 0; i < numberOfMaps; ++i) {
+    // Prints Rows (results)
+    for (int i = 0; i < numberOfMaps; ++i)
+    {
         std::cout << std::setw(10) << "Map " << i + 1;
-        for (int j = 0; j < numberOfGames; ++j) {
+        for (int j = 0; j < numberOfGames; ++j)
+        {
             std::cout << std::setw(10) << results[i][j];
         }
         std::cout << std::endl;
     }
-
 }
 
 void GameEngine::setMaxTurns(int gameMaxTurns) { maxTurns = new int(gameMaxTurns); }
 int GameEngine::getMaxTurns() const { return *maxTurns; }
 
 int main()
+
 {
+
     GameEngine *engine = new GameEngine();
 
     engine->startupPhase(*engine);
 
     delete engine;
+    // testPlayers();
 
     // testMainGameLoop();
 
@@ -980,20 +996,42 @@ bool GameEngine::reinforcementPhase()
     for (int i = 0; i < playerArray.size(); i++)
     {
         playerArray[i]->toDefend();
-        if (playerArray[i]->getSizeOfToDefend() == 0)
+        vector<Territory *> playerTerritories;
+        if (playerArray[i]->getSizeOfToDefend() == 0) // No territories to defend - have to check if player even has territories
         {
-            std::cout << "Player " << playerArray[i]->getPlayerID() << " has no territories, removing them from the game" << endl;
-            playerArray.erase(playerArray.begin() + i);
+            for (Territory *territory : map->getTerritories())
+            {
+                // Check to see player still has territories - will have its id in the map
+                if (playerArray[i]->getPlayerID() == territory->getPlayer())
+                {
+                    playerTerritories.push_back(territory); // Check all territries in map if ID of terr matches Id of player means
+                                                            // player still has territories so add to vector then we check if empty
+                }
+            }
+            // if vector is empty player has no territories - remove from game
+            if (playerTerritories.empty())
+            {
+                std::cout << "Player " << playerArray[i]->getPlayerID() << " has no territories, removing them from the game" << endl;
+                playerArray.erase(playerArray.begin() + i);
+            }
         }
     }
-
-
 
     if (playerArray.size() == 1)
     {
         std::cout << "\nPlayer " << playerArray[0]->getPlayerID() << " wins!!!\n"
                   << endl;
         return true;
+    }
+
+    // Players draw cards at start of every turn
+    for (Player *player : playerArray)
+    {
+        if (player->getInitStrategyName() != "Cheater")
+        { // cheater has no hand
+            cout << "Player " << player->getPlayerID() << " - " << player->getInitStrategyName() << endl;
+            player->getDeck()->draw(player->getHand());
+        }
     }
 
     // calculating troops for each player
@@ -1119,7 +1157,7 @@ void GameEngine::executeOrdersPhase()
                                 // TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "Neutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
-                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                                playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
                             }
                         }
 
@@ -1142,7 +1180,7 @@ void GameEngine::executeOrdersPhase()
                                 // TODO: rn changing to cheater player strat, once aggresive player strat is implemented change to that
                                 cout << "\nNeutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
 
-                                playerArray[i]->setPlayerStrategy(new CheaterPlayerStrategy());
+                                playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
                             }
                         }
 
@@ -1162,16 +1200,15 @@ void GameEngine::executeOrdersPhase()
               << endl;
 }
 
-vector<Player*> GameEngine::getPlayers() const 
+vector<Player *> GameEngine::getPlayers() const
 {
     return playerArray;
 }
 
 string GameEngine::mainGameLoop()
 
-
 {
-    
+
     int currentTurn = 0;
     // part 3 here - players already have to be set
     while (true)

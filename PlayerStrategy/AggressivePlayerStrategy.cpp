@@ -74,6 +74,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 			deck->returnCard(card);
 			hand->removeCard(card);
 
+
 			cout << "\nEnding turn\n" << endl;
 			return false;
 		}
@@ -103,7 +104,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 			//Once adjacent territories' troops are all 0, the strongest territory will attack a random enemy territory
 			Territory* target = map->getTerritory(toAttackTerritories[rand() % player->getSizeOfToAttack()].getName());
 			
-			ordersList->add(new Advance(player->getPlayerID(), "", std::numeric_limits<int>::max(), strongestTerritory, target));
+			ordersList->add(new Advance(player->getPlayerID(), "", strongestTerritory->getArmy(), strongestTerritory, target));
 			cout << "\nAdvancing all troops from " << strongestTerritory->getName() << " to " << target->getName();
 			cout << "\nEnding turn\n" << endl;
 			return true;

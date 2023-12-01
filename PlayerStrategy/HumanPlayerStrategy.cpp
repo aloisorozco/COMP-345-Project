@@ -218,6 +218,7 @@ bool HumanPlayerStrategy::issueOrder(Player* player) {
 		cout << "Option 3: End turn\n" << endl;
 		return true;
 	}
+	
 }
 
 Territory* HumanPlayerStrategy::toAttack(Player* player) {

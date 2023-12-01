@@ -82,16 +82,19 @@ void testPlayers() {
 
 	Deck* deck = new Deck();
 
-	AggressivePlayerStrategy* aps1 = new AggressivePlayerStrategy();
-	AggressivePlayerStrategy* aps2 = new AggressivePlayerStrategy();
+	PlayerStrategy* aps1;
+	PlayerStrategy* aps2;
+
+	aps1 = new AggressivePlayerStrategy();
+	aps2 = new AggressivePlayerStrategy();
 
 	Player* player1 = new Player(map, deck, aps1);
     Player* player2 = new Player(map, deck, aps2);
 
 
 	////Testing stream insertion
-	cout << *player1;
-	cout << *player2;
+	cout << player1->getInitStrategyName() << endl;
+	cout << player2->getInitStrategyName() << endl;
 
 	cout << "Player 2 strongest territory: " << aps2->getStrongestTerritory(player2)->getName() << endl;
 	cout << "Player 2 second strongest territory: " << aps2->getSecondStrongestTerritory(player2)->getName() << endl;

@@ -9,440 +9,491 @@
 #include "../Map/Map.h"
 using namespace std;
 
-class Order : public Subject, public ILoggable{
-    protected:
-        //ID of the player Issuing the order
-        int* playerIssuerID;
+class Order : public Subject, public ILoggable
+{
+protected:
+    // ID of the player Issuing the order
+    int *playerIssuerID;
 
-        //Description of the order
-        string* description;
+    // Description of the order
+    string *description;
 
-    public:
-        Order() : playerIssuerID(nullptr), description(new string("This is a generic order"))  {}
-        Order(int playerID, const std::string desc) : playerIssuerID(new int(playerID)), description(new string(desc)) {}
-        Order(const Order& other) : playerIssuerID(new int(*other.playerIssuerID)), description(new string(*other.description)) {}
+public:
+    Order() : playerIssuerID(nullptr), description(new string("This is a generic order")) {}
+    Order(int playerID, const std::string desc) : playerIssuerID(new int(playerID)), description(new string(desc)) {}
+    Order(const Order &other) : playerIssuerID(new int(*other.playerIssuerID)), description(new string(*other.description)) {}
 
-        Order& operator=(const Order& other) {
+    Order &operator=(const Order &other)
+    {
 
-            if (this != &other) {
-                delete playerIssuerID;
-                delete description;
-
-                this->description = new string(*other.description);
-                this->playerIssuerID = new int(*other.playerIssuerID);
-            }
-            return *this;
-        }
-
-        ~Order(){
-
+        if (this != &other)
+        {
             delete playerIssuerID;
             delete description;
+
+            this->description = new string(*other.description);
+            this->playerIssuerID = new int(*other.playerIssuerID);
         }
+        return *this;
+    }
 
-        virtual bool validate();
-        virtual int execute();
+    ~Order()
+    {
 
-        friend ostream& operator<<(std::ostream& os, const Order& order) {
-            os << "Order description: " << endl;
-            //os << order.description << " executed by Player " << order.playerIssuerID << "\n";
-            return os;
+        delete playerIssuerID;
+        delete description;
+    }
+
+    virtual bool validate();
+    virtual int execute();
+
+    friend ostream &operator<<(std::ostream &os, const Order &order)
+    {
+        os << "Order description: " << endl;
+        // os << order.description << " executed by Player " << order.playerIssuerID << "\n";
+        return os;
+    }
+
+    virtual string getDescription() const
+    {
+        if (this->description != nullptr)
+        {
+            return *this->description;
         }
-
-        virtual string getDescription() const {
-            if(this->description != nullptr){
-                return *this->description;
-            }
-            else{
-                return "Error, null pointer";
-            }
+        else
+        {
+            return "Error, null pointer";
         }
+    }
 
-        virtual int getPlayerIssuerID() const {
-            return *this->playerIssuerID;
-        }
+    virtual int getPlayerIssuerID() const
+    {
+        return *this->playerIssuerID;
+    }
 
-        string stringToLog() override;
+    string stringToLog() override;
 };
 
-class Deploy : public Order{
+class Deploy : public Order
+{
 
-    private:
-        //Number of troops to deploy
-        int* troops;
+private:
+    // Number of troops to deploy
+    int *troops;
 
-        //Territory to send troops to
-        Territory* target;
+    // Territory to send troops to
+    Territory *target;
 
-    public:
-        Deploy() : Order() {
-            *description = "This is a deploy order";
-            troops = new int(0);
-            target = nullptr;
-        }
+public:
+    Deploy() : Order()
+    {
+        *description = "This is a deploy order";
+        troops = new int(0);
+        target = nullptr;
+    }
 
-        Deploy(int playerID, const std::string& desc, int troops, Territory* target) : Order(playerID, desc), troops(new int(troops)), target(target) {
-            description = new string("Deploy order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been deployed to " + target->getName());
+    Deploy(int playerID, const std::string &desc, int troops, Territory *target) : Order(playerID, desc), troops(new int(troops)), target(target)
+    {
+        description = new string("Deploy order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been deployed to " + target->getName());
+    }
 
-        }
+    Deploy(const Deploy &other) : Order(other), troops(new int(*other.troops)), target(other.target) {}
 
-        Deploy(const Deploy& other) : Order(other), troops(new int(*other.troops)), target(other.target) {}
+    ~Deploy()
+    {
 
-        ~Deploy() {
+        Order::~Order();
+        delete troops;
+    }
 
-            Order::~Order();
+    Deploy &operator=(const Deploy &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
             delete troops;
+            this->troops = new int(*other.troops);
+            this->target = other.target;
         }
+        return *this;
+    }
 
-        Deploy& operator=(const Deploy& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                delete troops;
-                this->troops = new int(*other.troops);
-                this->target = other.target;
-            }
-            return *this;
-        }
+    friend ostream &operator<<(std::ostream &os, const Deploy &order)
+    {
+        os << *order.description;
+        return os;
+    }
 
-        friend ostream& operator<<(std::ostream& os, const Deploy& order) {
-            os << *order.description;
-            return os;
-        }
+    bool validate() override;
+    int execute() override;
 
-        bool validate() override;
-        int execute() override;
+    int getTroops() const { return *troops; }
+    void setTroops(int value) { *troops = value; }
 
-        int getTroops() const { return *troops; }
-        void setTroops(int value) { *troops = value; }
-
-        Territory* getTarget() const { return target; }
-        void setTarget(Territory* value) { target = value; }
-
+    Territory *getTarget() const { return target; }
+    void setTarget(Territory *value) { target = value; }
 };
 
-class Advance : public Order{
+class Advance : public Order
+{
 
-    private:
+private:
+    // Number of troops to advance from source
+    int *troops;
 
-        //Number of troops to advance from source
-        int* troops;
+    // Source of the troops
+    Territory *source;
 
-        //Source of the troops
-        Territory* source;
+    // Territory to send troops to
+    Territory *target;
 
-        //Territory to send troops to
-        Territory* target;
+public:
+    Advance() : Order()
+    {
+        description = new std::string("This is an advance order");
+        troops = new int(0);
+        source = nullptr;
+        target = nullptr;
+    }
 
-    public:
-        Advance() : Order() {
-            *description = "This is an advance order";
-            troops = new int(0);
-            source = nullptr;
-            target = nullptr;
-        }
+    Advance(int playerID, const std::string &desc, int troops, Territory *source, Territory *target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target)
+    {
+        // Use std::to_string to convert integers to strings
+        description = new std::string("Advance order executed by Player " + std::to_string(playerID) + ": " + std::to_string(troops) + " troops have been advanced from " + source->getName() + " to " + target->getName());
+    }
+    
+    Advance(const Advance &other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
 
-        Advance(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {
-            description = new string("Advance order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been advanced from " + source->getName() + " to " + target->getName());
+    ~Advance()
+    {
+        Order::~Order();
+        delete troops;
+    }
 
-        }
-
-        Advance(const Advance& other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
-
-        ~Advance() {
-            Order::~Order();
+    Advance &operator=(const Advance &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
             delete troops;
+            delete description;
+            this->troops = new int(*other.troops);
+            this->source = other.source;
+            this->target = other.target;
+            this->description = new std::string(*other.description);
         }
+        return *this;
+    }
 
-        Advance& operator=(const Advance& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                delete troops;
-                this->troops = new int(*other.troops);
-                this->source = other.source;
-                this->target = other.target;
-            }
-            return *this;
-        }
+    friend ostream &operator<<(std::ostream &os, const Advance &order)
+    {
+        os << *order.description;
+        return os;
+    }
 
-        friend ostream& operator<<(std::ostream& os, const Advance& order) {
-            os << *order.description;
-            return os;
-        }
+    bool validate() override;
+    int execute() override;
 
-        bool validate() override;
-        int execute() override;
+    int getTroops() const { return *troops; }
+    void setTroops(int value) { *troops = value; }
 
-        int getTroops() const { return *troops; }
-        void setTroops(int value) { *troops = value; }
+    Territory *getSource() const { return source; }
+    void setSource(Territory *value) { source = value; }
 
-        Territory* getSource() const { return source; }
-        void setSource(Territory* value) { source = value; }
-
-        Territory* getTarget() const { return target; }
-        void setTarget(Territory* value) { target = value; }
-
+    Territory *getTarget() const { return target; }
+    void setTarget(Territory *value) { target = value; }
 };
 
-class Bomb : public Order{
+class Bomb : public Order
+{
 
-    private:
+private:
+    // Territory to send the bomb order to
+    Territory *target;
 
-        //Territory to send the bomb order to
-        Territory* target;
+public:
+    Bomb() : Order()
+    {
+        *description = "This is a bomb order";
+        target = nullptr;
+    }
 
-    public:
-        Bomb() : Order() {
-            *description = "This is a bomb order";
-            target = nullptr;
+    Bomb(int playerID, const std::string &desc, Territory *target) : Order(playerID, desc), target(target)
+    {
+        description = new string("Bomb order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been bombed ");
+    }
+
+    Bomb(const Bomb &other) : Order(other), target(other.target) {}
+
+    ~Bomb()
+    {
+        Order::~Order();
+    }
+
+    Bomb &operator=(const Bomb &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
+            this->target = other.target;
         }
+        return *this;
+    }
 
-        Bomb(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {
-            description = new string("Bomb order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been bombed ");
-        }
+    friend ostream &operator<<(std::ostream &os, const Bomb &order)
+    {
+        os << *order.description;
+        return os;
+    }
 
-        Bomb(const Bomb& other) : Order(other), target(other.target) {}
+    bool validate() override;
+    int execute() override;
 
-        ~Bomb() {
-            Order::~Order();
-        }
-
-        Bomb& operator=(const Bomb& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                this->target = other.target;
-            }
-            return *this;
-        }
-
-        friend ostream& operator<<(std::ostream& os, const Bomb& order) {
-            os << *order.description;
-            return os;
-        }
-
-        bool validate() override;
-        int execute() override;
-
-        Territory* getTarget() const { return target; }
-        void setTarget(Territory* value) { target = value; }
-
+    Territory *getTarget() const { return target; }
+    void setTarget(Territory *value) { target = value; }
 };
 
-class Blockade : public Order{
+class Blockade : public Order
+{
 
-    private:
-        //Territory to blockade
-        Territory* target;
+private:
+    // Territory to blockade
+    Territory *target;
 
-    public:
-        Blockade() : Order() {
-            *description = "This is a blockade order";
-            target = nullptr;
+public:
+    Blockade() : Order()
+    {
+        *description = "This is a blockade order";
+        target = nullptr;
+    }
+
+    Blockade(int playerID, const std::string &desc, Territory *target) : Order(playerID, desc), target(target)
+    {
+        description = new string("Blockade order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been blockaded ");
+    }
+
+    Blockade(const Blockade &other) : Order(other), target(other.target) {}
+
+    ~Blockade()
+    {
+        Order::~Order();
+    }
+
+    Blockade &operator=(const Blockade &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
+            this->target = other.target;
         }
+        return *this;
+    }
 
-        Blockade(int playerID, const std::string& desc, Territory* target) : Order(playerID, desc), target(target) {
-            description = new string("Blockade order executed by Player " + to_string(playerID) + ": " + target->getName() + " has been blockaded ");
-        }
+    friend ostream &operator<<(std::ostream &os, const Blockade &order)
+    {
+        os << *order.description;
+        return os;
+    }
 
-        Blockade(const Blockade& other) : Order(other), target(other.target) {}
+    bool validate() override;
+    int execute() override;
 
-        ~Blockade() {
-            Order::~Order();
-        }
-
-        Blockade& operator=(const Blockade& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                this->target = other.target;
-            }
-            return *this;
-        }
-
-        friend ostream& operator<<(std::ostream& os, const Blockade& order) {
-            os << *order.description;
-            return os;
-        }
-
-        bool validate() override;
-        int execute() override;
-
-        Territory* getTarget() const { return target; }
-        void setTarget(Territory* value) { target = value; }
+    Territory *getTarget() const { return target; }
+    void setTarget(Territory *value) { target = value; }
 };
 
-class Airlift : public Order{
+class Airlift : public Order
+{
 
-    private:
+private:
+    // Number of troops to send
+    int *troops;
 
-        //Number of troops to send
-        int* troops;
+    // Source territory
+    Territory *source;
 
-        //Source territory
-        Territory* source;
+    // Target territory
+    Territory *target;
 
-        //Target territory
-        Territory* target;
+public:
+    Airlift() : Order()
+    {
+        *description = "This is an airlift order";
+        troops = new int(0);
+        source = nullptr;
+        target = nullptr;
+    }
 
-    public:
-        Airlift() : Order() {
-            *description = "This is an airlift order";
-            troops = new int(0);
-            source = nullptr;
-            target = nullptr;
-        }
+    Airlift(int playerID, const std::string &desc, int troops, Territory *source, Territory *target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target)
+    {
+        description = new string("Airlift order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been airlifted from " + source->getName() + " to " + target->getName());
+    }
 
-        Airlift(int playerID, const std::string& desc, int troops, Territory* source, Territory* target) : Order(playerID, desc), troops(new int(troops)), source(source), target(target) {
-            description = new string("Airlift order executed by Player " + to_string(playerID) + ": " + to_string(troops) + " troops have been airlifted from " + source->getName() + " to " + target->getName());
+    Airlift(const Airlift &other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
 
-        }
+    ~Airlift()
+    {
+        Order::~Order();
+        delete troops;
+    }
 
-        Airlift(const Airlift& other) : Order(other), troops(new int(*other.troops)), source(other.source), target(other.target) {}
-
-        ~Airlift() {
-            Order::~Order();
+    Airlift &operator=(const Airlift &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
             delete troops;
+            this->troops = new int(*other.troops);
+            this->source = other.source;
+            this->target = other.target;
         }
+        return *this;
+    }
 
-        Airlift& operator=(const Airlift& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                delete troops;
-                this->troops = new int(*other.troops);
-                this->source = other.source;
-                this->target = other.target;
-            }
-            return *this;
-        }
+    friend ostream &operator<<(std::ostream &os, const Airlift &order)
+    {
+        os << *order.description;
+        return os;
+    }
 
-        friend ostream& operator<<(std::ostream& os, const Airlift& order) {
-            os << *order.description;
-            return os;
-        }
+    bool validate() override;
+    int execute() override;
 
-        bool validate() override;
-        int execute() override;
+    int getTroops() const { return *troops; }
+    void setTroops(int value) { *troops = value; }
 
-        int getTroops() const { return *troops; }
-        void setTroops(int value) { *troops = value; }
+    Territory *getSource() const { return source; }
+    void setSource(Territory *value) { source = value; }
 
-        Territory* getSource() const { return source; }
-        void setSource(Territory* value) { source = value; }
-
-        Territory* getTarget() const { return target; }
-        void setTarget(Territory* value) { target = value; }
-
+    Territory *getTarget() const { return target; }
+    void setTarget(Territory *value) { target = value; }
 };
 
-class Negotiate : public Order{
+class Negotiate : public Order
+{
 
-    private:
-        //Player ID to negotiate with
-        int* targetPlayerID;
+private:
+    // Player ID to negotiate with
+    int *targetPlayerID;
 
-        //Array to store negotiations for the negotiations. To be cleared at the end of the turn.
-        static std::vector<std::pair<int, int>> negotiations;
+    // Array to store negotiations for the negotiations. To be cleared at the end of the turn.
+    static std::vector<std::pair<int, int>> negotiations;
 
-    public:
-        Negotiate() : Order() {
-            *description = "This is a Negotiate order";
-            targetPlayerID = new int(0);
-        }
+public:
+    Negotiate() : Order()
+    {
+        *description = "This is a Negotiate order";
+        targetPlayerID = new int(0);
+    }
 
-        Negotiate(int playerID, const std::string& desc, int targetPlayerID) : Order(playerID, desc), targetPlayerID(new int(targetPlayerID)) {
-            description = new string("Negotiate order executed by Player " + to_string(playerID) + " with Player " + to_string(targetPlayerID));
-        }
+    Negotiate(int playerID, const std::string &desc, int targetPlayerID) : Order(playerID, desc), targetPlayerID(new int(targetPlayerID))
+    {
+        description = new string("Negotiate order executed by Player " + to_string(playerID) + " with Player " + to_string(targetPlayerID));
+    }
 
-        Negotiate(const Negotiate& other) : Order(other), targetPlayerID(new int(*other.targetPlayerID)) {}
+    Negotiate(const Negotiate &other) : Order(other), targetPlayerID(new int(*other.targetPlayerID)) {}
 
-        ~Negotiate() {
-            Order::~Order();
+    ~Negotiate()
+    {
+        Order::~Order();
+        delete targetPlayerID;
+    }
+
+    Negotiate &operator=(const Negotiate &other)
+    {
+        if (this != &other)
+        {
+            Order::operator=(other);
             delete targetPlayerID;
+            this->targetPlayerID = new int(*other.targetPlayerID);
+        }
+        return *this;
+    }
+
+    friend ostream &operator<<(std::ostream &os, const Negotiate &order)
+    {
+        os << *order.description;
+        return os;
+    }
+
+    static void addNegotiation(int player1, int player2)
+    {
+        negotiations.push_back(std::make_pair(player1, player2));
+    }
+
+    static bool isNegotiation(int player1, int player2)
+    {
+        for (std::pair pair : negotiations)
+        {
+            if ((pair.first == player1 || pair.second == player1) && (pair.first == player2 || pair.second == player2) && (player1 != player2))
+                return true;
         }
 
-        Negotiate& operator=(const Negotiate& other) {
-            if (this != &other) {
-                Order::operator=(other);
-                delete targetPlayerID;
-                this->targetPlayerID = new int(*other.targetPlayerID);
-            }
-            return *this;
-        }
+        return false;
+    }
 
-        friend ostream& operator<<(std::ostream& os, const Negotiate& order) {
-            os << *order.description;
-            return os;
-        }
+    static void emptyNegotiations()
+    {
+        negotiations.clear();
+    }
 
-        static void addNegotiation(int player1, int player2){
-            negotiations.push_back(std::make_pair(player1, player2));
-        }
+    bool validate() override;
+    int execute() override;
 
-        static bool isNegotiation(int player1, int player2){
-            for(std::pair pair : negotiations){
-                if((pair.first == player1 || pair.second == player1) && (pair.first == player2 || pair.second == player2) && (player1 != player2))
-                    return true;
-            }
-
-            return false;
-        }
-
-        static void emptyNegotiations(){
-            negotiations.clear();
-        }
-
-        bool validate() override;
-        int execute() override;
-
-        int getPlayerTargetID() const { return *targetPlayerID; }
-        void setPlayerTargetID(int value) { *targetPlayerID = value; }
-
+    int getPlayerTargetID() const { return *targetPlayerID; }
+    void setPlayerTargetID(int value) { *targetPlayerID = value; }
 };
 
-class OrdersList : public ILoggable, public Subject{
+class OrdersList : public ILoggable, public Subject
+{
 
-    private:
-      
-        std::vector<Order*> orders;
-        void copyOrders(const OrdersList& other);
+private:
+    std::vector<Order *> orders;
+    void copyOrders(const OrdersList &other);
 
-    public:
-        OrdersList() = default;
-        OrdersList(const OrdersList& other);
+public:
+    OrdersList() = default;
+    OrdersList(const OrdersList &other);
 
-        ~OrdersList() {
-            for (Order* order : orders) {
-                delete order;
-            }
-
-            orders.clear();
+    ~OrdersList()
+    {
+        for (Order *order : orders)
+        {
+            delete order;
         }
 
-        OrdersList& operator=(const OrdersList& other);
+        orders.clear();
+    }
 
-        int add(Order* order);
-        int move(int index1, int index2);
-        int remove();
-        int remove(int index);
-        void clear();
-        int executeAll();
+    OrdersList &operator=(const OrdersList &other);
 
-        Order* get(int index) {
-            return orders[index];
-        }
+    int add(Order *order);
+    int move(int index1, int index2);
+    int remove();
+    int remove(int index);
+    void clear();
+    int executeAll();
 
-        vector<Order*> getOrders() {
-            return orders;
-        }
+    Order *get(int index)
+    {
+        return orders[index];
+    }
 
-        void setOrder(vector<Order*> ordersVector) {
-            orders = ordersVector;
-        }
+    vector<Order *> getOrders()
+    {
+        return orders;
+    }
 
-        friend std::ostream& operator<<(std::ostream& os, const OrdersList& ordersList);
+    void setOrder(vector<Order *> ordersVector)
+    {
+        orders = ordersVector;
+    }
 
+    friend std::ostream &operator<<(std::ostream &os, const OrdersList &ordersList);
 
-        string stringToLog() override;
+    string stringToLog() override;
 
-        void addOrders(const Order& o);
+    void addOrders(const Order &o);
 };
 
 // free function declaration

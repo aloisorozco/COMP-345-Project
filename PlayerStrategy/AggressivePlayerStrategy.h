@@ -20,6 +20,7 @@ public:
 	}
 
 	string getStrategyName();
+	
 	Territory* getStrongestTerritory(Player* player);
 	Territory* getSecondStrongestTerritory(Player* player);
 

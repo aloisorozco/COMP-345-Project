@@ -107,7 +107,7 @@ void Territory::removeTroops(int troops) {if(troops <= *army){*army = *army - tr
 void Territory::transferTroops(Territory* territory, int troops){
 
     if(this->getPlayer() == territory->getPlayer()){
-        if(*this->army >= troops){
+        if(this->getArmy() >= troops){
             this->removeTroops(troops);
             territory->addTroops(troops);
         }
