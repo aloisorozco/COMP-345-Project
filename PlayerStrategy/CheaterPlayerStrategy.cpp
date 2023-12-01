@@ -16,20 +16,6 @@ bool CheaterPlayerStrategy::issueOrder(Player* player) {
 	Territory* toAttackTerritories = toAttack(player);
 
 	cout << "\nCheater Player " << player->getPlayerID() << "'s issue order\n" << endl;
-
-	//idk if we should include this or not for AI players
-	/*cout << "\nTerritories to defend for player " << player->getPlayerID() << endl;
-	for (int i = 0; i < player->getSizeOfToDefend(); i++) {
-		cout << toDefendTerritories[i] << endl;
-	}
-	cout << "---\n" << endl;
-
-	cout << "Territories to attack for player " << player->getPlayerID() << endl;
-	for (int i = 0; i < player->getSizeOfToAttack(); i++) {
-		cout << toAttackTerritories[i] << endl;
-	}
-	cout << "---\n" << endl;*/
-
 	//if player has troops to deploy, player is forced to deploy them can't issue another order
 	//can remove this if if cheater player should ignore his reinforcement pool (since he is cheating)
 	if (*player->getTroopsToDeploy() > 0) {
@@ -61,7 +47,7 @@ bool CheaterPlayerStrategy::issueOrder(Player* player) {
 
             cout << "\nConquering territory " << toAttackTerritories[i].getName() << endl;
             cout<< map->getTerritory(toAttackTerritories[i].getName())->getName()<< endl;
-            cout << player->getPlayerID() << endl;
+            cout <<"Attacking player: "<< player->getPlayerID() << endl;
             map->getTerritory(toAttackTerritories[i].getName())->setPlayer(player->getPlayerID());
 
         }

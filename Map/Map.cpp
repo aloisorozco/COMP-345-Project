@@ -288,13 +288,16 @@ void Map::setContinents(const vector<Continent *> &continents)
         }
     }
 }
-
 Territory* Map::getTerritory(string name) {
-    for (Territory* territory : territories) {
-        if (territory->getName() == name) {
-            return territory;
+    continents = this->getContinents();
+    for (Continent *continent : continents) {
+        for (Territory *territory : continent->getTerritories()) {
+            if (territory->getName() == name) {
+                return territory;
+            }
         }
     }
+
     return NULL;
 }
 

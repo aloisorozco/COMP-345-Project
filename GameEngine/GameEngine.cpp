@@ -530,7 +530,9 @@ void GameEngine::issueOrdersPhase() {
     {
         for (int i = 0; i < playerArray.size(); i++)
         {
-            if (playersDoneArray[i])
+            PlayerStrategy* strategy = playerArray[i]->getPlayerStrategy();
+            // skip orders from those that are done and Cheater.
+            if (playersDoneArray[i] || dynamic_cast<CheaterPlayerStrategy*>(strategy) != nullptr )
             {
                 continue;
             }
@@ -548,6 +550,7 @@ void GameEngine::issueOrdersPhase() {
     }
     std::cout << "--------------------\n"
               << endl;
+
 }
 
 void GameEngine::executeOrdersPhase()
@@ -557,6 +560,7 @@ void GameEngine::executeOrdersPhase()
     while (true)
     {
         bool executeOrdersDone = true;
+
         for (int i = 0; i < playerArray.size(); i++)
         {
             Order *order = playerArray[i]->getNextInOrdersList();
@@ -592,8 +596,9 @@ void GameEngine::executeOrdersPhase()
 
                             if (*playerAttackedID == playerArray[i]->getPlayerID()) {
                                 cout << "Neutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
-
+                                cout<< "Player was set to Strategy: " <<playerArray[i]->getPlayerStrategy()<<endl;
                                 playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
+                                cout<< "Player is now set to Strategy: " <<playerArray[i]->getPlayerStrategy()<<endl;
                             }
                         }
 
@@ -610,8 +615,9 @@ void GameEngine::executeOrdersPhase()
 
                             if (*playerAttackedID == playerArray[i]->getPlayerID()) {
                                 cout << "\nNeutral Player " << playerArray[i]->getPlayerID() << " attacked, converting into an Aggressive Player" << endl;
-
+                                cout<< "Player was set to Strategy: " <<playerArray[i]->getPlayerStrategy()<<endl;
                                 playerArray[i]->setPlayerStrategy(new AggressivePlayerStrategy());
+                                cout<< "Player is now set to Strategy: " <<playerArray[i]->getPlayerStrategy()<<endl;
                             }
                         }
 

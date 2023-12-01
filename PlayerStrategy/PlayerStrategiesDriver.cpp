@@ -147,7 +147,7 @@ void testPlayers() {
     Deck* deck = new Deck();
 
     AggressivePlayerStrategy* aps1 = new AggressivePlayerStrategy();
-    AggressivePlayerStrategy* aps2 = new AggressivePlayerStrategy();
+    BenevolentPlayerStrategy* aps2 = new BenevolentPlayerStrategy();
 
     Player* player1 = new Player(map, deck, aps1);
     Player* player2 = new Player(map, deck, aps2);
@@ -158,7 +158,7 @@ void testPlayers() {
     cout << *player2;
 
     cout << "Player 2 strongest territory: " << aps2->getStrongestTerritory(player2)->getName() << endl;
-    cout << "Player 2 second strongest territory: " << aps2->getSecondStrongestTerritory(player2)->getName() << endl;
+    //cout << "Player 2 second strongest territory: " << aps2->getSecondStrongestTerritory(player2)->getName() << endl;
 
     player1->setTroopsToDeploy(10);
     player2->setTroopsToDeploy(10);

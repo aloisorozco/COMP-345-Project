@@ -53,7 +53,7 @@ int main() {
             case 2:
                 // call function to test player
                 //testPlayerStrategies();
-                //testPlayers();
+                testPlayers();
                 break;
 
             case 3:
