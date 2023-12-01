@@ -726,13 +726,12 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                     PlayerStrategy *strategy;
                     if (playerStrategies[j] == "aggressive")
                     {
-                        cout << "=============TEST===============" << endl;
                         strategy = new AggressivePlayerStrategy();
                     }
-                    // else if (playerStrategies[j] == "benevolent")
-                    // {
-                    //     strategy = new BenevolentPlayerStrategy();
-                    // }
+                    else if (playerStrategies[j] == "benevolent")
+                    {
+                        strategy = new BenevolentPlayerStrategy();
+                    }
                     else if (playerStrategies[j] == "cheater")
                     {
                         strategy = new CheaterPlayerStrategy();
