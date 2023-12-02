@@ -562,7 +562,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
             {
                 cout << "Too few turns. Number of turns is set to 10\n"
                      << endl;
-                maxTurns = 2; // set turns to 10 if number too low
+                maxTurns = 10; // set turns to 10 if number too low
             }
         }
     }
@@ -902,81 +902,7 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
 void GameEngine::setMaxTurns(int gameMaxTurns) { maxTurns = new int(gameMaxTurns); }
 int GameEngine::getMaxTurns() const { return *maxTurns; }
 
-int main()
 
-{
-
-    GameEngine *engine = new GameEngine();
-
-    engine->startupPhase(*engine);
-
-    delete engine;
-    // testPlayers();
-
-    // testMainGameLoop();
-
-    // Map *map = new Map();
-    // cout<<"map created"<<endl;
-
-    // Deck *deck = new Deck();
-    // cout<<"deck created"<<endl;
-
-    // PlayerStrategy *strategy2 = new NeutralPlayerStrategy();
-    // cout<<"strategy created"<<endl;
-
-    // Player* player2 = new Player(map, deck, strategy2);
-    // cout<<player2->getPlayerStrategyName()<<endl;
-    // delete player2;
-    // cout<<"player deleted"<<endl;
-
-    // cout << "success" << endl;
-
-    //    MapLoader loader;
-    // Map* testMap = loader.loadMap();
-
-    // cout << *testMap << endl;
-
-    // if (testMap->validate())
-    // {
-    //     cout << "\n\nMap is valid" << endl;
-    // }
-    // else
-    // {
-    //     cout << "Map is not valid" << endl;
-    // }
-
-    // Deck* deck = new Deck();
-
-    // GameEngine* engine = new GameEngine();
-
-    // PlayerStrategy* strategy = new CheaterPlayerStrategy();
-    // PlayerStrategy* cheaterStrategy = new NeutralPlayerStrategy();
-
-    // Player* p1 = new Player(testMap, deck, strategy);
-    // Player* p2 = new Player(testMap, deck, cheaterStrategy);
-    // Player* p3 = new Player(testMap, deck, strategy);
-
-    // for (int i = 0; i < 5; i++) {
-    //     deck->draw(p1->getHand());
-    // }
-
-    // engine->addPlayer(p1);
-    // engine->addPlayer(p2);
-    // engine->addPlayer(p3);
-
-    // testMap->setContinents(testMap->getContinents());
-
-    // for (Territory* territory : testMap->getTerritories()) {
-    //     territory->setPlayer(1);
-    // }
-    // testMap->getTerritories()[0]->setPlayer(2);
-
-    // cout << "Main Game Loop start: " << endl;
-
-    // engine->mainGameLoop();
-
-    return 0;
-}
 
 void GameEngine::play(GameEngine &engineArg)
 {

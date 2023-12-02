@@ -202,3 +202,7 @@ Territory* BenevolentPlayerStrategy::getStrongestTerritory(Player* player){
     }
     return strongestTerritory;
 }
+
+string BenevolentPlayerStrategy::getStrategyName(){
+    return "Benevolent";
+}

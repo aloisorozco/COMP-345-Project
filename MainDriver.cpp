@@ -11,6 +11,7 @@
 #include "CommandProcessor/CommandProcessing.h"
 #include "Observer/LoggingObserver.h"
 #include "Map/Map.h"
+#include "GameEngine/TournamentDriver.cpp"
 
 
 void printMenu() {
@@ -25,6 +26,8 @@ void printMenu() {
     std::cout << "8. Command Processing\n";
     std::cout<< "9. Startup Phase\n";
     std::cout << "10. Main Game Loop\n";
+
+    std::cout<<"11. Tournament\n";
     std::cout << "Enter number > ";
 }
 
@@ -89,6 +92,9 @@ int main() {
             case 10:
                 testMainGameLoop();
                 break;
+
+            case 11:
+                testTournament();
 
             default:
                 std::cout << "Invalid choice. Please enter a number between 1 and 6.\n";
