@@ -495,6 +495,7 @@ Map *MapLoader::loadMap()
 
     // Get the current working directory
     fs::path currentDir = fs::current_path();
+    cout<<currentDir<<endl;
 
     // Search for a ".map" file in the current directory
     vector<string> mapFiles;

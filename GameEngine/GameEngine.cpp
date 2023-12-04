@@ -14,6 +14,8 @@
 #include "../PlayerStrategy/HumanPlayerStrategy.h"
 #include "../PlayerStrategy/NeutralPlayerStrategy.h"
 #include "../PlayerStrategy/CheaterPlayerStrategy.h"
+#include "../PlayerStrategy/AggressivePlayerStrategy.h"
+#include "../PlayerStrategy/BenevolentPlayerStrategy.h"
 #include "../Map/Map.h"
 #include "../CommandProcessor/CommandProcessing.h"
 
@@ -726,10 +728,10 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                     {
                         strategy = new AggressivePlayerStrategy();
                     }
-                    // else if (playerStrategies[j] == "benevolent")
-                    // {
-                    //     strategy = new BenevolentPlayerStrategy();
-                    // }
+                    else if (playerStrategies[j] == "benevolent")
+                    {
+                        strategy = new BenevolentPlayerStrategy();
+                    }
                     else if (playerStrategies[j] == "cheater")
                     {
                         strategy = new CheaterPlayerStrategy();
@@ -1045,6 +1047,7 @@ void GameEngine::executeOrdersPhase()
                     if (bomb->getTarget() != NULL)
                     {
                         playerAttackedID = new int(bomb->getTarget()->getPlayer());
+                        
                     }
                 }
                 if (dynamic_cast<Advance *>(order) != NULL)

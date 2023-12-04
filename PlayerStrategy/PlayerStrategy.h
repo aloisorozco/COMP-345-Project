@@ -25,6 +25,8 @@ public:
 
 	virtual string getStrategyName() = 0;
 
+	virtual Territory* getWeakestTerritory(Player* player) {return NULL;};//empty default implementation will be overridden in benevolentPlayer strat
+
 	virtual Territory* getStrongestTerritory(Player* player) {return NULL;};//empty default implementation will be overridden in agressivePlayer strat
 	virtual Territory* getSecondStrongestTerritory(Player* player) {return NULL;};
 
