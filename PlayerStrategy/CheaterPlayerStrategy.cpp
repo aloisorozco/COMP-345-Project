@@ -59,9 +59,6 @@ bool CheaterPlayerStrategy::issueOrder(Player *player)
 	*/
 	else
 	{
-		// conquering territories like this instead of by orders since player is cheating
-		
-
 		for (int i = 0; i < player->getSizeOfToAttack(); i++)
 		{
 			// initialize vector that will have attck ource for creation of attack order
@@ -85,14 +82,8 @@ bool CheaterPlayerStrategy::issueOrder(Player *player)
 				}
 			}
 
-
 			// Adds order to send max int as troops to conquer territory instantly
 			ordersList->add(new Advance(player->getPlayerID(), "", std::numeric_limits<int>::max(), cheaterAttackingTerritories[0], map->getTerritory(toAttackTerritories[i].getName())));
-
-			// cout << "\nConquering territory " << toAttackTerritories[i].getName() << endl;
-			// cout<< map->getTerritory(toAttackTerritories[i].getName())->getName()<< endl;
-			// cout <<"Attacking player: "<< player->getPlayerID() << endl;
-			// map->getTerritory(toAttackTerritories[i].getName())->setPlayer(player->getPlayerID());
 		}
 
 		std::cout << "\nEnding turn\n"
