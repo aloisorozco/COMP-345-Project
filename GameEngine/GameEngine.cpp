@@ -14,8 +14,6 @@
 #include "../PlayerStrategy/HumanPlayerStrategy.h"
 #include "../PlayerStrategy/NeutralPlayerStrategy.h"
 #include "../PlayerStrategy/CheaterPlayerStrategy.h"
-#include "../PlayerStrategy/AggressivePlayerStrategy.h"
-#include "../PlayerStrategy/BenevolentPlayerStrategy.h"
 #include "../Map/Map.h"
 #include "../CommandProcessor/CommandProcessing.h"
 
@@ -1011,9 +1009,7 @@ void GameEngine::issueOrdersPhase()
     {
         for (int i = 0; i < playerArray.size(); i++)
         {
-            PlayerStrategy* strategy = playerArray[i]->getPlayerStrategy();
-            // skip orders from those that are done and Cheater.
-            if (playersDoneArray[i] || dynamic_cast<CheaterPlayerStrategy*>(strategy) != nullptr )
+            if (playersDoneArray[i])
             {
                 continue;
             }
@@ -1031,7 +1027,6 @@ void GameEngine::issueOrdersPhase()
     }
     std::cout << "--------------------\n"
               << endl;
-
 }
 
 void GameEngine::executeOrdersPhase()
@@ -1041,7 +1036,6 @@ void GameEngine::executeOrdersPhase()
     while (true)
     {
         bool executeOrdersDone = true;
-
         for (int i = 0; i < playerArray.size(); i++)
         {
             Order *order = playerArray[i]->getNextInOrdersList();

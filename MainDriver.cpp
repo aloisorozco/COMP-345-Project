@@ -7,7 +7,6 @@
 #include "Cards/Cards.h"
 #include "Orders/Orders.h"
 #include "Player/Player.h"
-#include "PlayerStrategy/PlayerStrategy.h"
 #include "CommandProcessor/CommandProcessing.h"
 #include "Observer/LoggingObserver.h"
 #include "Map/Map.h"
@@ -55,7 +54,6 @@ int main() {
 
             case 2:
                 // call function to test player
-                //testPlayerStrategies();
                 testPlayers();
                 break;
 

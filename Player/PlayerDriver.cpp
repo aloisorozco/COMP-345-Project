@@ -13,7 +13,7 @@ using namespace std;
 vector<Territory*> getTerritoryArray() {
 	vector<Territory*> territoryArray;
 
-   // Create Territories
+    // Create Territories
 	Territory* temp = new Territory("Yukon", "c1");
 	temp->setPlayer(2);
 	temp->setArmy(7);
@@ -107,7 +107,6 @@ void testPlayers() {
 
 	while(!player1->issueOrder());
 	while(!player2->issueOrder());
-
 	cout << "---" << endl;
 
 	////Testing attack and defend functions
@@ -127,7 +126,6 @@ void testPlayers() {
 		cout << toAttackTerritories[i] << endl;
 	}
 	cout << "---" << endl;
-
 	//Testing toDefend()
 	cout << "Territories to defend for " << *player2 << endl;
 	for (int i = 0; i < sizeOfToDefendP2; i++) {

@@ -298,6 +298,7 @@ Territory* Map::getTerritory(string name) {
             }
         }
     }
+    
     return NULL;
 }
 
@@ -494,8 +495,7 @@ Map *MapLoader::loadMap()
 
     // Get the current working directory
     fs::path currentDir = fs::current_path();
-    //needed to know where it's checking for maps.
-    cout<<currentDir<<endl;
+
     // Search for a ".map" file in the current directory
     vector<string> mapFiles;
     string mapFileName;

@@ -43,7 +43,6 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 		if(hand->getHandSize() > 0){
 
 			Card* card = hand->getCards().back();
-            cout<<"The card currently about to be played is :"<<card->cardTypeToString()<<endl;
 			Territory* target = map->getTerritory(toAttackTerritories[rand() % player->getSizeOfToAttack()].getName());
 
 			if(card->getType() == Card::ReinforcementCT){
@@ -67,7 +66,7 @@ bool AggressivePlayerStrategy::issueOrder(Player* player) {
 				cout << "\nAirlifting " << secondStrongest->getArmy() << " troops from " << secondStrongest->getName() << " to " << strongestTerritory->getName();
 			}
 
-			//Aggressive Player will ignore cards with no offensive nature
+			//Aggressive Player will ignore cards with no offencive nature
 			else{
 				cout << "\nNot issuing orders";
 			}
@@ -146,33 +145,15 @@ Territory* AggressivePlayerStrategy::toAttack(Player* player) {
 	return enemies;
 
 }
-//Just to print out what it currently owns.
+
+//Returns empty array because aggressive player won't take defensive approaches
 Territory* AggressivePlayerStrategy::toDefend(Player* player) {
-    Map* map = player->getMap();
-
-    if (map == NULL) {
-        return 0;
-    }
-
-    Territory* temp = new Territory[map->getTerritories().size()];
-    int count = 0;
-    for (Territory* territory : map->getTerritories()) {
-        if (territory->getPlayer() == player->getPlayerID()) {
-            temp[count] = *territory;
-            count++;
-        }
-    }
-
-    Territory* toDefend = new Territory[count];
-    for (int i = 0; i < count; i++) {
-        toDefend[i] = temp[i];
-    }
-
-    player->setSizeOfToDefend(count);
-    return toDefend;
+	
+	player->setSizeOfToDefend(0);
+	return new Territory[0];
 }
 
-//Returns the territory with the most troops, which is going to attack(borders enemy)
+//Returns the territory with the most troops, which is going to attack
 Territory* AggressivePlayerStrategy::getStrongestTerritory(Player* player){
 
 	Map* map = player->getMap();

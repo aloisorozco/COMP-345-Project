@@ -3,11 +3,9 @@
 #include <chrono>
 #include <thread>
 #include "GameEngine.h"
-#include "../PlayerStrategy/AggressivePlayerStrategy.h"
-#include "../PlayerStrategy/BenevolentPlayerStrategy.h"
-#include "../PlayerStrategy/CheaterPlayerStrategy.h"
 #include "../PlayerStrategy/HumanPlayerStrategy.h"
 #include "../PlayerStrategy/NeutralPlayerStrategy.h"
+#include "../PlayerStrategy/CheaterPlayerStrategy.h"
 
 // Console-driven interface that allows the user to navigate through all the states by typing commands
 void testGameStates(){
@@ -120,37 +118,23 @@ void testMainGameLoop() {
     }
 
     Deck* deck = new Deck();
-    deck->setDeckSize(12);
+
     GameEngine* engine = new GameEngine();
 
     PlayerStrategy* strategy = new NeutralPlayerStrategy();
-    PlayerStrategy* cheaterStrategy = new CheaterPlayerStrategy();
-    PlayerStrategy* benevolentStrategy = new BenevolentPlayerStrategy();
-    PlayerStrategy* aggressiveStrategy = new AggressivePlayerStrategy();
-    PlayerStrategy* humanStrategy = new HumanPlayerStrategy();
-    //(1) different players can be assigned different strategies that lead to different behavior using the Strategy design pattern;
+    PlayerStrategy* cheaterStrategy = new HumanPlayerStrategy();
+
     Player* p1 = new Player(testMap, deck, strategy);
     Player* p2 = new Player(testMap, deck, cheaterStrategy);
     Player* p3 = new Player(testMap, deck, strategy);
-    Player* p4 = new Player(testMap, deck, benevolentStrategy);
-    Player* p5 = new Player(testMap, deck, aggressiveStrategy);
-    Player* p6 = new Player(testMap, deck, humanStrategy);
 
-    //deck size 12, give 2 cards per player
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 5; i++) {
         deck->draw(p1->getHand());
-        deck->draw(p2->getHand());
-        deck->draw(p3->getHand());
-        deck->draw(p4->getHand());
-        deck->draw(p5->getHand());
-        deck->draw(p6->getHand());
     }
+
     engine->addPlayer(p1);
     engine->addPlayer(p2);
     engine->addPlayer(p3);
-    engine->addPlayer(p4);
-    engine->addPlayer(p5);
-    engine->addPlayer(p6);
 
     testMap->setContinents(testMap->getContinents());
 
@@ -158,11 +142,6 @@ void testMainGameLoop() {
         territory->setPlayer(1);
     }
     testMap->getTerritories()[0]->setPlayer(2);
-    testMap->getTerritories()[1]->setPlayer(3);
-    testMap->getTerritories()[2]->setPlayer(4);
-    testMap->getTerritories()[3]->setPlayer(5);
-    testMap->getTerritories()[4]->setPlayer(6);
-
 
     cout << "Main Game Loop start: " << endl;
 
