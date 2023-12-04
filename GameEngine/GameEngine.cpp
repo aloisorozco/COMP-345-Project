@@ -688,14 +688,12 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
     // Array to keep track of players in game and add them back into the playerArray after each game
     vector<Player *> players;
 
+    //Initialize observer
+    Observer* logObserver = new LogObserver();
+
     /////////////////// Games Start /////////////////////////
     for (int i = 0; i < numberOfGames; i++)
     {
-
-        // TODO: fix setMaxTurns
-
-        // engine->setMaxTurns(maxTurns);
-        // cout<<"Game loaded  -  "<< engine->getMaxTurns()<<endl;
 
         for (int l = 0; l < mapFiles.size(); l++)
         {
@@ -728,10 +726,10 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                     {
                         strategy = new AggressivePlayerStrategy();
                     }
-                    else if (playerStrategies[j] == "benevolent")
-                    {
-                        strategy = new BenevolentPlayerStrategy();
-                    }
+                    // else if (playerStrategies[j] == "benevolent")
+                    // {
+                    //     strategy = new BenevolentPlayerStrategy();
+                    // }
                     else if (playerStrategies[j] == "cheater")
                     {
                         strategy = new CheaterPlayerStrategy();
@@ -753,14 +751,6 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                 // Reset Player array so all players are in game
                 engine->setPlayers(players);
 
-                for (Player *player : players)
-                {
-                    cout << *player << endl;
-                }
-
-                for (Player* player: playerArray){
-                    cout<<*player<<endl;
-                }
                 // Reset players hand, deck and map
                 for (Player *player : playerArray)
                 {
@@ -774,7 +764,10 @@ void GameEngine::tournamentMode(GameEngine &engineArg, vector<string> commandWor
                     player->setMap(map);
                     player->setDeck(deck);
 
-                    cout << "player init" << endl;
+                    if (player->getInitStrategyName()== "Neutral"){
+                        player->setPlayerStrategy(new NeutralPlayerStrategy());
+                    }
+
                 }
 
                 engine->processCommand("addplayer");
